@@ -463,3 +463,5 @@ def sendDiscordNotification(title, message, type = "info") {
         echo "⚠️ Failed to send Discord notification: ${e.message}"
     }
 }
+
+}
