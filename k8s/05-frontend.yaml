@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: islamic-app-frontend
+  namespace: islamic-app
+  labels:
+    app: islamic-app-frontend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: islamic-app-frontend
+  template:
+    metadata:
+      labels:
+        app: islamic-app-frontend
+    spec:
+      containers:
+      - name: frontend
+        image: khaledhawil/islamic-app_frontend:1.0.1
+        # imagePullPolicy: Never  # For local development
+        env:
+        - name: REACT_APP_API_URL
+          valueFrom:
+            configMapKeyRef:
+              name: islamic-app-config
+              key: REACT_APP_API_URL
+        - name: NODE_ENV
+          valueFrom:
+            configMapKeyRef:
+              name: islamic-app-config
+              key: NODE_ENV
+        ports:
+        - containerPort: 3000
+          name: http
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 3000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: islamic-app-frontend
+  namespace: islamic-app
+  labels:
+    app: islamic-app-frontend
+spec:
+  type: ClusterIP
+  ports:
+  - port: 3000
+    targetPort: 3000
+    protocol: TCP
+    name: http
+  selector:
+    app: islamic-app-frontend
+---

@@ -1,0 +1,17 @@
+Flask>=2.2
+requests
+gunicorn
+Jinja2
+itsdangerous
+Werkzeug
+click
+Flask-CORS
+Flask-JWT-Extended
+Flask-SQLAlchemy
+Flask-Migrate
+psycopg2-binary
+python-dotenv
+marshmallow
+flask-marshmallow
+marshmallow-sqlalchemy
+python-dateutil

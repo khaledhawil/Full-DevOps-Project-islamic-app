@@ -1,0 +1,90 @@
+version: '3.8'
+
+services:
+  # Database Tier
+  database:
+    image: postgres:15-alpine
+    container_name: islamic-app-db
+    restart: always
+    environment:
+      POSTGRES_DB: islamic_app
+      POSTGRES_USER: islamic_user
+      POSTGRES_PASSWORD: islamic_pass123
+      POSTGRES_HOST_AUTH_METHOD: trust
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - islamic-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U islamic_user -d islamic_app"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Backend API Tier
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: islamic-app-backend
+    restart: always
+    environment:
+      FLASK_ENV: production
+      DATABASE_URL: postgresql://islamic_user:islamic_pass123@database:5432/islamic_app
+      SECRET_KEY: your-super-secret-key-change-in-production
+      JWT_SECRET_KEY: your-jwt-secret-key-change-in-production
+      CORS_ORIGINS: http://localhost:3000,http://frontend:3000,http://localhost:8090
+    ports:
+      - "5000:5000"
+    depends_on:
+      database:
+        condition: service_healthy
+    networks:
+      - islamic-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Frontend Tier
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: islamic-app-frontend
+    restart: always
+    environment:
+      REACT_APP_API_URL: http://localhost:8090/api
+      NODE_ENV: production
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - islamic-network
+
+  # Nginx Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    container_name: islamic-app-nginx
+    restart: always
+    ports:
+      - "8090:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - islamic-network
+
+networks:
+  islamic-network:
+    driver: bridge
+
+volumes:
+  postgres_data:

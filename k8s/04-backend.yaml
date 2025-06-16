@@ -1,0 +1,105 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: islamic-app-backend
+  namespace: islamic-app
+  labels:
+    app: islamic-app-backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: islamic-app-backend
+  template:
+    metadata:
+      labels:
+        app: islamic-app-backend
+    spec:
+      initContainers:
+      - name: wait-for-postgres
+        image: postgres:15-alpine
+        command: ['sh', '-c']
+        args:
+        - |
+          until pg_isready -h postgres -p 5432 -U islamic_user; do
+            echo "Waiting for postgres..."
+            sleep 2
+          done
+          echo "PostgreSQL is ready!"
+        env:
+        - name: PGPASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: islamic-app-secrets
+              key: postgres-password
+      containers:
+      - name: backend
+        image: khaledhawil/islamic-app_backend:1.0.0
+        # imagePullPolicy: Never  # For local development
+        env:
+        - name: FLASK_ENV
+          valueFrom:
+            configMapKeyRef:
+              name: islamic-app-config
+              key: FLASK_ENV
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: islamic-app-secrets
+              key: database-url
+        - name: SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: islamic-app-secrets
+              key: secret-key
+        - name: JWT_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: islamic-app-secrets
+              key: jwt-secret-key
+        - name: CORS_ORIGINS
+          valueFrom:
+            configMapKeyRef:
+              name: islamic-app-config
+              key: CORS_ORIGINS
+        ports:
+        - containerPort: 5000
+          name: http
+        livenessProbe:
+          httpGet:
+            path: /api/health
+            port: 5000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /api/health
+            port: 5000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: islamic-app-backend
+  namespace: islamic-app
+  labels:
+    app: islamic-app-backend
+spec:
+  type: ClusterIP
+  ports:
+  - port: 5000
+    targetPort: 5000
+    protocol: TCP
+    name: http
+  selector:
+    app: islamic-app-backend
+---
