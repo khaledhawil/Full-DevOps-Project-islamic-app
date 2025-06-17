@@ -1,6 +1,16 @@
 pipeline {
     agent any
     
+    // Optimize build triggers to reduce API calls
+    options {
+        // Reduce build retention to minimize history API calls
+        buildDiscarder(logRotator(numToKeepStr: '10', daysToKeepStr: '7'))
+        // Skip default SCM checkout to do it manually with better control
+        skipDefaultCheckout(true)
+        // Disable concurrent builds to avoid API conflicts
+        disableConcurrentBuilds()
+    }
+    
     environment {
         DOCKER_REGISTRY = 'khaledhawil'
         PROJECT_NAME = 'islamic-app'
@@ -317,37 +327,54 @@ def detectChanges() {
     def changes = [frontend: false, backend: false]
     
     try {
-        // Get changed files since last successful build
-        def lastSuccessfulCommit = sh(
-            script: '''
-                git log --format="%H" --grep="\\[skip ci\\]" --invert-grep -n 1 HEAD~1 2>/dev/null || git rev-parse HEAD~1 2>/dev/null || echo ""
-            ''',
-            returnStdout: true
-        ).trim()
+        // Use more efficient git commands to reduce API calls
+        def lastCommit = env.GIT_PREVIOUS_SUCCESSFUL_COMMIT ?: env.GIT_PREVIOUS_COMMIT
         
-        if (lastSuccessfulCommit) {
-            def changedFiles = sh(
-                script: "git diff --name-only ${lastSuccessfulCommit} HEAD",
+        if (!lastCommit) {
+            // For first build or when can't determine last commit, check only recent changes
+            def recentChanges = sh(
+                script: "git diff --name-only HEAD~1 HEAD 2>/dev/null || echo 'all'",
                 returnStdout: true
-            ).trim().split('\n')
+            ).trim()
             
-            echo "📁 Changed files: ${changedFiles.join(', ')}"
+            if (recentChanges == 'all') {
+                echo "⚠️ First build or unable to detect changes, building both components"
+                changes.frontend = true
+                changes.backend = true
+                return changes
+            }
+            
+            def changedFiles = recentChanges.split('\n')
+            echo "📁 Recent changed files: ${changedFiles.join(', ')}"
             
             changedFiles.each { file ->
-                if (file.startsWith('frontend/') || file.startsWith('k8s/05-frontend.yaml')) {
+                if (file.startsWith('frontend/') || file.contains('frontend') || file.startsWith('k8s/05-frontend.yaml')) {
                     changes.frontend = true
                 }
-                if (file.startsWith('backend/') || file.startsWith('k8s/04-backend.yaml')) {
+                if (file.startsWith('backend/') || file.contains('backend') || file.startsWith('k8s/04-backend.yaml')) {
                     changes.backend = true
                 }
             }
         } else {
-            echo "⚠️ Could not determine last commit, building both"
-            changes.frontend = true
-            changes.backend = true
+            // Use Jenkins built-in commit comparison
+            def changedFiles = sh(
+                script: "git diff --name-only ${lastCommit} HEAD",
+                returnStdout: true
+            ).trim().split('\n')
+            
+            echo "📁 Changed files since last build: ${changedFiles.join(', ')}"
+            
+            changedFiles.each { file ->
+                if (file.startsWith('frontend/') || file.contains('frontend') || file.startsWith('k8s/05-frontend.yaml')) {
+                    changes.frontend = true
+                }
+                if (file.startsWith('backend/') || file.contains('backend') || file.startsWith('k8s/04-backend.yaml')) {
+                    changes.backend = true
+                }
+            }
         }
     } catch (Exception e) {
-        echo "⚠️ Error detecting changes: ${e.message}, building both"
+        echo "⚠️ Error detecting changes: ${e.message}, building both components"
         changes.frontend = true
         changes.backend = true
     }
