@@ -186,8 +186,6 @@ secrets/
 .sentry
 
 # Build tools
-.gradle/
-.mvn/
 
 # JetBrains
 .idea/
