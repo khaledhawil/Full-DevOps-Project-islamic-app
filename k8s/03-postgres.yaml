@@ -163,13 +163,13 @@ spec:
             - pg_isready -U islamic_user -d islamic_app
           initialDelaySeconds: 5
           periodSeconds: 5
-        resources:
-          requests:
-            memory: "128Mi"  # Reduced from 256Mi
-            cpu: "100m"      # Reduced from 250m
-          limits:
-            memory: "256Mi"  # Reduced from 512Mi
-            cpu: "200m"      # Reduced from 500m
+        # resources:
+        #   requests:
+        #     memory: "128Mi"  # Reduced from 256Mi
+        #     cpu: "100m"      # Reduced from 250m
+        #   limits:
+        #     memory: "256Mi"  # Reduced from 512Mi
+        #     cpu: "200m"      # Reduced from 500m
       volumes:
       - name: postgres-storage
         persistentVolumeClaim:

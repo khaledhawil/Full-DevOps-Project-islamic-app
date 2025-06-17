@@ -6,7 +6,7 @@ metadata:
   labels:
     app: islamic-app-backend
 spec:
-  replicas: 1  # Reduced from 2 to 1
+  replicas: 2  # Reduced from 2 to 1
   selector:
     matchLabels:
       app: islamic-app-backend
@@ -77,13 +77,13 @@ spec:
             port: 5000
           initialDelaySeconds: 5
           periodSeconds: 5
-        resources:
-          requests:
-            memory: "128Mi"  # Reduced from 256Mi
-            cpu: "100m"      # Reduced from 250m
-          limits:
-            memory: "256Mi"  # Reduced from 512Mi
-            cpu: "200m"      # Reduced from 500m
+        # resources:
+        #   requests:
+        #     memory: "128Mi"  # Reduced from 256Mi
+        #     cpu: "100m"      # Reduced from 250m
+        #   limits:
+        #     memory: "256Mi"  # Reduced from 512Mi
+        #     cpu: "200m"      # Reduced from 500m
 
 ---
 apiVersion: v1

@@ -17,7 +17,7 @@ const Navbar: React.FC = () => {
 
   const navigationItems = [
     { path: '/', label: '🏠 الرئيسية', showWhenLoggedIn: true, showWhenLoggedOut: true },
-    { path: '/dashboard', label: '📊 لوحة التحكم', showWhenLoggedIn: true, showWhenLoggedOut: false },
+    { path: '/azkar', label: '🤲 الأذكار', showWhenLoggedIn: true, showWhenLoggedOut: false },
     { path: '/tasbeh', label: '📿 التسبيح', showWhenLoggedIn: true, showWhenLoggedOut: false },
     { path: '/prayer-times', label: '🕌 أوقات الصلاة', showWhenLoggedIn: true, showWhenLoggedOut: false },
     { path: '/quran', label: '📖 القرآن', showWhenLoggedIn: true, showWhenLoggedOut: false },

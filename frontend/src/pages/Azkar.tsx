@@ -83,6 +83,160 @@ const Azkar: React.FC = () => {
           count: 7,
           reward: 'من قالها سبع مرات كفاه الله ما أهمه',
           times: 'سبع مرات'
+        },
+        {
+          id: 101,
+          arabic: 'بِسْمِ اللَّهِ الَّذِي لا يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الْأَرْضِ وَلا فِي السَّمَاءِ وَهُوَ السَّمِيعُ الْعَلِيمُ',
+          transliteration: 'Bismillahil-lathee la yadhurru ma\'as-mihi shay\'un fil-ardhi wa la fis-sama\'i wa huwas-samee\'ul-\'aleem',
+          translation: 'In the name of Allah with whose name nothing is harmed on earth nor in the heavens and He is the All-Seeing, the All-Knowing.',
+          source: 'أبو داود',
+          category: 'morning',
+          count: 3,
+          reward: 'من قالها ثلاثاً لم تصبه فجأة بلاء حتى يمسي',
+          times: 'ثلاث مرات'
+        },
+        {
+          id: 102,
+          arabic: 'اللَّهُمَّ مَا أَصْبَحَ بِي مِنْ نِعْمَةٍ أَوْ بِأَحَدٍ مِنْ خَلْقِكَ فَمِنْكَ وَحْدَكَ لا شَرِيكَ لَكَ فَلَكَ الْحَمْدُ وَلَكَ الشُّكْرُ',
+          transliteration: 'Allahumma ma asbaha bee min ni\'matin aw bi-ahadin min khalqika faminka wahdaka la shareeka laka falakaal-hamdu wa lakash-shukr',
+          translation: 'O Allah, what blessing I or any of Your creation have risen upon, is from You alone, without partner, so for You is all praise and unto You all thanks.',
+          source: 'أبو داود',
+          category: 'morning',
+          count: 1,
+          reward: 'من قالها فقد أدى شكر يومه',
+          times: 'مرة واحدة'
+        },
+        {
+          id: 103,
+          arabic: 'رَضِيتُ بِاللَّهِ رَبًّا، وَبِالْإِسْلامِ دِينًا، وَبِمُحَمَّدٍ صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ رَسُولاً',
+          transliteration: 'Radheetu billahi rabban, wa bil-islaami deenan, wa bi-muhammadin sallallahu \'alayhi wa sallama rasoolan',
+          translation: 'I am pleased with Allah as a Lord, and Islam as a religion and Muhammad peace be upon him as a Messenger.',
+          source: 'أبو داود',
+          category: 'morning',
+          count: 3,
+          reward: 'كان حقاً على الله أن يرضيه يوم القيامة',
+          times: 'ثلاث مرات'
+        },
+        {
+          id: 104,
+          arabic: 'اللَّهُمَّ عَافِنِي فِي بَدَنِي، اللَّهُمَّ عَافِنِي فِي سَمْعِي، اللَّهُمَّ عَافِنِي فِي بَصَرِي، لا إِلَهَ إِلاَّ أَنْتَ',
+          transliteration: 'Allahumma \'aafini fee badanee, allahumma \'aafini fee sam\'ee, allahumma \'aafini fee basaree, la ilaha illa anta',
+          translation: 'O Allah, grant my body health, O Allah, grant my hearing health, O Allah, grant my sight health. None has the right to be worshipped except You.',
+          source: 'أبو داود',
+          category: 'morning',
+          count: 3,
+          reward: 'دعاء للعافية في البدن والحواس',
+          times: 'ثلاث مرات'
+        },
+        {
+          id: 105,
+          arabic: 'اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْكُفْرِ وَالْفَقْرِ، وَأَعُوذُ بِكَ مِنْ عَذَابِ الْقَبْرِ، لا إِلَهَ إِلاَّ أَنْتَ',
+          transliteration: 'Allahumma innee a\'oothu bika minal-kufri wal-faqr, wa a\'oothu bika min \'athaabil-qabr, la ilaha illa anta',
+          translation: 'O Allah, I take refuge with You from disbelief and poverty, and I take refuge with You from the punishment of the grave. None has the right to be worshipped except You.',
+          source: 'أبو داود',
+          category: 'morning',
+          count: 3,
+          reward: 'استعاذة من الكفر والفقر وعذاب القبر',
+          times: 'ثلاث مرات'
+        },
+        {
+          id: 132,
+          arabic: 'قُلْ هُوَ اللَّهُ أَحَدٌ، اللَّهُ الصَّمَدُ، لَمْ يَلِدْ وَلَمْ يُولَدْ، وَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ',
+          transliteration: 'Qul huwallahu ahad, Allahus-samad, lam yalid wa lam yoolad, wa lam yakun lahu kufuwan ahad',
+          translation: 'Say: He is Allah, [who is] One, Allah, the Eternal Refuge. He neither begets nor is born, Nor is there to Him any equivalent.',
+          source: 'سورة الإخلاص',
+          category: 'morning',
+          count: 3,
+          reward: 'تعدل ثلث القرآن',
+          times: 'ثلاث مرات'
+        },
+        {
+          id: 133,
+          arabic: 'قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ، مِن شَرِّ مَا خَلَقَ، وَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ، وَمِن شَرِّ النَّفَّاثَاتِ فِي الْعُقَدِ، وَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ',
+          transliteration: 'Qul a\'oothu birabbi-l-falaq, min sharri ma khalaq, wa min sharri ghasiqin itha waqab, wa min sharrin-naffathati fil-\'uqad, wa min sharri hasidin itha hasad',
+          translation: 'Say: I seek refuge in the Lord of daybreak, From the evil of that which He created, And from the evil of darkness when it settles, And from the evil of the blowers in knots, And from the evil of an envier when he envies.',
+          source: 'سورة الفلق',
+          category: 'morning',
+          count: 3,
+          reward: 'حماية من الشر والحسد',
+          times: 'ثلاث مرات'
+        },
+        {
+          id: 134,
+          arabic: 'قُلْ أَعُوذُ بِرَبِّ النَّاسِ، مَلِكِ النَّاسِ، إِلَـهِ النَّاسِ، مِن شَرِّ الْوَسْوَاسِ الْخَنَّاسِ، الَّذِي يُوَسْوِسُ فِي صُدُورِ النَّاسِ، مِنَ الْجِنَّةِ وَالنَّاسِ',
+          transliteration: 'Qul a\'oothu birabbi-n-nas, maliki-n-nas, ilahi-n-nas, min sharril-waswasil-khannas, alladhee yuwaswisu fee sudoorin-nas, minal-jinnati wan-nas',
+          translation: 'Say: I seek refuge in the Lord of mankind, The Sovereign of mankind, The God of mankind, From the evil of the retreating whisperer, Who whispers [evil] into the breasts of mankind, From among the jinn and mankind.',
+          source: 'سورة الناس',
+          category: 'morning',
+          count: 3,
+          reward: 'حماية من وساوس الشياطين',
+          times: 'ثلاث مرات'
+        },
+        {
+          id: 135,
+          arabic: 'اللَّهُمَّ عَالِمَ الْغَيْبِ وَالشَّهَادَةِ فَاطِرَ السَّمَاوَاتِ وَالأَرْضِ، رَبَّ كُلِّ شَيْءٍ وَمَلِيكَهُ، أَشْهَدُ أَنْ لا إِلَـهَ إِلاَّ أَنْتَ، أَعُوذُ بِكَ مِنْ شَرِّ نَفْسِي وَمِنْ شَرِّ الشَّيْطَانِ وَشِرْكِهِ',
+          transliteration: 'Allahumma \'alimal-ghaybi wash-shahadati fatiras-samawati wal-ard, rabba kulli shay\'in wa maleekah, ashhadu an la ilaha illa anta, a\'oothu bika min sharri nafsee wa min sharrish-shaytani wa shirkihi',
+          translation: 'O Allah, Knower of the unseen and the witnessed, Creator of the heavens and the earth, Lord of everything and its Owner, I bear witness that there is none worthy of worship but You. I seek refuge in You from the evil of my soul and from the evil of Satan and his polytheism.',
+          source: 'الترمذي',
+          category: 'morning',
+          count: 1,
+          reward: 'حماية من الشر والشرك',
+          times: 'مرة واحدة'
+        },
+        {
+          id: 136,
+          arabic: 'اللَّهُمَّ بِكَ أَصْبَحْنَا وَبِكَ أَمْسَيْنَا وَبِكَ نَحْيَا وَبِكَ نَمُوتُ وَإِلَيْكَ النُّشُورُ',
+          transliteration: 'Allahumma bika asbahna wa bika amsayna wa bika nahya wa bika namootu wa ilaykan-nushoor',
+          translation: 'O Allah, by You we have reached the morning and by You we have reached the evening, by You we live and by You we die and to You is our resurrection.',
+          source: 'الترمذي',
+          category: 'morning',
+          count: 1,
+          reward: 'تفويض الأمر كله لله',
+          times: 'مرة واحدة'
+        },
+        {
+          id: 137,
+          arabic: 'اللَّهُمَّ إِنِّي أَسْأَلُكَ الْهُدَى وَالتُّقَى وَالْعَفَافَ وَالْغِنَى',
+          transliteration: 'Allahumma innee as\'alukal-huda wat-tuqa wal-\'afafa wal-ghina',
+          translation: 'O Allah, I ask You for guidance, piety, chastity and contentment.',
+          source: 'مسلم',
+          category: 'morning',
+          count: 1,
+          reward: 'دعاء جامع للخير',
+          times: 'مرة واحدة'
+        },
+        {
+          id: 138,
+          arabic: 'اللَّهُمَّ أَعِنِّي عَلَى ذِكْرِكَ وَشُكْرِكَ وَحُسْنِ عِبَادَتِكَ',
+          transliteration: 'Allahumma a\'innee ala thikrika wa shukrika wa husni \'ibadatik',
+          translation: 'O Allah, help me remember You, to be grateful to You, and to worship You in an excellent manner.',
+          source: 'أبو داود',
+          category: 'morning',
+          count: 1,
+          reward: 'دعاء للإعانة على الذكر والشكر وحسن العبادة',
+          times: 'مرة واحدة'
+        },
+        {
+          id: 139,
+          arabic: 'أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ. اللَّهُ لا إِلَـهَ إِلاَّ هُوَ الْحَيُّ الْقَيُّومُ لا تَأْخُذُهُ سِنَةٌ وَلا نَوْمٌ لَّهُ مَا فِي السَّمَاوَاتِ وَمَا فِي الأَرْضِ مَن ذَا الَّذِي يَشْفَعُ عِنْدَهُ إِلاَّ بِإِذْنِهِ يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْفَهُمْ وَلا يُحِيطُونَ بِشَيْءٍ مِّنْ عِلْمِهِ إِلاَّ بِمَا شَاء وَسِعَ كُرْسِيُّهُ السَّمَاوَاتِ وَالأَرْضَ وَلا يَؤُودُهُ حِفْظُهُمَا وَهُوَ الْعَلِيُّ الْعَظِيمُ',
+          transliteration: 'A\'oothu billahi minash-shaytanir-rajeem. Allahu la ilaha illa huwal-hayyul-qayyoom, la ta\'khuthuhu sinatun wa la nawm, lahu ma fis-samawati wa ma fil-ard, man thal-lathee yashfa\'u \'indahu illa bi\'ithnih, ya\'lamu ma bayna aydeehim wa ma khalfahum, wa la yuheetoona bishay\'in min \'ilmihi illa bima sha\'a, wasi\'a kursiyyuhus-samawati wal-arda wa la ya\'ooduhu hifthuhuma wa huwal-\'aliyyul-\'atheem',
+          translation: 'I seek refuge in Allah from Satan, the accursed one. Allah - there is no deity except Him, the Ever-Living, the Sustainer of existence. Neither drowsiness overtakes Him nor sleep. To Him belongs whatever is in the heavens and whatever is on the earth. Who is it that can intercede with Him except by His permission? He knows what is before them and what will be after them, and they encompass not a thing of His knowledge except for what He wills. His Kursi extends over the heavens and the earth, and their preservation tires Him not. And He is the Most High, the Most Great.',
+          source: 'آية الكرسي - البقرة',
+          category: 'morning',
+          count: 1,
+          reward: 'من قرأها لم يزل عليه من الله حافظ',
+          times: 'مرة واحدة'
+        },
+        {
+          id: 140,
+          arabic: 'لا إِلَهَ إِلاَّ اللَّهُ وَحْدَهُ لا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ',
+          transliteration: 'La ilaha illallahu wahdahu la shareeka lahu, lahul-mulku walahul-hamdu wa huwa ala kulli shay\'in qadeer',
+          translation: 'None has the right to be worshipped but Allah alone, who has no partner. His is the dominion and His is the praise, and He is Able to do all things.',
+          source: 'الترمذي',
+          category: 'morning',
+          count: 100,
+          reward: 'كانت له عدل عشر رقاب وكتبت له مائة حسنة',
+          times: '100 مرة'
         }
       ]
     },
@@ -111,6 +265,116 @@ const Azkar: React.FC = () => {
           category: 'evening',
           count: 3,
           reward: 'من قالها ثلاث مرات لم تضره حمة تلك الليلة',
+          times: 'ثلاث مرات'
+        },
+        {
+          id: 106,
+          arabic: 'اللَّهُمَّ أَنْتَ رَبِّي لا إِلَـهَ إِلاَّ أَنْتَ، خَلَقْتَنِي وَأَنَا عَبْدُكَ، وَأَنَا عَلَى عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ، أَعُوذُ بِكَ مِنْ شَرِّ مَا صَنَعْتُ، أَبُوءُ لَكَ بِنِعْمَتِكَ عَلَيَّ، وَأَبُوءُ لَكَ بِذَنْبِي فَاغْفِرْ لِي فَإِنَّهُ لا يَغْفِرُ الذُّنُوبَ إِلاَّ أَنْتَ',
+          transliteration: 'Allahumma anta rabbee la ilaha illa anta, khalaqtanee wa ana abduka, wa ana ala ahdika wa wa\'dika mastata\'tu, a\'oothu bika min sharri ma sana\'tu, aboo\'u laka bini\'matika \'alayya, wa aboo\'u laka bithanbee faghfir lee fa\'innahu la yaghfiru ath-thunooba illa anta',
+          translation: 'O Allah, You are my Lord, none has the right to be worshipped except You, You created me and I am Your servant and I abide to Your covenant and promise as best I can, I take refuge in You from the evil of which I committed. I acknowledge Your favor upon me and I acknowledge my sin, so forgive me, for verily none can forgive sin except You.',
+          source: 'البخاري',
+          category: 'evening',
+          count: 1,
+          reward: 'من قالها من الليل موقناً بها فمات قبل أن يصبح فهو من أهل الجنة',
+          times: 'مرة واحدة'
+        },
+        {
+          id: 107,
+          arabic: 'بِسْمِ اللَّهِ الَّذِي لا يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الْأَرْضِ وَلا فِي السَّمَاءِ وَهُوَ السَّمِيعُ الْعَلِيمُ',
+          transliteration: 'Bismillahil-lathee la yadhurru ma\'as-mihi shay\'un fil-ardhi wa la fis-sama\'i wa huwas-samee\'ul-\'aleem',
+          translation: 'In the name of Allah with whose name nothing is harmed on earth nor in the heavens and He is the All-Seeing, the All-Knowing.',
+          source: 'أبو داود',
+          category: 'evening',
+          count: 3,
+          reward: 'من قالها ثلاثاً لم تصبه فجأة بلاء حتى يصبح',
+          times: 'ثلاث مرات'
+        },
+        {
+          id: 108,
+          arabic: 'اللَّهُمَّ مَا أَمْسَى بِي مِنْ نِعْمَةٍ أَوْ بِأَحَدٍ مِنْ خَلْقِكَ فَمِنْكَ وَحْدَكَ لا شَرِيكَ لَكَ فَلَكَ الْحَمْدُ وَلَكَ الشُّكْرُ',
+          transliteration: 'Allahumma ma amsa bee min ni\'matin aw bi-ahadin min khalqika faminka wahdaka la shareeka laka falakaal-hamdu wa lakash-shukr',
+          translation: 'O Allah, what blessing I or any of Your creation have reached the evening upon, is from You alone, without partner, so for You is all praise and unto You all thanks.',
+          source: 'أبو داود',
+          category: 'evening',
+          count: 1,
+          reward: 'من قالها فقد أدى شكر ليلته',
+          times: 'مرة واحدة'
+        },
+        {
+          id: 109,
+          arabic: 'اللَّهُمَّ عَافِنِي فِي بَدَنِي، اللَّهُمَّ عَافِنِي فِي سَمْعِي، اللَّهُمَّ عَافِنِي فِي بَصَرِي، لا إِلَهَ إِلاَّ أَنْتَ',
+          transliteration: 'Allahumma \'aafini fee badanee, allahumma \'aafini fee sam\'ee, allahumma \'aafini fee basaree, la ilaha illa anta',
+          translation: 'O Allah, grant my body health, O Allah, grant my hearing health, O Allah, grant my sight health. None has the right to be worshipped except You.',
+          source: 'أبو داود',
+          category: 'evening',
+          count: 3,
+          reward: 'دعاء للعافية في البدن والحواس',
+          times: 'ثلاث مرات'
+        },
+        {
+          id: 141,
+          arabic: 'اللَّهُمَّ بِكَ أَمْسَيْنَا وَبِكَ أَصْبَحْنَا وَبِكَ نَحْيَا وَبِكَ نَمُوتُ وَإِلَيْكَ الْمَصِيرُ',
+          transliteration: 'Allahumma bika amsayna wa bika asbahna wa bika nahya wa bika namootu wa ilaykal-maseer',
+          translation: 'O Allah, by You we have reached the evening and by You we have reached the morning, by You we live and by You we die and to You is our return.',
+          source: 'الترمذي',
+          category: 'evening',
+          count: 1,
+          reward: 'تفويض الأمر كله لله',
+          times: 'مرة واحدة'
+        },
+        {
+          id: 142,
+          arabic: 'قُلْ هُوَ اللَّهُ أَحَدٌ، اللَّهُ الصَّمَدُ، لَمْ يَلِدْ وَلَمْ يُولَدْ، وَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ',
+          transliteration: 'Qul huwallahu ahad, Allahus-samad, lam yalid wa lam yoolad, wa lam yakun lahu kufuwan ahad',
+          translation: 'Say: He is Allah, [who is] One, Allah, the Eternal Refuge. He neither begets nor is born, Nor is there to Him any equivalent.',
+          source: 'سورة الإخلاص',
+          category: 'evening',
+          count: 3,
+          reward: 'تعدل ثلث القرآن',
+          times: 'ثلاث مرات'
+        },
+        {
+          id: 143,
+          arabic: 'قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ، مِن شَرِّ مَا خَلَقَ، وَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ، وَمِن شَرِّ النَّفَّاثَاتِ فِي الْعُقَدِ، وَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ',
+          transliteration: 'Qul a\'oothu birabbi-l-falaq, min sharri ma khalaq, wa min sharri ghasiqin itha waqab, wa min sharrin-naffathati fil-\'uqad, wa min sharri hasidin itha hasad',
+          translation: 'Say: I seek refuge in the Lord of daybreak, From the evil of that which He created, And from the evil of darkness when it settles, And from the evil of the blowers in knots, And from the evil of an envier when he envies.',
+          source: 'سورة الفلق',
+          category: 'evening',
+          count: 3,
+          reward: 'حماية من الشر والحسد',
+          times: 'ثلاث مرات'
+        },
+        {
+          id: 144,
+          arabic: 'قُلْ أَعُوذُ بِرَبِّ النَّاسِ، مَلِكِ النَّاسِ، إِلَـهِ النَّاسِ، مِن شَرِّ الْوَسْوَاسِ الْخَنَّاسِ، الَّذِي يُوَسْوِسُ فِي صُدُورِ النَّاسِ، مِنَ الْجِنَّةِ وَالنَّاسِ',
+          transliteration: 'Qul a\'oothu birabbi-n-nas, maliki-n-nas, ilahi-n-nas, min sharril-waswasil-khannas, alladhee yuwaswisu fee sudoorin-nas, minal-jinnati wan-nas',
+          translation: 'Say: I seek refuge in the Lord of mankind, The Sovereign of mankind, The God of mankind, From the evil of the retreating whisperer, Who whispers [evil] into the breasts of mankind, From among the jinn and mankind.',
+          source: 'سورة الناس',
+          category: 'evening',
+          count: 3,
+          reward: 'حماية من وساوس الشياطين',
+          times: 'ثلاث مرات'
+        },
+        {
+          id: 145,
+          arabic: 'رَضِيتُ بِاللَّهِ رَبًّا، وَبِالْإِسْلامِ دِينًا، وَبِمُحَمَّدٍ صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ رَسُولاً',
+          transliteration: 'Radheetu billahi rabban, wa bil-islaami deenan, wa bi-muhammadin sallallahu \'alayhi wa sallama rasoolan',
+          translation: 'I am pleased with Allah as a Lord, and Islam as a religion and Muhammad peace be upon him as a Messenger.',
+          source: 'أبو داود',
+          category: 'evening',
+          count: 3,
+          reward: 'كان حقاً على الله أن يرضيه يوم القيامة',
+          times: 'ثلاث مرات'
+        },
+        {
+          id: 146,
+          arabic: 'اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْكُفْرِ وَالْفَقْرِ، وَأَعُوذُ بِكَ مِنْ عَذَابِ الْقَبْرِ، لا إِلَهَ إِلاَّ أَنْتَ',
+          transliteration: 'Allahumma innee a\'oothu bika minal-kufri wal-faqr, wa a\'oothu bika min \'athaabil-qabr, la ilaha illa anta',
+          translation: 'O Allah, I take refuge with You from disbelief and poverty, and I take refuge with You from the punishment of the grave. None has the right to be worshipped except You.',
+          source: 'أبو داود',
+          category: 'evening',
+          count: 3,
+          reward: 'استعاذة من الكفر والفقر وعذاب القبر',
           times: 'ثلاث مرات'
         }
       ]
@@ -164,6 +428,61 @@ const Azkar: React.FC = () => {
           count: 10,
           reward: 'كانت له عدل عشر رقاب',
           times: '10 مرات'
+        },
+        {
+          id: 110,
+          arabic: 'لا حَوْلَ وَلا قُوَّةَ إِلاَّ بِاللَّهِ',
+          transliteration: 'La hawla wa la quwwata illa billah',
+          translation: 'There is no might nor power except with Allah',
+          source: 'البخاري',
+          category: 'general',
+          count: 100,
+          reward: 'كنز من كنوز الجنة',
+          times: '100 مرة'
+        },
+        {
+          id: 111,
+          arabic: 'سُبْحَانَ اللَّهِ وَبِحَمْدِهِ، سُبْحَانَ اللَّهِ الْعَظِيمِ',
+          transliteration: 'Subhan Allahi wa bihamdih, subhan Allah al-\'atheem',
+          translation: 'Glory and praise to Allah, Glory to Allah the Almighty',
+          source: 'مسلم',
+          category: 'general',
+          count: 1,
+          reward: 'كلمتان خفيفتان على اللسان ثقيلتان في الميزان',
+          times: 'أي عدد'
+        },
+        {
+          id: 112,
+          arabic: 'أَسْتَغْفِرُ اللَّهَ وَأَتُوبُ إِلَيْهِ',
+          transliteration: 'Astaghfirullah wa atoobu ilayh',
+          translation: 'I seek forgiveness of Allah and repent to Him',
+          source: 'البخاري',
+          category: 'general',
+          count: 70,
+          reward: 'كان النبي صلى الله عليه وسلم يستغفر في اليوم أكثر من سبعين مرة',
+          times: '70 مرة'
+        },
+        {
+          id: 113,
+          arabic: 'اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى نَبِيِّنَا مُحَمَّدٍ',
+          transliteration: 'Allahumma salli wa sallim \'ala nabiyyina Muhammad',
+          translation: 'O Allah, send prayers and peace upon our Prophet Muhammad',
+          source: 'الترمذي',
+          category: 'general',
+          count: 10,
+          reward: 'من صلى علي واحدة صلى الله عليه عشراً',
+          times: '10 مرات'
+        },
+        {
+          id: 114,
+          arabic: 'رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ',
+          transliteration: 'Rabbana atina fid-dunya hasanatan wa fil-akhirati hasanatan wa qina \'athab an-nar',
+          translation: 'Our Lord, give us in this world [that which is] good and in the Hereafter [that which is] good and protect us from the punishment of the Fire',
+          source: 'البقرة',
+          category: 'general',
+          count: 1,
+          reward: 'دعاء جامع لخير الدنيا والآخرة',
+          times: 'أي عدد'
         }
       ]
     },
@@ -194,6 +513,233 @@ const Azkar: React.FC = () => {
           count: 1,
           reward: 'غُفر له وإن كان فر من الزحف',
           times: 'مرة واحدة'
+        },
+        {
+          id: 115,
+          arabic: 'رَبِّ اغْفِرْ لِي ذَنْبِي وَخَطَئِي وَجَهْلِي',
+          transliteration: 'Rabbi ghfir lee thanbee wa khata\'ee wa jahlee',
+          translation: 'My Lord, forgive me my sin, my error, and my ignorance',
+          source: 'البخاري',
+          category: 'istighfar',
+          count: 1,
+          reward: 'دعاء شامل للمغفرة',
+          times: 'أي عدد'
+        },
+        {
+          id: 116,
+          arabic: 'اللَّهُمَّ اغْفِرْ لِي ذَنْبِي، وَوَسِّعْ لِي فِي دَارِي، وَبَارِكْ لِي فِي رِزْقِي',
+          transliteration: 'Allahumma ghfir lee thanbee wa wassi\' lee fee daaree wa baarik lee fee rizqee',
+          translation: 'O Allah, forgive me my sin, expand for me my home, and bless me in my provision',
+          source: 'الطبراني',
+          category: 'istighfar',
+          count: 1,
+          reward: 'دعاء للمغفرة وسعة الرزق والمنزل',
+          times: 'أي عدد'
+        },
+        {
+          id: 117,
+          arabic: 'أَسْتَغْفِرُ اللَّهَ رَبِّي مِنْ كُلِّ ذَنْبٍ وَأَتُوبُ إِلَيْهِ',
+          transliteration: 'Astaghfirullah rabbee min kulli thanbin wa atoobu ilayh',
+          translation: 'I seek forgiveness of Allah, my Lord, from every sin and I repent to Him',
+          source: 'أبو داود',
+          category: 'istighfar',
+          count: 1,
+          reward: 'استغفار شامل من جميع الذنوب',
+          times: 'أي عدد'
+        }
+      ]
+    },
+    {
+      id: 'sleep',
+      name: 'أذكار النوم',
+      icon: '🌛',
+      description: 'أذكار تُقال قبل النوم',
+      azkar: [
+        {
+          id: 118,
+          arabic: 'بِاسْمِكَ رَبِّي وَضَعْتُ جَنْبِي، وَبِكَ أَرْفَعُهُ، فَإِنْ أَمْسَكْتَ نَفْسِي فَارْحَمْهَا، وَإِنْ أَرْسَلْتَهَا فَاحْفَظْهَا بِمَا تَحْفَظُ بِهِ عِبَادَكَ الصَّالِحِينَ',
+          transliteration: 'Bismika rabbee wada\'tu janbee, wa bika arfa\'uhu, fa\'in amsakta nafsee farhamha, wa in arsaltaha fahfathha bima tahfathu bihi \'ibaadakas-saliheen',
+          translation: 'In Your name my Lord, I lie down and in Your name I rise, so if You should take my soul then have mercy upon it, and if You should return my soul then protect it in the manner You do so with Your righteous servants.',
+          source: 'البخاري',
+          category: 'sleep',
+          count: 1,
+          reward: 'دعاء قبل النوم للحفظ والرحمة',
+          times: 'مرة واحدة'
+        },
+        {
+          id: 119,
+          arabic: 'اللَّهُمَّ قِنِي عَذَابَكَ يَوْمَ تَبْعَثُ عِبَادَكَ',
+          transliteration: 'Allahumma qinee \'athaabaka yawma tab\'athu \'ibaadak',
+          translation: 'O Allah, protect me from Your punishment on the Day You resurrect Your servants.',
+          source: 'أبو داود',
+          category: 'sleep',
+          count: 3,
+          reward: 'حماية من عذاب يوم القيامة',
+          times: 'ثلاث مرات'
+        },
+        {
+          id: 120,
+          arabic: 'اللَّهُمَّ بِاسْمِكَ أَمُوتُ وَأَحْيَا',
+          transliteration: 'Allahumma bismika amootu wa ahya',
+          translation: 'O Allah, in Your name I live and die.',
+          source: 'البخاري',
+          category: 'sleep',
+          count: 1,
+          reward: 'تفويض الأمر لله في النوم والاستيقاظ',
+          times: 'مرة واحدة'
+        }
+      ]
+    },
+    {
+      id: 'wakeup',
+      name: 'أذكار الاستيقاظ',
+      icon: '☀️',
+      description: 'أذكار تُقال عند الاستيقاظ من النوم',
+      azkar: [
+        {
+          id: 121,
+          arabic: 'الْحَمْدُ لِلَّهِ الَّذِي أَحْيَانَا بَعْدَ مَا أَمَاتَنَا وَإِلَيْهِ النُّشُورُ',
+          transliteration: 'Alhamdulillahil-lathee ahyana ba\'da ma amatana wa ilayhin-nushoor',
+          translation: 'All praise is for Allah who gave us life after having taken it from us and unto Him is the resurrection.',
+          source: 'البخاري',
+          category: 'wakeup',
+          count: 1,
+          reward: 'شكر الله على إحياء بعد النوم',
+          times: 'مرة واحدة'
+        },
+        {
+          id: 122,
+          arabic: 'اللَّهُمَّ عَافِنِي فِي بَدَنِي، اللَّهُمَّ عَافِنِي فِي سَمْعِي، اللَّهُمَّ عَافِنِي فِي بَصَرِي',
+          transliteration: 'Allahumma \'aafini fee badanee, allahumma \'aafini fee sam\'ee, allahumma \'aafini fee basaree',
+          translation: 'O Allah, grant my body health, O Allah, grant my hearing health, O Allah, grant my sight health.',
+          source: 'أبو داود',
+          category: 'wakeup',
+          count: 3,
+          reward: 'دعاء للعافية في البدن والحواس',
+          times: 'ثلاث مرات'
+        }
+      ]
+    },
+    {
+      id: 'food',
+      name: 'أذكار الطعام',
+      icon: '🍽️',
+      description: 'أذكار تُقال قبل وبعد الطعام',
+      azkar: [
+        {
+          id: 123,
+          arabic: 'بِسْمِ اللَّهِ',
+          transliteration: 'Bismillah',
+          translation: 'In the name of Allah',
+          source: 'الترمذي',
+          category: 'food',
+          count: 1,
+          reward: 'بركة في الطعام',
+          times: 'قبل الطعام'
+        },
+        {
+          id: 124,
+          arabic: 'الْحَمْدُ لِلَّهِ الَّذِي أَطْعَمَنَا وَسَقَانَا وَجَعَلَنَا مُسْلِمِينَ',
+          transliteration: 'Alhamdulillahil-lathee at\'amana wa saqana wa ja\'alana muslimeen',
+          translation: 'All praise is for Allah who fed us and gave us drink and made us Muslims.',
+          source: 'أبو داود',
+          category: 'food',
+          count: 1,
+          reward: 'شكر الله على الطعام والشراب والإسلام',
+          times: 'بعد الطعام'
+        },
+        {
+          id: 125,
+          arabic: 'اللَّهُمَّ بَارِكْ لَنَا فِيمَا رَزَقْتَنَا وَقِنَا عَذَابَ النَّارِ، بِسْمِ اللَّهِ',
+          transliteration: 'Allahumma baarik lana feema razaqtana wa qina \'athab an-nar, bismillah',
+          translation: 'O Allah, bless for us what You have provided us and protect us from the punishment of the Fire. In the name of Allah.',
+          source: 'الترمذي',
+          category: 'food',
+          count: 1,
+          reward: 'دعاء للبركة في الرزق والحماية من النار',
+          times: 'قبل الطعام'
+        }
+      ]
+    },
+    {
+      id: 'travel',
+      name: 'أذكار السفر',
+      icon: '✈️',
+      description: 'أذكار تُقال في السفر',
+      azkar: [
+        {
+          id: 126,
+          arabic: 'سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَذَا وَمَا كُنَّا لَهُ مُقْرِنِينَ وَإِنَّا إِلَى رَبِّنَا لَمُنْقَلِبُونَ',
+          transliteration: 'Subhanal-lathee sakhkhara lana hatha wa ma kunna lahu muqrineen wa inna ila rabbina lamunqaliboon',
+          translation: 'Exalted is He who has subjected this to us, and we could not have [otherwise] subdued it. And indeed we, to our Lord, will [surely] return.',
+          source: 'أبو داود',
+          category: 'travel',
+          count: 1,
+          reward: 'دعاء ركوب وسائل النقل',
+          times: 'عند ركوب وسيلة النقل'
+        },
+        {
+          id: 127,
+          arabic: 'اللَّهُمَّ إِنَّا نَسْأَلُكَ فِي سَفَرِنَا هَذَا الْبِرَّ وَالتَّقْوَى وَمِنَ الْعَمَلِ مَا تَرْضَى',
+          transliteration: 'Allahumma inna nas\'aluka fee safarina hathal-birra wat-taqwa wa minal-\'amali ma tardha',
+          translation: 'O Allah, we ask You on this our journey for goodness and piety, and for works that are pleasing to You.',
+          source: 'الترمذي',
+          category: 'travel',
+          count: 1,
+          reward: 'دعاء عند بداية السفر',
+          times: 'عند بداية السفر'
+        },
+        {
+          id: 128,
+          arabic: 'اللَّهُمَّ اطْوِ لَنَا الْأَرْضَ وَهَوِّنْ عَلَيْنَا السَّفَرَ',
+          transliteration: 'Allahumma itwi lanal-ardha wa hawwin \'alaynas-safar',
+          translation: 'O Allah, shorten the earth for us and make this journey easy for us.',
+          source: 'الطبراني',
+          category: 'travel',
+          count: 1,
+          reward: 'دعاء لتسهيل السفر',
+          times: 'أثناء السفر'
+        }
+      ]
+    },
+    {
+      id: 'weather',
+      name: 'أذكار الطقس',
+      icon: '🌦️',
+      description: 'أذكار تُقال عند تغير الطقس',
+      azkar: [
+        {
+          id: 129,
+          arabic: 'اللَّهُمَّ صَيِّباً نَافِعاً',
+          transliteration: 'Allahumma sayyiban nafi\'an',
+          translation: 'O Allah, [bring us] beneficial rain.',
+          source: 'البخاري',
+          category: 'weather',
+          count: 1,
+          reward: 'دعاء عند نزول المطر',
+          times: 'عند نزول المطر'
+        },
+        {
+          id: 130,
+          arabic: 'مُطِرْنَا بِفَضْلِ اللَّهِ وَرَحْمَتِهِ',
+          transliteration: 'Mutirnaa bifadhlillahi wa rahmatih',
+          translation: 'We have been given rain by the grace of Allah and His mercy.',
+          source: 'البخاري',
+          category: 'weather',
+          count: 1,
+          reward: 'شكر الله على المطر',
+          times: 'بعد نزول المطر'
+        },
+        {
+          id: 131,
+          arabic: 'اللَّهُمَّ حَوَالَيْنَا وَلا عَلَيْنَا، اللَّهُمَّ عَلَى الآكَامِ وَالظِّرَابِ وَبُطُونِ الْأَوْدِيَةِ وَمَنَابِتِ الشَّجَرِ',
+          transliteration: 'Allahumma hawalayna wa la \'alayna, allahumma \'alal-akami wadh-dhirabi wa butoonil-awdiyati wa manabitis-shajar',
+          translation: 'O Allah, [let it rain] around us and not upon us. O Allah, [let it rain] on the pastures, hills, valleys and the roots of trees.',
+          source: 'البخاري',
+          category: 'weather',
+          count: 1,
+          reward: 'دعاء عند شدة المطر',
+          times: 'عند شدة المطر'
         }
       ]
     }

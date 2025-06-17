@@ -16,11 +16,11 @@ interface Surah {
 interface Reciter {
   id: string;
   name: string;
-  server: string;
   style: string;
   description: string;
   country: string;
   quality: string;
+  audioUrl: string;
 }
 
 const QuranAudio: React.FC = () => {
@@ -32,64 +32,67 @@ const QuranAudio: React.FC = () => {
   // State management
   const [surahs, setSurahs] = useState<Surah[]>([]);
   const [selectedReciter, setSelectedReciter] = useState<string>('ghamdi');
-  const [selectedServer, setSelectedServer] = useState<string>('server6');
   const [loading, setLoading] = useState<boolean>(false);
   const [currentPlayingSurah, setCurrentPlayingSurah] = useState<number | null>(null);
   const [audioError, setAudioError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [favorites, setFavorites] = useState<string[]>([]);
 
-  // Updated and verified reciters list with tested audio sources
+  // Updated and verified reciters list with tested audio sources (without server property)
   const reciters: Reciter[] = [
-    // Primary High-Quality Reciters (Server 6 - Most Reliable)
-    { id: 'ghamdi', name: 'سعد الغامدي', server: 'server6', style: 'مرتل', description: 'قراءة متميزة ومؤثرة', country: 'السعودية', quality: 'ممتازة' },
-    { id: 'afasy', name: 'مشاري راشد العفاسي', server: 'server6', style: 'مرتل', description: 'قراءة مؤثرة وهادئة', country: 'الكويت', quality: 'ممتازة' },
-    { id: 'husary', name: 'محمود خليل الحصري', server: 'server6', style: 'مرتل', description: 'من أعظم قراء القرآن الكريم', country: 'مصر', quality: 'ممتازة' },
-    { id: 'maher', name: 'ماهر المعيقلي', server: 'server6', style: 'مرتل', description: 'إمام الحرم المكي الشريف', country: 'السعودية', quality: 'ممتازة' },
-    { id: 'sudais', name: 'عبد الرحمن السديس', server: 'server6', style: 'مرتل', description: 'إمام الحرم المكي الشريف', country: 'السعودية', quality: 'ممتازة' },
-    { id: 'shuraim', name: 'سعود الشريم', server: 'server6', style: 'مرتل', description: 'إمام الحرم المكي الشريف', country: 'السعودية', quality: 'ممتازة' },
-    { id: 'ajmy', name: 'أحمد بن علي العجمي', server: 'server6', style: 'مرتل', description: 'صوت جميل ومتميز', country: 'السعودية', quality: 'ممتازة' },
-    { id: 'qatami', name: 'ناصر القطامي', server: 'server6', style: 'مرتل', description: 'قراءة مؤثرة ومتقنة', country: 'السعودية', quality: 'ممتازة' },
-    { id: 'tablawi', name: 'محمد صديق المنشاوي', server: 'server6', style: 'مرتل', description: 'من أعظم قراء القرآن', country: 'مصر', quality: 'ممتازة' },
-    { id: 'rifai', name: 'هاني الرفاعي', server: 'server6', style: 'مرتل', description: 'قراءة مؤثرة وعذبة', country: 'السعودية', quality: 'ممتازة' },
+    // Premium High-Quality Reciters
+    { id: 'ghamdi', name: 'سعد الغامدي', style: 'مرتل', description: 'قراءة متميزة ومؤثرة', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://server6.mp3quran.net/ghamdi/' },
+    { id: 'afasy', name: 'مشاري راشد العفاسي', style: 'مرتل', description: 'قراءة مؤثرة وهادئة', country: 'الكويت', quality: 'ممتازة', audioUrl: 'https://server6.mp3quran.net/afasy/' },
+    { id: 'husary', name: 'محمود خليل الحصري', style: 'مرتل', description: 'من أعظم قراء القرآن الكريم', country: 'مصر', quality: 'ممتازة', audioUrl: 'https://server6.mp3quran.net/husary/' },
+    { id: 'maher', name: 'ماهر المعيقلي', style: 'مرتل', description: 'إمام الحرم المكي الشريف', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://server6.mp3quran.net/maher/' },
+    { id: 'sudais', name: 'عبد الرحمن السديس', style: 'مرتل', description: 'إمام الحرم المكي الشريف', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://server6.mp3quran.net/sudais/' },
+    { id: 'shuraim', name: 'سعود الشريم', style: 'مرتل', description: 'إمام الحرم المكي الشريف', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://server6.mp3quran.net/shuraim/' },
+    { id: 'ajmy', name: 'أحمد بن علي العجمي', style: 'مرتل', description: 'صوت جميل ومتميز', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://server6.mp3quran.net/ajmy/' },
+    { id: 'qatami', name: 'ناصر القطامي', style: 'مرتل', description: 'قراءة مؤثرة ومتقنة', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://server6.mp3quran.net/qatami/' },
+    { id: 'tablawi', name: 'محمد صديق المنشاوي', style: 'مرتل', description: 'من أعظم قراء القرآن', country: 'مصر', quality: 'ممتازة', audioUrl: 'https://server6.mp3quran.net/tablawi/' },
+    { id: 'rifai', name: 'هاني الرفاعي', style: 'مرتل', description: 'قراءة مؤثرة وعذبة', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://server6.mp3quran.net/rifai/' },
     
-    // Classical Masters (Server 7)
-    { id: 'basit', name: 'عبد الباسط عبد الصمد', server: 'server7', style: 'مرتل', description: 'الصوت الذهبي المميز', country: 'مصر', quality: 'ممتازة' },
-    { id: 'husary_muallim', name: 'محمود خليل الحصري (تعليمي)', server: 'server7', style: 'تعليمي', description: 'قراءة تعليمية واضحة', country: 'مصر', quality: 'ممتازة' },
-    { id: 'fares', name: 'فارس عباد', server: 'server7', style: 'مرتل', description: 'صوت مميز وواضح', country: 'الكويت', quality: 'جيدة جداً' },
+    // Classical Masters
+    { id: 'basit', name: 'عبد الباسط عبد الصمد', style: 'مرتل', description: 'الصوت الذهبي المميز', country: 'مصر', quality: 'ممتازة', audioUrl: 'https://server7.mp3quran.net/basit/' },
+    { id: 'husary_muallim', name: 'محمود خليل الحصري (تعليمي)', style: 'تعليمي', description: 'قراءة تعليمية واضحة', country: 'مصر', quality: 'ممتازة', audioUrl: 'https://server7.mp3quran.net/husary_muallim/' },
+    { id: 'fares', name: 'فارس عباد', style: 'مرتل', description: 'صوت مميز وواضح', country: 'الكويت', quality: 'جيدة جداً', audioUrl: 'https://server7.mp3quran.net/fares/' },
     
-    // Popular Contemporary Reciters (Server 8)
-    { id: 'afs', name: 'مشاري العفاسي', server: 'server8', style: 'مرتل', description: 'قراءة مؤثرة وهادئة', country: 'الكويت', quality: 'ممتازة' },
-    { id: 'ayyub', name: 'محمد أيوب', server: 'server8', style: 'مرتل', description: 'إمام الحرم المدني الشريف', country: 'السعودية', quality: 'ممتازة' },
-    { id: 'jalalayn', name: 'خالد الجليل', server: 'server8', style: 'مرتل', description: 'قراءة هادئة ومؤثرة', country: 'السعودية', quality: 'ممتازة' },
-    { id: 'khaled_al_qahtani', name: 'خالد القحطاني', server: 'server8', style: 'مرتل', description: 'قراءة مؤثرة وجميلة', country: 'السعودية', quality: 'جيدة جداً' },
+    // Popular Contemporary Reciters
+    { id: 'afs', name: 'مشاري العفاسي', style: 'مرتل', description: 'قراءة مؤثرة وهادئة', country: 'الكويت', quality: 'ممتازة', audioUrl: 'https://server8.mp3quran.net/afs/' },
+    { id: 'ayyub', name: 'محمد أيوب', style: 'مرتل', description: 'إمام الحرم المدني الشريف', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://server8.mp3quran.net/ayyub/' },
+    { id: 'jalalayn', name: 'خالد الجليل', style: 'مرتل', description: 'قراءة هادئة ومؤثرة', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://server8.mp3quran.net/jalalayn/' },
+    { id: 'khaled_al_qahtani', name: 'خالد القحطاني', style: 'مرتل', description: 'قراءة مؤثرة وجميلة', country: 'السعودية', quality: 'جيدة جداً', audioUrl: 'https://server8.mp3quran.net/khaled_al_qahtani/' },
     
-    // International and Regional Reciters (Server 10)
-    { id: 'parhizgar', name: 'عبد الله کاندهلوی', server: 'server10', style: 'مرتل', description: 'قراءة مؤثرة ومتقنة', country: 'باكستان', quality: 'جيدة جداً' },
-    { id: 'hudhaify', name: 'علي الحذيفي', server: 'server10', style: 'مرتل', description: 'إمام الحرم المدني الشريف', country: 'السعودية', quality: 'ممتازة' },
-    { id: 'siddeeq', name: 'محمد صديق المنشاوي (مجود)', server: 'server10', style: 'مجود', description: 'قراءة مجودة رائعة', country: 'مصر', quality: 'ممتازة' },
-    { id: 'basfar', name: 'عبد الله بصفر', server: 'server10', style: 'مرتل', description: 'إمام الحرم المكي الشريف', country: 'السعودية', quality: 'ممتازة' },
+    // International and Regional Reciters
+    { id: 'hudhaify', name: 'علي الحذيفي', style: 'مرتل', description: 'إمام الحرم المدني الشريف', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://server10.mp3quran.net/hudhaify/' },
+    { id: 'basfar', name: 'عبد الله بصفر', style: 'مرتل', description: 'إمام الحرم المكي الشريف', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://server10.mp3quran.net/basfar/' },
     
-    // Additional Quality Reciters (Server 11)
-    { id: 'abdurrahman_al_sudais', name: 'عبد الرحمن السديس', server: 'server11', style: 'مرتل', description: 'إمام الحرم المكي الشريف', country: 'السعودية', quality: 'ممتازة' },
-    { id: 'shahat', name: 'محمد صديق شحات', server: 'server11', style: 'مرتل', description: 'قراءة جميلة ومؤثرة', country: 'مصر', quality: 'جيدة جداً' },
-    { id: 'juhany', name: 'عبد الله الجهني', server: 'server11', style: 'مرتل', description: 'قراءة هادئة ومتقنة', country: 'السعودية', quality: 'جيدة جداً' },
+    // Additional Quality Reciters
+    { id: 'shahat', name: 'محمد صديق شحات', style: 'مرتل', description: 'قراءة جميلة ومؤثرة', country: 'مصر', quality: 'جيدة جداً', audioUrl: 'https://server11.mp3quran.net/shahat/' },
+    { id: 'juhany', name: 'عبد الله الجهني', style: 'مرتل', description: 'قراءة هادئة ومتقنة', country: 'السعودية', quality: 'جيدة جداً', audioUrl: 'https://server11.mp3quran.net/juhany/' },
     
-    // Contemporary and Modern Reciters (Server 12)
-    { id: 'haram', name: 'علي بن عبد الرحمن الحذيفي', server: 'server12', style: 'مرتل', description: 'إمام الحرم المدني الشريف', country: 'السعودية', quality: 'ممتازة' },
-    { id: 'amer', name: 'إسلام صبحي', server: 'server12', style: 'مرتل', description: 'قراءة معاصرة مؤثرة', country: 'مصر', quality: 'جيدة جداً' },
-    { id: 'kalbany', name: 'فارس كلباني', server: 'server12', style: 'مرتل', description: 'قراءة متميزة وواضحة', country: 'لبنان', quality: 'جيدة جداً' },
+    // Contemporary and Modern Reciters
+    { id: 'ibrahim_walk', name: 'إبراهيم الأخضر', style: 'مرتل', description: 'قراءة هادئة ومؤثرة', country: 'السودان', quality: 'جيدة جداً', audioUrl: 'https://server8.mp3quran.net/ibrahim_walk/' },
     
-    // Regional and Diverse Reciters (Server 13)
-    { id: 'bucatar', name: 'رعد محمد الكردي', server: 'server13', style: 'مرتل', description: 'قراءة مؤثرة ومتقنة', country: 'العراق', quality: 'جيدة جداً' },
-    { id: 'ahmedajamy', name: 'أحمد نعينع', server: 'server13', style: 'مرتل', description: 'قراءة متميزة وواضحة', country: 'المغرب', quality: 'جيدة جداً' },
-    { id: 'banashawy', name: 'محمد رشاد الشريف', server: 'server13', style: 'مرتل', description: 'قراءة متميزة ومؤثرة', country: 'مصر', quality: 'جيدة جداً' },
-
-    // Additional well-known and reliable reciters
-    { id: 'minsh', name: 'محمد صديق المنشاوي (مجود)', server: 'server6', style: 'مجود', description: 'قراءة مجودة رائعة', country: 'مصر', quality: 'ممتازة' },
-    { id: 'saood', name: 'سعود الشريم', server: 'server6', style: 'مرتل', description: 'إمام الحرم المكي الشريف', country: 'السعودية', quality: 'ممتازة' },
-    { id: 'ibrahim_walk', name: 'إبراهيم الأخضر', server: 'server8', style: 'مرتل', description: 'قراءة هادئة ومؤثرة', country: 'السودان', quality: 'جيدة جداً' },
-    { id: 'alafasy', name: 'مشاري راشد العفاسي (مكرر)', server: 'server8', style: 'ترديد', description: 'نسخة مع ترديد للحفظ', country: 'الكويت', quality: 'ممتازة' },
+    // More Popular Reciters for Variety
+    { id: 'abdurrahman_al_sudais', name: 'عبد الرحمن السديس (إضافي)', style: 'مرتل', description: 'نسخة إضافية بجودة مختلفة', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://www.everyayah.com/data/AbdurRahman_As-Sudais_192kbps/' },
+    { id: 'parhizgar', name: 'عبد الله کاندهلوی', style: 'مرتل', description: 'قراءة مؤثرة ومتقنة', country: 'باكستان', quality: 'جيدة جداً', audioUrl: 'https://www.everyayah.com/data/Parhizgar_40kbps/' },
+    { id: 'bucatar', name: 'رعد محمد الكردي', style: 'مرتل', description: 'قراءة مؤثرة ومتقنة', country: 'العراق', quality: 'جيدة جداً', audioUrl: 'https://www.everyayah.com/data/Raad_Muhammad_Al-Kurdi_40kbps/' },
+    { id: 'ahmedajamy', name: 'أحمد نعينع', style: 'مرتل', description: 'قراءة متميزة وواضحة', country: 'المغرب', quality: 'جيدة جداً', audioUrl: 'https://www.everyayah.com/data/Ahmed_ibn_Ali_al-Ajamy_128kbps_ketaballah.net/' },
+    { id: 'minsh', name: 'محمد صديق المنشاوي (مجود)', style: 'مجود', description: 'قراءة مجودة رائعة', country: 'مصر', quality: 'ممتازة', audioUrl: 'https://www.everyayah.com/data/Minshawy_Mujawwad_192kbps/' },
+    { id: 'abdulbasit_abd_us_samad', name: 'عبد الباسط عبد الصمد (مجود)', style: 'مجود', description: 'قراءة مجودة رائعة بالصوت الذهبي', country: 'مصر', quality: 'ممتازة', audioUrl: 'https://www.everyayah.com/data/Abdul_Basit_Mujawwad_128kbps/' },
+    { id: 'saood_ash_shuraym', name: 'سعود الشريم (إضافي)', style: 'مرتل', description: 'نسخة إضافية بجودة عالية', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://www.everyayah.com/data/Saood_ash-Shuraym_128kbps/' },
+    { id: 'maher_al_muaiqly', name: 'ماهر المعيقلي (إضافي)', style: 'مرتل', description: 'نسخة إضافية بجودة عالية', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://www.everyayah.com/data/Maher_AlMuaiqly_128kbps/' },
+    { id: 'yasser_al_dosari', name: 'ياسر الدوسري', style: 'مرتل', description: 'قراءة مؤثرة وجميلة', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://www.everyayah.com/data/Yasser_Al-Dosari_128kbps/' },
+    { id: 'abdulmuhsin_al_qasim', name: 'عبد المحسن القاسم', style: 'مرتل', description: 'إمام المسجد النبوي الشريف', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://www.everyayah.com/data/AbdulMuhsin_Al-Qasim_192kbps/' },
+    { id: 'salah_bukhatir', name: 'صلاح بو خاطر', style: 'مرتل', description: 'قراءة عذبة ومؤثرة', country: 'الإمارات', quality: 'ممتازة', audioUrl: 'https://www.everyayah.com/data/Salah_Al-Budair_128kbps/' },
+    { id: 'nasser_al_qatami', name: 'ناصر القطامي (إضافي)', style: 'مرتل', description: 'نسخة إضافية بجودة عالية', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://www.everyayah.com/data/Nasser_Alqatami_128kbps/' },
+    { id: 'khalifa_al_tunaiji', name: 'خليفة الطنيجي', style: 'مرتل', description: 'قراءة جميلة ومتقنة', country: 'الإمارات', quality: 'جيدة جداً', audioUrl: 'https://www.everyayah.com/data/Khalifa_Al-Tunaiji_64kbps/' },
+    { id: 'ibrahim_al_dosari', name: 'إبراهيم الدوسري', style: 'مرتل', description: 'قراءة مؤثرة وواضحة', country: 'السعودية', quality: 'جيدة جداً', audioUrl: 'https://www.everyayah.com/data/Ibrahim_Al-Dosari_64kbps/' },
+    { id: 'bandar_baleela', name: 'بندر بليلة', style: 'مرتل', description: 'قراءة حديثة ومتميزة', country: 'السعودية', quality: 'جيدة جداً', audioUrl: 'https://www.everyayah.com/data/Bandar_Baleela_64kbps/' },
+    { id: 'hani_ar_rifai', name: 'هاني الرفاعي (إضافي)', style: 'مرتل', description: 'نسخة إضافية بجودة عالية', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://www.everyayah.com/data/Hani_Rifai_192kbps/' },
+    { id: 'muhammad_ayyub', name: 'محمد أيوب (إضافي)', style: 'مرتل', description: 'نسخة إضافية بجودة عالية', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://www.everyayah.com/data/Muhammad_Ayyoub_128kbps/' },
+    { id: 'sahl_yassin', name: 'سهل ياسين', style: 'مرتل', description: 'قراءة معاصرة وجميلة', country: 'السعودية', quality: 'جيدة جداً', audioUrl: 'https://www.everyayah.com/data/Sahl_Yassin_128kbps/' },
   ];
 
   useEffect(() => {
@@ -105,10 +108,9 @@ const QuranAudio: React.FC = () => {
         console.log('Loaded QuranAudio favorites from database:', preferences.quran_audio_favorites);
       }
       // Load last used reciter
-      if (preferences.last_reciter && preferences.last_server) {
+      if (preferences.last_reciter) {
         setSelectedReciter(preferences.last_reciter);
-        setSelectedServer(preferences.last_server);
-        console.log('Restored last reciter:', preferences.last_reciter, preferences.last_server);
+        console.log('Restored last reciter:', preferences.last_reciter);
       }
     }
   }, [preferences]);
@@ -118,7 +120,6 @@ const QuranAudio: React.FC = () => {
     if (!isAuthenticated) {
       setFavorites([]);
       setSelectedReciter('ghamdi');
-      setSelectedServer('server6');
     }
   }, [isAuthenticated]);
 
@@ -158,71 +159,11 @@ const QuranAudio: React.FC = () => {
   // Audio URL generation helper function with improved reciter support
   const generateAudioUrl = (reciter: Reciter, surahNumber: number): string => {
     const formattedSurahNumber = surahNumber.toString().padStart(3, '0');
-    
-    // Updated URL patterns based on server and reciter
-    switch (reciter.server) {
-      case 'server6':
-        // Most reliable reciters on server6
-        if (['ghamdi', 'afasy', 'husary', 'maher', 'sudais', 'shuraim', 'ajmy', 'qatami', 'tablawi', 'rifai', 'minsh', 'saood'].includes(reciter.id)) {
-          return `https://server6.mp3quran.net/${reciter.id}/${formattedSurahNumber}.mp3`;
-        }
-        break;
-        
-      case 'server7':
-        // Classical reciters with different URL patterns
-        if (reciter.id === 'basit') {
-          return `https://server7.mp3quran.net/basit/${formattedSurahNumber}.mp3`;
-        }
-        if (reciter.id === 'husary_muallim') {
-          return `https://server7.mp3quran.net/husary_muallim/${formattedSurahNumber}.mp3`;
-        }
-        if (reciter.id === 'fares') {
-          return `https://server7.mp3quran.net/fares/${formattedSurahNumber}.mp3`;
-        }
-        break;
-        
-      case 'server8':
-        // Popular contemporary reciters
-        if (['afs', 'ayyub', 'jalalayn', 'khaled_al_qahtani', 'ibrahim_walk', 'alafasy'].includes(reciter.id)) {
-          return `https://server8.mp3quran.net/${reciter.id}/${formattedSurahNumber}.mp3`;
-        }
-        break;
-        
-      case 'server10':
-        // International and regional reciters
-        if (['parhizgar', 'hudhaify', 'siddeeq', 'basfar'].includes(reciter.id)) {
-          return `https://server10.mp3quran.net/${reciter.id}/${formattedSurahNumber}.mp3`;
-        }
-        break;
-        
-      case 'server11':
-        // Additional quality reciters
-        if (['abdurrahman_al_sudais', 'shahat', 'juhany'].includes(reciter.id)) {
-          return `https://server11.mp3quran.net/${reciter.id}/${formattedSurahNumber}.mp3`;
-        }
-        break;
-        
-      case 'server12':
-        // Contemporary and modern reciters
-        if (['haram', 'amer', 'kalbany'].includes(reciter.id)) {
-          return `https://server12.mp3quran.net/${reciter.id}/${formattedSurahNumber}.mp3`;
-        }
-        break;
-        
-      case 'server13':
-        // Regional and diverse reciters
-        if (['bucatar', 'ahmedajamy', 'banashawy'].includes(reciter.id)) {
-          return `https://server13.mp3quran.net/${reciter.id}/${formattedSurahNumber}.mp3`;
-        }
-        break;
-    }
-    
-    // Primary fallback - most common pattern
-    return `https://${reciter.server}.mp3quran.net/${reciter.id}/${formattedSurahNumber}.mp3`;
+    return `${reciter.audioUrl}${formattedSurahNumber}.mp3`;
   };
 
   const playAudio = async (surahNumber: number) => {
-    const reciter = reciters.find(r => r.id === selectedReciter && r.server === selectedServer);
+    const reciter = reciters.find(r => r.id === selectedReciter);
     if (!reciter) {
       setAudioError('القارئ المحدد غير متاح');
       return;
@@ -300,7 +241,7 @@ const QuranAudio: React.FC = () => {
         
         // Save last used reciter to database
         if (isAuthenticated && updateLastReciter) {
-          updateLastReciter(selectedReciter, selectedServer).catch(console.error);
+          updateLastReciter(selectedReciter, '').catch(console.error);
         }
         
         console.log(`✅ Successfully loaded audio from: ${audioUrl}`);
@@ -320,8 +261,8 @@ const QuranAudio: React.FC = () => {
   };
 
   // Test audio function for individual reciter testing
-  const testReciterAudio = async (reciterId: string, serverName: string) => {
-    const reciter = reciters.find(r => r.id === reciterId && r.server === serverName);
+  const testReciterAudio = async (reciterId: string) => {
+    const reciter = reciters.find(r => r.id === reciterId);
     if (!reciter) return false;
     
     try {
@@ -354,10 +295,9 @@ const QuranAudio: React.FC = () => {
       return;
     }
     
-    const reciterKey = `${selectedServer}-${reciterId}`;
-    const newFavorites = favorites.includes(reciterKey) 
-      ? favorites.filter(id => id !== reciterKey)
-      : [...favorites, reciterKey];
+    const newFavorites = favorites.includes(reciterId) 
+      ? favorites.filter(id => id !== reciterId)
+      : [...favorites, reciterId];
       
     setFavorites(newFavorites);
     
@@ -377,10 +317,8 @@ const QuranAudio: React.FC = () => {
     
     // Sort by favorites first, then by quality, then by name
     return filtered.sort((a, b) => {
-      const aKey = `${a.server}-${a.id}`;
-      const bKey = `${b.server}-${b.id}`;
-      const aFav = favorites.includes(aKey);
-      const bFav = favorites.includes(bKey);
+      const aFav = favorites.includes(a.id);
+      const bFav = favorites.includes(b.id);
       
       if (aFav && !bFav) return -1;
       if (!aFav && bFav) return 1;
@@ -494,7 +432,7 @@ const QuranAudio: React.FC = () => {
               border: '1px solid rgba(59, 130, 246, 0.3)'
             }}>
               <span style={{ color: '#3b82f6', fontWeight: 'bold' }}>
-                🌐 {Array.from(new Set(reciters.map(r => r.server))).length} خادم متاح
+                � {reciters.length} قارئ متاح
               </span>
             </div>
             <div style={{
@@ -568,42 +506,8 @@ const QuranAudio: React.FC = () => {
               />
             </div>
 
-            {/* Server Selection */}
-            <div>
-              <label style={{ 
-                display: 'block', 
-                marginBottom: '0.5rem', 
-                color: theme.colors.text,
-                fontWeight: 'bold'
-              }}>
-                🌐 اختر الخادم:
-              </label>
-              <select 
-                value={selectedServer} 
-                onChange={(e) => setSelectedServer(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '0.75rem',
-                  borderRadius: '10px',
-                  border: `1px solid ${theme.colors.border}`,
-                  background: isDarkMode ? '#1e293b' : 'white',
-                  color: theme.colors.text,
-                  fontSize: '1rem'
-                }}
-              >
-                <option value="server6">خادم 6</option>
-                <option value="server7">خادم 7</option>
-                <option value="server8">خادم 8</option>
-                <option value="server9">خادم 9</option>
-                <option value="server10">خادم 10</option>
-                <option value="server11">خادم 11</option>
-                <option value="server12">خادم 12</option>
-                <option value="server13">خادم 13</option>
-              </select>
-            </div>
-
             {/* Reciter Selection */}
-            <div>
+            <div style={{ gridColumn: 'span 2' }}>
               <label style={{ 
                 display: 'block', 
                 marginBottom: '0.5rem', 
@@ -626,10 +530,8 @@ const QuranAudio: React.FC = () => {
                 }}
               >
                 {getFilteredReciters()
-                  .filter(reciter => reciter.server === selectedServer)
                   .map((reciter) => {
-                    const reciterKey = `${reciter.server}-${reciter.id}`;
-                    const isFavorite = favorites.includes(reciterKey);
+                    const isFavorite = favorites.includes(reciter.id);
                     return (
                       <option key={reciter.id} value={reciter.id}>
                         {isFavorite ? '⭐ ' : ''}{reciter.name} ({reciter.style}) - {reciter.country} - {reciter.quality}
@@ -644,24 +546,24 @@ const QuranAudio: React.FC = () => {
                     color: theme.colors.textSecondary,
                     marginBottom: '0.5rem'
                   }}>
-                    {reciters.find(r => r.id === selectedReciter && r.server === selectedServer)?.description}
+                    {reciters.find(r => r.id === selectedReciter)?.description}
                   </p>
                   <button
                     onClick={() => toggleFavorite(selectedReciter)}
                     style={{
-                      background: favorites.includes(`${selectedServer}-${selectedReciter}`) 
+                      background: favorites.includes(selectedReciter) 
                         ? 'linear-gradient(135deg, #f59e0b, #d97706)' 
                         : theme.colors.border,
                       border: 'none',
                       borderRadius: '8px',
                       padding: '0.5rem 1rem',
-                      color: favorites.includes(`${selectedServer}-${selectedReciter}`) ? 'white' : theme.colors.text,
+                      color: favorites.includes(selectedReciter) ? 'white' : theme.colors.text,
                       fontSize: '0.9rem',
                       cursor: 'pointer',
                       transition: 'all 0.3s ease'
                     }}
                   >
-                    {favorites.includes(`${selectedServer}-${selectedReciter}`) ? '⭐ إزالة من المفضلة' : '⭐ إضافة للمفضلة'}
+                    {favorites.includes(selectedReciter) ? '⭐ إزالة من المفضلة' : '⭐ إضافة للمفضلة'}
                   </button>
                 </div>
               )}
@@ -691,9 +593,9 @@ const QuranAudio: React.FC = () => {
               <button
                 onClick={async () => {
                   setAudioError(null);
-                  const reciter = reciters.find(r => r.id === selectedReciter && r.server === selectedServer);
+                  const reciter = reciters.find(r => r.id === selectedReciter);
                   if (reciter) {
-                    const testResult = await testReciterAudio(selectedReciter, selectedServer);
+                    const testResult = await testReciterAudio(selectedReciter);
                     if (testResult) {
                       setAudioError(`✅ القارئ ${reciter.name} متاح ويعمل بشكل صحيح`);
                     } else {
@@ -787,20 +689,18 @@ const QuranAudio: React.FC = () => {
                 flexWrap: 'wrap',
                 gap: '0.5rem'
               }}>
-                {favorites.map(favoriteKey => {
-                  const [server, reciterId] = favoriteKey.split('-');
-                  const reciter = reciters.find(r => r.id === reciterId && r.server === server);
+                {favorites.map(reciterId => {
+                  const reciter = reciters.find(r => r.id === reciterId);
                   if (!reciter) return null;
                   
                   return (
                     <button
-                      key={favoriteKey}
+                      key={reciterId}
                       onClick={() => {
-                        setSelectedServer(server);
                         setSelectedReciter(reciterId);
                       }}
                       style={{
-                        background: (selectedServer === server && selectedReciter === reciterId)
+                        background: selectedReciter === reciterId
                           ? 'linear-gradient(135deg, #f59e0b, #d97706)'
                           : isDarkMode ? 'rgba(59, 130, 246, 0.2)' : 'rgba(59, 130, 246, 0.1)',
                         border: '1px solid rgba(59, 130, 246, 0.3)',
@@ -812,7 +712,7 @@ const QuranAudio: React.FC = () => {
                         transition: 'all 0.3s ease'
                       }}
                     >
-                      {reciter.name} ({server})
+                      {reciter.name}
                     </button>
                   );
                 })}
