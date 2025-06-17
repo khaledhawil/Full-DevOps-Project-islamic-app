@@ -10,7 +10,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-# Install everything in one layer to minimize image size
+# Install everything in one layer to minimize image size // 
 RUN apk add --no-cache --virtual .build-deps \
     gcc \
     musl-dev \
