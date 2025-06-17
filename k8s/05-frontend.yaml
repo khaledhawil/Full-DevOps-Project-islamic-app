@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: khaledhawil/islamic-app_frontend:18-2835942
+        image: khaledhawil/islamic-app_frontend:20-254c35e
         # imagePullPolicy: Never  # For local development
         env:
         - name: REACT_APP_API_URL
