@@ -119,16 +119,11 @@ pipeline {
                 script {
                     try {
                         echo "🏗️ Building Frontend..."
-                        
                         dir('frontend') {
-                            // Build Docker image
-                            def frontendImage = docker.build("${FRONTEND_IMAGE}:${env.BUILD_TAG}")
-                            
-                            // Tag as latest
-                            sh "docker tag ${FRONTEND_IMAGE}:${env.BUILD_TAG} ${FRONTEND_IMAGE}:latest"
-                            
+                            sh "docker build -t ${env.FRONTEND_IMAGE}:${env.BUILD_TAG} ."
+                            sh "docker tag ${env.FRONTEND_IMAGE}:${env.BUILD_TAG} ${env.FRONTEND_IMAGE}:latest"
                             env.FRONTEND_IMAGE_TAG = env.BUILD_TAG
-                            echo "✅ Frontend build completed: ${FRONTEND_IMAGE}:${env.BUILD_TAG}"
+                            echo "✅ Frontend build completed: ${env.FRONTEND_IMAGE}:${env.BUILD_TAG}"
                         }
                     } catch (Exception e) {
                         sendDiscordNotification("❌ **Frontend Build Failed**", "Frontend build failed: ${e.message}", "error")
@@ -146,16 +141,11 @@ pipeline {
                 script {
                     try {
                         echo "🏗️ Building Backend..."
-                        
                         dir('backend') {
-                            // Build Docker image
-                            def backendImage = docker.build("${BACKEND_IMAGE}:${env.BUILD_TAG}")
-                            
-                            // Tag as latest
-                            sh "docker tag ${BACKEND_IMAGE}:${env.BUILD_TAG} ${BACKEND_IMAGE}:latest"
-                            
+                            sh "docker build -t ${env.BACKEND_IMAGE}:${env.BUILD_TAG} ."
+                            sh "docker tag ${env.BACKEND_IMAGE}:${env.BUILD_TAG} ${env.BACKEND_IMAGE}:latest"
                             env.BACKEND_IMAGE_TAG = env.BUILD_TAG
-                            echo "✅ Backend build completed: ${BACKEND_IMAGE}:${env.BUILD_TAG}"
+                            echo "✅ Backend build completed: ${env.BACKEND_IMAGE}:${env.BUILD_TAG}"
                         }
                     } catch (Exception e) {
                         sendDiscordNotification("❌ **Backend Build Failed**", "Backend build failed: ${e.message}", "error")
@@ -202,26 +192,23 @@ pipeline {
                     }
                     steps {
                         script {
-                            docker.withRegistry('https://registry.hub.docker.com', 'dockerhub') {
-                                sh "docker push ${FRONTEND_IMAGE}:${env.BUILD_TAG}"
-                                sh "docker push ${FRONTEND_IMAGE}:latest"
-                            }
-                            echo "✅ Frontend image pushed: ${FRONTEND_IMAGE}:${env.BUILD_TAG}"
+                            sh "echo $DOCKER_CREDENTIALS_PSW | docker login -u $DOCKER_CREDENTIALS_USR --password-stdin"
+                            sh "docker push ${env.FRONTEND_IMAGE}:${env.BUILD_TAG}"
+                            sh "docker push ${env.FRONTEND_IMAGE}:latest"
+                            echo "✅ Frontend image pushed: ${env.FRONTEND_IMAGE}:${env.BUILD_TAG}"
                         }
                     }
                 }
-                
                 stage('Push Backend') {
                     when {
                         expression { env.BUILD_BACKEND == 'true' }
                     }
                     steps {
                         script {
-                            docker.withRegistry('https://registry.hub.docker.com', 'dockerhub') {
-                                sh "docker push ${BACKEND_IMAGE}:${env.BUILD_TAG}"
-                                sh "docker push ${BACKEND_IMAGE}:latest"
-                            }
-                            echo "✅ Backend image pushed: ${BACKEND_IMAGE}:${env.BUILD_TAG}"
+                            sh "echo $DOCKER_CREDENTIALS_PSW | docker login -u $DOCKER_CREDENTIALS_USR --password-stdin"
+                            sh "docker push ${env.BACKEND_IMAGE}:${env.BUILD_TAG}"
+                            sh "docker push ${env.BACKEND_IMAGE}:latest"
+                            echo "✅ Backend image pushed: ${env.BACKEND_IMAGE}:${env.BUILD_TAG}"
                         }
                     }
                 }
