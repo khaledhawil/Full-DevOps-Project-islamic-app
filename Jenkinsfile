@@ -157,7 +157,7 @@ pipeline {
         
         stage('Security Scan') {
             when {
-                not { params.SKIP_SECURITY_SCAN }
+                expression { !params.SKIP_SECURITY_SCAN }
             }
             parallel {
                 stage('Scan Frontend') {
@@ -220,7 +220,7 @@ pipeline {
         
         stage('Update K8s Manifests') {
             when {
-                not { params.SKIP_DEPLOY }
+                expression { !params.SKIP_DEPLOY }
             }
             steps {
                 script {
@@ -456,7 +456,7 @@ def sendDiscordNotification(title, message, type = "info") {
             httpMode: 'POST',
             url: env.DISCORD_WEBHOOK,
             contentType: 'APPLICATION_JSON',
-            requestBody: groovy.json.JsonBuilder(payload).toString()
+            requestBody: new groovy.json.JsonBuilder(payload).toString()
         )
     } catch (Exception e) {
         echo "⚠️ Failed to send Discord notification: ${e.message}"
