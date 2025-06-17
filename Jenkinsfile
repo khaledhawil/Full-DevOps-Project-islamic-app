@@ -293,15 +293,21 @@ pipeline {
             // Archive artifacts
             archiveArtifacts artifacts: 'security-reports/*.json', allowEmptyArchive: true
             
-            // Publish security scan results
-            publishHTML([
-                allowMissing: false,
-                alwaysLinkToLastBuild: true,
-                keepAll: true,
-                reportDir: 'security-reports',
-                reportFiles: '*.html',
-                reportName: 'Security Scan Report'
-            ])
+            // Publish security scan results (if HTML Publisher plugin is available)
+            script {
+                try {
+                    publishHTML([
+                        allowMissing: false,
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true,
+                        reportDir: 'security-reports',
+                        reportFiles: '*.html',
+                        reportName: 'Security Scan Report'
+                    ])
+                } catch (Exception e) {
+                    echo "⚠️ HTML Publisher plugin not available or no HTML reports found: ${e.message}"
+                }
+            }
         }
     }
 }
@@ -368,6 +374,15 @@ def scanImage(imageName, component) {
         sh """
             trivy image --format json --output security-reports/${component}-scan.json ${imageName}
             trivy image --format table ${imageName} | tee security-reports/${component}-scan.txt
+            
+            # Generate HTML report if possible
+            if command -v pandoc &> /dev/null; then
+                pandoc security-reports/${component}-scan.txt -f plain -t html -o security-reports/${component}-scan.html 2>/dev/null || echo "HTML conversion failed"
+            else
+                echo "<html><body><h1>Security Scan Report for ${component}</h1><pre>" > security-reports/${component}-scan.html
+                cat security-reports/${component}-scan.txt >> security-reports/${component}-scan.html
+                echo "</pre></body></html>" >> security-reports/${component}-scan.html
+            fi
         """
         
         // Check for HIGH/CRITICAL vulnerabilities
@@ -452,13 +467,26 @@ def sendDiscordNotification(title, message, type = "info") {
     ]
     
     try {
+        // Use JsonOutput instead of JsonBuilder for better compatibility
+        def jsonPayload = groovy.json.JsonOutput.toJson(payload)
         httpRequest(
             httpMode: 'POST',
             url: env.DISCORD_WEBHOOK,
             contentType: 'APPLICATION_JSON',
-            requestBody: new groovy.json.JsonBuilder(payload).toString()
+            requestBody: jsonPayload
         )
     } catch (Exception e) {
         echo "⚠️ Failed to send Discord notification: ${e.message}"
+        // Fallback: try simple curl command
+        try {
+            def simpleMessage = "${title}: ${message}"
+            sh """
+                curl -X POST -H "Content-Type: application/json" \\
+                     -d '{"content": "${simpleMessage.replaceAll('"', '\\\\"')}"}' \\
+                     "${env.DISCORD_WEBHOOK}" || echo "Curl fallback also failed"
+            """
+        } catch (Exception fallbackError) {
+            echo "⚠️ Discord notification fallback also failed: ${fallbackError.message}"
+        }
     }
 }
