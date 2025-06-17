@@ -16,7 +16,7 @@ RUN npm run build \
     && find build -name "*.map" -delete \
     && rm -rf node_modules src public package*.json
 
-# Ultra-minimal nginx 
+# Ultra-minimal nginx  //
 FROM nginx:alpine
 
 # Remove everything unnecessary
