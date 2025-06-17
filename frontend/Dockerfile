@@ -10,7 +10,7 @@ COPY package*.json ./
 RUN npm ci --silent --legacy-peer-deps \
     && npm cache clean --force
 
-# Copy source and build
+# Copy source and build //
 COPY . ./
 RUN npm run build \
     && find build -name "*.map" -delete \
