@@ -18,7 +18,7 @@ pipeline {
         BACKEND_IMAGE = "${DOCKER_REGISTRY}/${PROJECT_NAME}_backend"
         DISCORD_WEBHOOK = credentials('discord')
         DOCKER_CREDENTIALS = credentials('dockerhub')
-        GIT_CREDENTIALS = credentials('github-credentials')
+        GIT_CREDENTIALS = credentials('github')
         TRIVY_VERSION = '0.48.0'
     }
     
@@ -226,7 +226,7 @@ pipeline {
                         updateK8sManifests()
                         
                         // Commit and push changes
-                        withCredentials([usernamePassword(credentialsId: 'github-credentials', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
+                        withCredentials([usernamePassword(credentialsId: 'github', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
                             sh """
                                 git config user.name "Jenkins CI"
                                 git config user.email "jenkins@islamic-app.local"

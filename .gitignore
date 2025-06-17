@@ -172,7 +172,7 @@ config.local.*
 settings.local.*
 
 # Package lock files (choose one strategy)
-package-lock.json
+# package-lock.json (now included for Docker builds)
 yarn.lock
 
 # Security and secrets
