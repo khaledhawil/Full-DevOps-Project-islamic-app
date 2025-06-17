@@ -229,13 +229,13 @@ pipeline {
                         updateK8sManifests()
                         
                         // Commit and push changes
-                        withCredentials([gitUsernamePassword(credentialsId: 'git-credentials')]) {
+                        withCredentials([usernamePassword(credentialsId: 'github-credentials', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
                             sh """
                                 git config user.name "Jenkins CI"
                                 git config user.email "jenkins@islamic-app.local"
                                 git add k8s/
                                 git commit -m "🚀 Update image tags to ${env.BUILD_TAG} [skip ci]" || echo "No changes to commit"
-                                git push origin HEAD:master
+                                git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/\$(git config --get remote.origin.url | sed 's/.*github.com[:/]//;s/.git\$//')/ HEAD:master
                             """
                         }
                         
@@ -247,8 +247,7 @@ pipeline {
                 }
             }
         }
-        
-       
+    }
     post {
         success {
             script {
@@ -462,6 +461,4 @@ def sendDiscordNotification(title, message, type = "info") {
     } catch (Exception e) {
         echo "⚠️ Failed to send Discord notification: ${e.message}"
     }
-}
-
 }
