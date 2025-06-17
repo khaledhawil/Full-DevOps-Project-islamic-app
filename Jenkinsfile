@@ -366,9 +366,13 @@ def scanImage(imageName, component) {
         
         // Install Trivy if not exists
         sh """
-            if ! command -v trivy &> /dev/null; then
+            if ! command -v trivy &> /dev/null && ! test -f ./bin/trivy; then
                 echo "Installing Trivy..."
-                wget -O - https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin v${TRIVY_VERSION}
+                mkdir -p ./bin
+                wget -O - https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b ./bin v${TRIVY_VERSION}
+                export PATH=\$PWD/bin:\$PATH
+            elif test -f ./bin/trivy; then
+                export PATH=\$PWD/bin:\$PATH
             fi
         """
         
@@ -377,6 +381,11 @@ def scanImage(imageName, component) {
         
         // Run security scan
         sh """
+            # Ensure trivy is in PATH
+            if test -f ./bin/trivy; then
+                export PATH=\$PWD/bin:\$PATH
+            fi
+            
             trivy image --format json --output security-reports/${component}-scan.json ${imageName}
             trivy image --format table ${imageName} | tee security-reports/${component}-scan.txt
             
@@ -392,7 +401,12 @@ def scanImage(imageName, component) {
         
         // Check for HIGH/CRITICAL vulnerabilities
         def criticalVulns = sh(
-            script: "trivy image --severity HIGH,CRITICAL --format json ${imageName} | jq '.Results[]?.Vulnerabilities // [] | length' | awk '{sum += \$1} END {print sum+0}'",
+            script: """
+                if test -f ./bin/trivy; then
+                    export PATH=\$PWD/bin:\$PATH
+                fi
+                trivy image --severity HIGH,CRITICAL --format json ${imageName} | jq '.Results[]?.Vulnerabilities // [] | length' | awk '{sum += \$1} END {print sum+0}'
+            """,
             returnStdout: true
         ).trim().toInteger()
         
