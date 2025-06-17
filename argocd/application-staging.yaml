@@ -1,0 +1,32 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: islamic-app-staging
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: islamic-app-project
+  source:
+    repoURL: https://github.com/khaledhawil/Full-DevOps-Project-islamic-app.git
+    targetRevision: develop
+    path: k8s
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: islamic-app-staging
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: false
+    syncOptions:
+      - CreateNamespace=true
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true
+    retry:
+      limit: 3
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 2m
+  revisionHistoryLimit: 5

@@ -1,0 +1,49 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: islamic-app-project
+  namespace: argocd
+spec:
+  description: Islamic App Project for Prayer Times, Quran, and Islamic Content
+  sourceRepos:
+    - https://github.com/khaledhawil/Full-DevOps-Project-islamic-app.git
+  destinations:
+    - namespace: islamic-app
+      server: https://kubernetes.default.svc
+    - namespace: islamic-app-staging
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: ''
+      kind: Namespace
+    - group: ''
+      kind: PersistentVolume
+    - group: storage.k8s.io
+      kind: StorageClass
+    - group: networking.k8s.io
+      kind: Ingress
+  namespaceResourceWhitelist:
+    - group: ''
+      kind: '*'
+    - group: apps
+      kind: '*'
+    - group: extensions
+      kind: '*'
+    - group: networking.k8s.io
+      kind: '*'
+    - group: autoscaling
+      kind: '*'
+  roles:
+    - name: admin
+      description: Admin access to Islamic App
+      policies:
+        - p, proj:islamic-app-project:admin, applications, *, islamic-app-project/*, allow
+        - p, proj:islamic-app-project:admin, repositories, *, *, allow
+      groups:
+        - islamic-app:admin
+    - name: developer
+      description: Developer access to Islamic App
+      policies:
+        - p, proj:islamic-app-project:developer, applications, get, islamic-app-project/*, allow
+        - p, proj:islamic-app-project:developer, applications, sync, islamic-app-project/*, allow
+      groups:
+        - islamic-app:developer
