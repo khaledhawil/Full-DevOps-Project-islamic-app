@@ -6,7 +6,7 @@ metadata:
   labels:
     app: islamic-app-frontend
 spec:
-  replicas: 2
+  replicas: 1  # Reduced from 3 to 1
   selector:
     matchLabels:
       app: islamic-app-frontend
@@ -47,11 +47,11 @@ spec:
           periodSeconds: 5
         resources:
           requests:
-            memory: "256Mi"
-            cpu: "250m"
+            memory: "128Mi"  # Reduced from 256Mi
+            cpu: "100m"      # Reduced from 250m
           limits:
-            memory: "512Mi"
-            cpu: "500m"
+            memory: "256Mi"  # Reduced from 512Mi
+            cpu: "200m"      # Reduced from 500m
 
 ---
 apiVersion: v1
