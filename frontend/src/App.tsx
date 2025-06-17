@@ -9,7 +9,6 @@ import AudioWidget from './components/AudioWidget';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import Dashboard from './pages/Dashboard';
 import Tasbeh from './pages/Tasbeh';
 import PrayerTimes from './pages/PrayerTimes';
 import Quran from './pages/Quran';
