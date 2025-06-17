@@ -102,13 +102,14 @@ data:
 
 ---
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: postgres
   namespace: islamic-app
   labels:
     app: postgres
 spec:
+  serviceName: postgres
   replicas: 1
   selector:
     matchLabels:
@@ -139,6 +140,8 @@ spec:
               key: postgres-password
         - name: POSTGRES_HOST_AUTH_METHOD
           value: "trust"
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
         ports:
         - containerPort: 5432
           name: postgres
@@ -155,6 +158,8 @@ spec:
             - pg_isready -U islamic_user -d islamic_app
           initialDelaySeconds: 30
           periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
         readinessProbe:
           exec:
             command:
@@ -163,6 +168,8 @@ spec:
             - pg_isready -U islamic_user -d islamic_app
           initialDelaySeconds: 5
           periodSeconds: 5
+          timeoutSeconds: 5
+          failureThreshold: 3
         # resources:
         #   requests:
         #     memory: "128Mi"  # Reduced from 256Mi
@@ -171,18 +178,44 @@ spec:
         #     memory: "256Mi"  # Reduced from 512Mi
         #     cpu: "200m"      # Reduced from 500m
       volumes:
-      - name: postgres-storage
-        persistentVolumeClaim:
-          claimName: postgres-pvc
       - name: postgres-init
         configMap:
           name: postgres-init-script
+  volumeClaimTemplates:
+  - metadata:
+      name: postgres-storage
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      storageClassName: "local-path"
+      resources:
+        requests:
+          storage: 5Gi
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: postgres
+  namespace: islamic-app
+  labels:
+    app: postgres
+spec:
+  type: ClusterIP
+  clusterIP: None  # Headless service for StatefulSet
+  ports:
+  - port: 5432
+    targetPort: 5432
+    protocol: TCP
+    name: postgres
+  selector:
+    app: postgres
+
+---
+# Regular service for accessing postgres from other pods
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-service
   namespace: islamic-app
   labels:
     app: postgres
