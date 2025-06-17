@@ -299,23 +299,14 @@ pipeline {
                     echo "⚠️ Docker cleanup failed: ${e.message}"
                 }
             }
-            
             // Archive artifacts
             archiveArtifacts artifacts: 'security-reports/*.json', allowEmptyArchive: true
-            
-            // Publish security scan results (if HTML Publisher plugin is available)
+            // Fallback for HTML report publishing
             script {
-                try {
-                    publishHTML([
-                        allowMissing: false,
-                        alwaysLinkToLastBuild: true,
-                        keepAll: true,
-                        reportDir: 'security-reports',
-                        reportFiles: '*.html',
-                        reportName: 'Security Scan Report'
-                    ])
-                } catch (Exception e) {
-                    echo "⚠️ HTML Publisher plugin not available or no HTML reports found: ${e.message}"
+                if (fileExists('security-reports')) {
+                    echo "Security scan HTML reports are available in the security-reports directory."
+                } else {
+                    echo "No security scan HTML reports found."
                 }
             }
         }
@@ -456,51 +447,13 @@ def updateK8sManifests() {
 }
 
 def sendDiscordNotification(title, message, type = "info") {
-    def color = [
-        "info": 3447003,    // Blue
-        "success": 65280,   // Green
-        "warning": 16776960, // Yellow
-        "error": 16711680   // Red
-    ][type] ?: 3447003
-    
-    def payload = [
-        embeds: [[
+    // Use discordSend step if available
+    try {
+        discordSend(
+            webhookURL: env.DISCORD_WEBHOOK,
             title: title,
             description: message,
-            color: color,
-            timestamp: new Date().format("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"),
-            footer: [
-                text: "Jenkins CI/CD Pipeline",
-                icon_url: "https://www.jenkins.io/images/logos/jenkins/jenkins.png"
-            ],
-            fields: [
-                [
-                    name: "Project",
-                    value: env.PROJECT_NAME,
-                    inline: true
-                ],
-                [
-                    name: "Branch",
-                    value: env.BRANCH_NAME ?: "master",
-                    inline: true
-                ],
-                [
-                    name: "Build",
-                    value: "#${env.BUILD_NUMBER}",
-                    inline: true
-                ]
-            ]
-        ]]
-    ]
-    
-    try {
-        // Use JsonOutput instead of JsonBuilder for better compatibility
-        def jsonPayload = groovy.json.JsonOutput.toJson(payload)
-        httpRequest(
-            httpMode: 'POST',
-            url: env.DISCORD_WEBHOOK,
-            contentType: 'APPLICATION_JSON',
-            requestBody: jsonPayload
+            footer: "Jenkins CI/CD Pipeline"
         )
     } catch (Exception e) {
         echo "⚠️ Failed to send Discord notification: ${e.message}"
