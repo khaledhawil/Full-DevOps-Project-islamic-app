@@ -6,15 +6,13 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Install all dependencies (including dev dependencies for build)
-RUN npm ci --silent --legacy-peer-deps \
+# Install dependencies with more verbose output and better error handling
+RUN npm ci --legacy-peer-deps \
     && npm cache clean --force
 
-# Copy source and build //
+# Copy source and build
 COPY . ./
-RUN npm run build \
-    && find build -name "*.map" -delete \
-    && rm -rf node_modules src public package*.json
+RUN npm run build
 
 # Ultra-minimal nginx  //
 FROM nginx:alpine
