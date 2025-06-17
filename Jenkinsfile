@@ -182,6 +182,34 @@ pipeline {
                     }
                 }
             }
+            post {
+                success {
+                    script {
+                        def message = "🛡️ **Security Scan Completed**\n"
+                        message += "All security scans completed successfully!\n\n"
+                        
+                        if (env.BUILD_FRONTEND == 'true') {
+                            message += "🎨 Frontend scan: ✅ Completed\n"
+                        }
+                        if (env.BUILD_BACKEND == 'true') {
+                            message += "⚙️ Backend scan: ✅ Completed\n"
+                        }
+                        
+                        message += "\n📊 [View Security Reports](${env.BUILD_URL}artifact/security-reports/)"
+                        
+                        sendDiscordNotification("🛡️ **Security Scan Completed**", message, "info")
+                    }
+                }
+                failure {
+                    script {
+                        def message = "🚨 **Security Scan Failed**\n"
+                        message += "One or more security scans failed.\n\n"
+                        message += "🔗 [View Build Logs](${env.BUILD_URL}console)"
+                        
+                        sendDiscordNotification("🚨 **Security Scan Failed**", message, "error")
+                    }
+                }
+            }
         }
         
         stage('Push Images') {
@@ -419,6 +447,11 @@ def scanImage(imageName, component) {
             )
         } else {
             echo "✅ No HIGH/CRITICAL vulnerabilities found in ${component}"
+            sendDiscordNotification(
+                "✅ **Scan Clean**", 
+                "${component} image scan completed - No HIGH/CRITICAL vulnerabilities found", 
+                "success"
+            )
         }
         
     } catch (Exception e) {

@@ -6,7 +6,7 @@ import datetime
 from datetime import timedelta
 from database import db, migrate
 
-# Initialize extensions 
+# Initialize extensions KhaledHawil
 jwt = JWTManager()
 
 def create_app():
