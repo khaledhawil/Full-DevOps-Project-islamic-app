@@ -1,14 +1,20 @@
-# Islamic App - Fullstack with DevOps 
+# Islamic App - Full-Stack Application with Enterprise DevOps
 
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://jenkins.yourdomain.com)
 [![Docker](https://img.shields.io/badge/docker-ready-blue)](https://hub.docker.com/u/khaledhawil)
 [![Kubernetes](https://img.shields.io/badge/kubernetes-deployed-blue)](https://k8s.io)
 [![ArgoCD](https://img.shields.io/badge/gitops-argocd-orange)](https://argoproj.github.io/cd/)
-[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-> **A production-ready Islamic application demonstrating enterprise-level DevOps practices with full CI/CD automation, containerization, and GitOps deployment.**
 
-This comprehensive Islamic application serves the Muslim community with essential digital tools for daily Islamic practices while showcasing modern DevOps methodologies including Infrastructure as Code, continuous integration, automated security scanning, and GitOps-based deployments.
+A production-ready Islamic application built with modern full-stack technologies and enterprise-grade DevOps practices. This project demonstrates comprehensive CI/CD automation, containerization, Kubernetes orchestration, and GitOps deployment methodologies while serving the Muslim community with essential digital Islamic tools.
+
+## Developer Information
+
+**Khaled Hawil**
+- GitHub: [@khaledhawil](https://github.com/khaledhawil)
+- Email: khaledhawil91@gmail.com
+- LinkedIn: [khaledhawi](https://linkedin.com/in/khaledhawil)
+- Portfolio: DevOps Engineer
 
 ## Project Overview
 
@@ -39,9 +45,10 @@ This project includes extensive documentation for all components:
 | **Nginx** | [`nginx/nginx-documentation.md`](nginx/nginx-documentation.md) | Load balancer configuration |
 | **Scripts** | [`k8s/SCRIPTS.md`](k8s/SCRIPTS.md) | Deployment automation scripts |
 
-## Application Features
+<details>
+<summary><strong>📋 Application Features</strong></summary>
 
-### 🕌 Islamic Features
+### Islamic Functionality
 - **Digital Tasbeh Counter**: Advanced counter with achievement system and progress tracking
 - **Quran Reader**: Complete Quran with Arabic text, translations, and search functionality
 - **Quran Audio**: High-quality recitations with multiple reciters and playback controls
@@ -51,15 +58,15 @@ This project includes extensive documentation for all components:
 - **User Profiles**: Personal settings, preferences, and spiritual progress tracking
 - **Islamic Calendar**: Hijri calendar integration with important Islamic dates
 
-### User Experience
-- **Theme Support**: Dark/light mode with user preferences
+### Technical Features
 - **Responsive Design**: Mobile-first approach with cross-device compatibility
+- **Theme Support**: Dark/light mode with user preferences
 - **Secure Authentication**: JWT-based authentication with user management
-- **Performance**: Optimized loading with lazy loading and caching
-- **Internationalization**: Multi-language support for global Muslim community
-- **♿ Accessibility**: WCAG compliant design for inclusive user experience
+- **Performance Optimization**: Lazy loading, caching, and optimized bundle sizes
+- **Multi-language Support**: Internationalization for global Muslim community
+- **Accessibility**: WCAG compliant design for inclusive user experience
 
-### 🔧 DevOps Infrastructure
+### DevOps Infrastructure
 - **Containerization**: Docker containers for all services with multi-stage builds
 - **Orchestration**: Kubernetes deployment with auto-scaling and self-healing
 - **CI/CD Pipeline**: Jenkins automated build, test, and deployment
@@ -68,9 +75,11 @@ This project includes extensive documentation for all components:
 - **Database**: PostgreSQL with persistent storage and automated backups
 - **Security Scanning**: Trivy vulnerability assessment in CI/CD pipeline
 - **Monitoring**: Application health checks and performance monitoring
-- **Notifications**: Discord webhook integration for build status updates
 
-## Architecture Overview
+</details>
+
+<details>
+<summary><strong>🏗️ Architecture Overview</strong></summary>
 
 ```mermaid
 graph TB
@@ -104,48 +113,105 @@ graph TB
     end
 ```
 
-##  Technology Stack
-### Frontend Stack
+</details>
+
+<details>
+<summary><strong>⚙️ Technology Stack</strong></summary>
+
+### Frontend Technologies
 | Technology | Version | Purpose |
 |------------|---------|---------|
-| **React** | 18.2.0 | Modern UI framework with hooks and concurrent features |
-| **TypeScript** | 4.9.5 | Type-safe development with enhanced IDE support |
-| **Material-UI** | 5.13.0 | Production-ready React components and design system |
-| **React Router** | 6.18.0 | Declarative routing for single-page applications |
-| **Zustand** | 4.4.6 | Lightweight state management without boilerplate |
-| **Axios** | 1.5.2 | Promise-based HTTP client with interceptors |
-| **Date-fns** | 2.30.0 | Modern JavaScript date utility library |
+| React | 18.2.0 | Modern UI framework with hooks and concurrent features |
+| TypeScript | 4.9.5 | Type-safe development with enhanced IDE support |
+| Material-UI | 5.13.0 | Production-ready React components and design system |
+| React Router | 6.18.0 | Declarative routing for single-page applications |
+| Zustand | 4.4.6 | Lightweight state management without boilerplate |
+| Axios | 1.5.2 | Promise-based HTTP client with interceptors |
 
-### Backend Stack
+### Backend Technologies
 | Technology | Version | Purpose |
 |------------|---------|---------|
-| **Flask** | 2.2+ | Lightweight and flexible Python web framework |
-| **SQLAlchemy** | Latest | Python SQL toolkit and Object-Relational Mapping |
-| **Flask-JWT-Extended** | Latest | JWT token authentication for Flask applications |
-| **PostgreSQL** | 15 | Advanced open-source relational database |
-| **Gunicorn** | Latest | Python WSGI HTTP Server for production |
-| **Flask-CORS** | Latest | Cross-Origin Resource Sharing support |
-| **Marshmallow** | Latest | Object serialization and validation |
+| Flask | 2.2+ | Lightweight and flexible Python web framework |
+| SQLAlchemy | Latest | Python SQL toolkit and Object-Relational Mapping |
+| Flask-JWT-Extended | Latest | JWT token authentication for Flask applications |
+| PostgreSQL | 15 | Advanced open-source relational database |
+| Gunicorn | Latest | Python WSGI HTTP Server for production |
 
-###  DevOps & Infrastructure
+### DevOps & Infrastructure
 | Tool | Purpose | Environment |
 |------|---------|-------------|
-| **Docker** | Containerization platform | All environments |
-| **Docker Compose** | Multi-container orchestration | Development |
-| **Kubernetes** | Container orchestration at scale | Production |
-| **Jenkins** | Continuous Integration/Continuous Deployment | CI/CD Pipeline |
-| **ArgoCD** | GitOps continuous delivery | Production |
-| **Nginx** | Reverse proxy and load balancer | Production |
-| **Trivy** | Vulnerability scanner for containers | Security |
-| **PostgreSQL** | Primary database with persistence | All environments |
+| Docker | Containerization platform | All environments |
+| Kubernetes | Container orchestration at scale | Production |
+| Jenkins | Continuous Integration/Continuous Deployment | CI/CD Pipeline |
+| ArgoCD | GitOps continuous delivery | Production |
+| Nginx | Reverse proxy and load balancer | Production |
+| Trivy | Vulnerability scanner for containers | Security |
 
-###  External Integrations
-- **Islamic Prayer Times API**: Accurate prayer time calculations based on location
-- **Quran API**: Complete Quran text with multiple translations
-- **Hadith APIs**: Authentic hadith collections from major sources
-- **Discord Webhooks**: Real-time build notifications and alerts
+</details>
 
-## Project Structure
+<details>
+<summary><strong>🛠️ Development & Deployment Tools</strong></summary>
+
+### Version Control & Repository Management
+| Tool | Purpose | Configuration |
+|------|---------|---------------|
+| **Git/GitHub** | Source code version control and collaboration | - Repository hosting<br>- Webhook integration for CI/CD<br>- Access tokens for Jenkins integration |
+
+### Containerization & Orchestration
+| Tool | Purpose | Configuration |
+|------|---------|---------------|
+| **Docker** | Application containerization | - Multi-stage builds for optimization<br>- Container image management |
+| **Docker Compose** | Local development environment | - Multi-service orchestration<br>- Volume management for development |
+| **Kubernetes (kubeadm)** | Production container orchestration | - 3-node cluster setup<br>- Auto-scaling and self-healing<br>- Persistent storage management |
+
+### CI/CD Pipeline
+| Tool | Purpose | Configuration |
+|------|---------|---------------|
+| **Jenkins** | Continuous Integration/Deployment | - **Containerized deployment**<br>- **Multibranch pipeline** for branch-based builds<br>- **Ignore Git Committer** to prevent infinite webhook loops<br>- Discord integration for build notifications |
+| **Ngrok** | Webhook forwarding for development | - **Tunnel**: `https://911d-41-129-24-45.ngrok-free.app` → `http://localhost:8080`<br>- Enables GitHub webhooks to reach local Jenkins |
+
+### GitOps & Deployment
+| Tool | Purpose | Configuration |
+|------|---------|---------------|
+| **ArgoCD** | GitOps continuous delivery | - Deployed in Kubernetes cluster<br>- Automated application synchronization<br>- Staging and production environments |
+
+### Infrastructure & Networking
+| Tool | Purpose | Configuration |
+|------|---------|---------------|
+| **Nginx** | Reverse proxy and load balancer | - SSL termination<br>- Static file serving<br>- Request routing |
+| **Vagrant** | Development environment virtualization | - **3-node Kubernetes cluster**<br>- Consistent development environment<br>- kubeadm cluster setup |
+
+### Development Environment
+| Tool | Purpose | Configuration |
+|------|---------|---------------|
+| **VS Code** | Primary development IDE | - Extensions for React, Python, Docker, Kubernetes<br>- Integrated terminal and debugging |
+| **Bash Scripting** | Automation and deployment | - Deployment scripts in `k8s/` directory<br>- Database migration scripts<br>- Easy-to-use automation tools |
+
+### Notification & Monitoring
+| Tool | Purpose | Configuration |
+|------|---------|---------------|
+| **Discord** | Build status notifications | - Real-time pipeline status updates<br>- Success/failure notifications<br>- Team collaboration |
+
+### Security & Authentication
+| Component | Purpose | Implementation |
+|-----------|---------|---------------|
+| **GitHub Access Tokens** | Jenkins-GitHub integration | - Secure API access for Jenkins<br>- Webhook authentication<br>- Repository access management |
+| **Webhook Protection** | Infinite loop prevention | - Git committer ignore rules<br>- Smart triggering logic |
+
+### Key DevOps Practices Implemented
+- **Infrastructure as Code**: All configurations version-controlled
+- **GitOps Workflow**: ArgoCD manages deployments from Git
+- **Containerized CI/CD**: Jenkins running in containers
+- **Multi-Environment Support**: Staging and production pipelines
+- **Automated Testing**: Integrated into pipeline stages
+- **Security Scanning**: Vulnerability assessment with Trivy
+- **Zero-Downtime Deployments**: Rolling updates with Kubernetes
+- **Monitoring & Alerting**: Real-time notifications via Discord
+
+</details>
+
+<details>
+<summary><strong>📁 Project Structure</strong></summary>
 
 ```
 islamic-app/
@@ -202,122 +268,52 @@ islamic-app/
 └── 📄 README.md                    # This file
 ```
 
-## Quick Start Guide
+</details>
+
+## Quick Start
 
 ### Prerequisites
+- Node.js 16+
+- Python 3.8+
+- PostgreSQL 12+
+- Docker 20+
+- Docker Compose 2.0+
 
-| Requirement | Version | Purpose |
-|-------------|---------|---------|
-| **Node.js** | 16+ | Frontend development and build tools |
-| **Python** | 3.8+ | Backend API development |
-| **PostgreSQL** | 12+ | Database server |
-| **Docker** | 20+ | Containerization |
-| **Docker Compose** | 2.0+ | Multi-container orchestration |
-| **kubectl** | Latest | Kubernetes CLI |
-| **Git** | Latest | Version control |
+### Development Setup
 
-**Optional for Production:**
-- Kubernetes cluster (local: minikube/kind, cloud: EKS/GKE/AKS)
-- Jenkins server for CI/CD
-- ArgoCD for GitOps deployment
-
-### ⚡ One-Command Setup
-
+**One-command setup:**
 ```bash
-# Complete development environment
 git clone <repository-url>
 cd Full-DevOps-Project-islamic-app
 docker-compose up -d
 ```
 
-**Access your application:**
-- **Frontend**: http://localhost:3000
-- **API**: http://localhost:5000
-- **Database**: localhost:5432
+**Access points:**
+- Frontend: http://localhost:3000
+- API: http://localhost:5000
+- Database: localhost:5432
 
-### 🔧 Manual Development Setup
-
-<details>
-<summary><strong>Frontend Development</strong></summary>
-
+**Manual setup:**
 ```bash
-# Navigate to frontend directory
-cd frontend
+# Frontend
+cd frontend && npm install && npm start
 
-# Install dependencies
-npm install
+# Backend
+cd backend && python -m venv venv && source venv/bin/activate
+pip install -r requirements.txt && python app.py
 
-# Start development server with hot reload
-npm start
-
-# Build for production
-npm run build
-
-# Run tests
-npm test
-```
-
-**Environment Configuration:**
-```bash
-# Create .env file in frontend/
-echo "REACT_APP_API_URL=http://localhost:5000" > .env
-echo "REACT_APP_ENVIRONMENT=development" >> .env
-```
-</details>
-
-<details>
-<summary><strong>🔧 Backend Development</strong></summary>
-
-```bash
-# Navigate to backend directory
-cd backend
-
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Set environment variables
-export DATABASE_URL="postgresql://islamic_user:islamic_pass123@localhost:5432/islamic_app"
-export SECRET_KEY="your-secret-key"
-export JWT_SECRET_KEY="your-jwt-secret"
-
-# Start development server
-python app.py
-```
-
-**Production Deployment:**
-```bash
-# Use Gunicorn for production
-gunicorn --bind 0.0.0.0:5000 --workers 4 app:app
-```
-</details>
-
-<details>
-<summary><strong>🗄️ Database Setup</strong></summary>
-
-```bash
-# Start PostgreSQL with Docker
+# Database
 docker run -d --name islamic-db \
   -e POSTGRES_DB=islamic_app \
   -e POSTGRES_USER=islamic_user \
   -e POSTGRES_PASSWORD=islamic_pass123 \
   -p 5432:5432 postgres:15-alpine
-
-# Initialize database schema
-psql -h localhost -U islamic_user -d islamic_app -f database/init.sql
-
-# Run migrations
-cd database && chmod +x migrate.sh && ./migrate.sh
 ```
-</details>
 
-##  Deployment Options
+<details>
+<summary><strong>Deployment</strong></summary>
 
-###  Docker Compose (Recommended for Development)
-
+### Docker Compose (Development)
 ```bash
 # Start all services
 docker-compose up -d
@@ -325,78 +321,35 @@ docker-compose up -d
 # View logs
 docker-compose logs -f
 
-# Scale services
-docker-compose up -d --scale backend=3
-
-# Stop services
-docker-compose down
-
 # Clean rebuild
 docker-compose down -v && docker-compose up --build -d
 ```
 
-**Services included:**
-- PostgreSQL database with persistent volume
-- Flask backend API with auto-reload
-- React frontend with hot reload
-- Nginx load balancer
-- Health checks and monitoring
-
-### Kubernetes (Production Ready)
-
+### Kubernetes (Production)
 ```bash
 # Quick deployment
-cd k8s
-./setup.sh && ./deploy.sh
+cd k8s && ./setup.sh && ./deploy.sh
 
-# Manual step-by-step
-kubectl apply -f 00-namespace.yaml
-kubectl apply -f 01-secrets-configmap.yaml
-kubectl apply -f 02-persistent-storage.yaml
-kubectl apply -f 03-postgres.yaml
-kubectl apply -f 04-backend.yaml
-kubectl apply -f 05-frontend.yaml
-kubectl apply -f 06-nginx.yaml
-kubectl apply -f 07-ingress.yaml
-kubectl apply -f 08-hpa.yaml
+# Manual deployment
+kubectl apply -f k8s/
 
 # Verify deployment
 kubectl get pods -n islamic-app
-kubectl get services -n islamic-app
-kubectl get ingress -n islamic-app
 ```
 
-**Production Features:**
-- Horizontal Pod Autoscaling (HPA)
-- Persistent Volume Claims for database
-- Ingress with SSL termination
-- Resource limits and requests
-- Health checks and readiness probes
-- Rolling updates with zero downtime
-
 ### GitOps with ArgoCD
-
 ```bash
 # Deploy ArgoCD applications
-cd argocd
-./deploy.sh
+cd argocd && ./deploy.sh
 
 # Access ArgoCD UI
 kubectl port-forward svc/argocd-server -n argocd 8080:443
-
-# Sync applications
-argocd app sync islamic-app-prod
-argocd app sync islamic-app-staging
 ```
 
-**GitOps Benefits:**
-- Declarative configuration management
-- Automated drift detection and correction
-- Git-based audit trail
-- Multi-environment support
-- Rollback capabilities
+</details>
 
-## CI/CD Pipeline
+<details>
+<summary><strong>CI/CD Pipeline</strong></summary>
 
 ### Jenkins Pipeline Features
 
@@ -434,301 +387,133 @@ curl -X POST "https://jenkins.yourdomain.com/job/islamic-app/buildWithParameters
 - Security scan results
 - Deployment status across environments
 
-## 🔌 API Documentation
+</details>
 
-### Authentication Endpoints
+<details>
+<summary><strong>API Documentation</strong></summary>
 
-| Method | Endpoint | Description | Request Body |
-|--------|----------|-------------|--------------|
-| `POST` | `/api/auth/register` | User registration | `{username, email, password}` |
-| `POST` | `/api/auth/login` | User authentication | `{email, password}` |
-| `POST` | `/api/auth/logout` | Session termination | `{refresh_token}` |
-| `GET` | `/api/auth/profile` | Get user profile | Headers: `Authorization: Bearer <token>` |
-| `PUT` | `/api/auth/profile` | Update profile | `{username, preferences}` |
+### Authentication
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/auth/register` | User registration |
+| POST | `/api/auth/login` | User authentication |
+| GET | `/api/auth/profile` | Get user profile |
+| PUT | `/api/auth/profile` | Update profile |
 
-### Tasbeh Counter API
+### Islamic Content
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/quran/surah/{id}` | Get specific Surah |
+| GET | `/api/quran/search` | Search Quran text |
+| GET | `/api/hadith/collections` | Get hadith collections |
+| GET | `/api/prayer-times` | Get prayer times |
+| GET | `/api/tasbeh/phrases` | Get tasbeh counts |
+| POST | `/api/tasbeh/increment` | Increment phrase count |
 
-| Method | Endpoint | Description | Parameters |
-|--------|----------|-------------|------------|
-| `GET` | `/api/tasbeh/phrases` | Get user's tasbeh counts | `user_id` |
-| `POST` | `/api/tasbeh/increment` | Increment phrase count | `{phrase, count}` |
-| `PUT` | `/api/tasbeh/reset` | Reset specific phrase | `{phrase}` |
-| `DELETE` | `/api/tasbeh/phrase/{id}` | Remove phrase | `phrase_id` |
+### Health Monitoring
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/health` | Application health check |
+| GET | `/api/health/detailed` | Detailed health status |
+| GET | `/metrics` | Prometheus metrics |
 
-###  User Management API
+</details>
 
-| Method | Endpoint | Description | Request Body |
-|--------|----------|-------------|--------------|
-| `GET` | `/api/user/preferences` | Get user preferences | - |
-| `PUT` | `/api/user/preferences` | Update preferences | `{theme, language, notifications}` |
-| `GET` | `/api/user/reading-stats` | Get Quran reading stats | `?surah=1&ayah=1` |
-| `POST` | `/api/user/achievements` | Track achievements | `{type, description, points}` |
-| `GET` | `/api/user/location` | Get user location | - |
-| `PUT` | `/api/user/location` | Update location | `{latitude, longitude, city}` |
+<details>
+<summary><strong>Security & Performance</strong></summary>
 
-### Prayer Times API
+### Security Features
+- JWT-based authentication with refresh tokens
+- bcrypt password hashing
+- CORS configuration and input validation
+- Container vulnerability scanning with Trivy
+- TLS encryption and RBAC in Kubernetes
+- Secrets management and network policies
 
-| Method | Endpoint | Description | Parameters |
-|--------|----------|-------------|------------|
-| `GET` | `/api/prayer-times` | Get prayer times | `?lat=40.7128&lng=-74.0060&date=2024-01-01` |
-| `POST` | `/api/prayer-times/location` | Update user location | `{latitude, longitude, timezone}` |
-| `GET` | `/api/prayer-times/settings` | Get notification settings | - |
-| `PUT` | `/api/prayer-times/settings` | Update notifications | `{enabled, offset_minutes}` |
+### Performance Optimization
+- Frontend: Code splitting, lazy loading, service workers
+- Backend: Connection pooling, query optimization, caching
+- Infrastructure: Auto-scaling, resource optimization, CDN integration
 
-###  Islamic Content API
+### Monitoring
+- Application health checks and performance metrics
+- Kubernetes and container monitoring
+- Error tracking and alerting
+- Discord/Slack notifications for incidents
 
-| Method | Endpoint | Description | Parameters |
-|--------|----------|-------------|------------|
-| `GET` | `/api/quran/surah/{id}` | Get specific Surah | `surah_id, translation?` |
-| `GET` | `/api/quran/ayah/{surah}/{ayah}` | Get specific Ayah | `surah_id, ayah_id` |
-| `GET` | `/api/quran/search` | Search Quran text | `?q=search_term&lang=en` |
-| `GET` | `/api/hadith/collections` | Get hadith collections | - |
-| `GET` | `/api/hadith/search` | Search hadiths | `?q=search_term&collection=bukhari` |
-| `GET` | `/api/azkar/categories` | Get Azkar categories | - |
-| `GET` | `/api/azkar/{category}` | Get Azkar by category | `category_name` |
+</details>
 
-### Health & Monitoring
+<details>
+<summary><strong>Testing & Quality Assurance</strong></summary>
 
-| Method | Endpoint | Description | Response |
-|--------|----------|-------------|----------|
-| `GET` | `/health` | Application health check | `{status: "healthy", timestamp}` |
-| `GET` | `/api/health/detailed` | Detailed health status | `{database, external_apis, cache}` |
-| `GET` | `/metrics` | Prometheus metrics | Metrics in Prometheus format |
-
-## Security Features
-
-###  Application Security
-- **JWT Authentication**: Secure token-based authentication with refresh tokens
-- **Password Hashing**: bcrypt with configurable rounds
-- **CORS Configuration**: Secure cross-origin resource sharing
-- **Input Validation**: Marshmallow schema validation for all endpoints
-- **SQL Injection Prevention**: SQLAlchemy ORM with parameterized queries
-- **Rate Limiting**: API endpoint rate limiting to prevent abuse
-
-### Container Security
-- **Multi-stage Builds**: Minimal production images
-- **Non-root Users**: Containers run as non-privileged users
-- **Vulnerability Scanning**: Trivy integration in CI/CD pipeline
-- **Security Updates**: Automated base image updates
-- **Secrets Management**: Kubernetes secrets for sensitive data
-- **Network Policies**: Kubernetes network segmentation
-
-### Infrastructure Security
-- **TLS Encryption**: End-to-end encryption with Let's Encrypt
-- **RBAC**: Role-based access control in Kubernetes
-- **Pod Security Standards**: Kubernetes security policies
-- **Network Segmentation**: Isolated namespaces and network policies
-- **Audit Logging**: Comprehensive security event logging
-- **Backup Encryption**: Encrypted database backups
-
-## Monitoring & Observability
-
-### Application Monitoring
-- **Health Checks**: Multi-level health endpoints for comprehensive status monitoring
-- **Performance Metrics**: Response times, throughput, and error rates
-- **Resource Usage**: CPU, memory, and disk utilization tracking
-- **User Analytics**: Feature usage and user behavior insights
-- **Error Tracking**: Centralized error logging and alerting
-
-### Infrastructure Monitoring
-- **Kubernetes Metrics**: Pod, node, and cluster-level monitoring
-- **Container Insights**: Resource usage and performance per container
-- **Database Monitoring**: Query performance and connection pooling
-- **Network Monitoring**: Traffic patterns and latency analysis
-- **Storage Monitoring**: Persistent volume usage and performance
-
-### Alerting & Notifications
-- **Discord Integration**: Real-time build and deployment notifications
-- **Slack Integration**: Monitoring alerts and incident management
-- **Email Notifications**: Critical system alerts and reports
-- **PagerDuty Integration**: On-call management for production issues
-- **Custom Webhooks**: Integration with external monitoring systems
-
-## Performance Optimization
-
-### Frontend Optimization
-- **Code Splitting**: Dynamic imports for reduced initial bundle size
-- **Lazy Loading**: On-demand component loading for better performance
-- **Service Workers**: Offline support and caching strategies
-- **Image Optimization**: WebP format with fallbacks and lazy loading
-- **Bundle Analysis**: Webpack bundle analyzer for size optimization
-- **CDN Integration**: Static asset delivery through global CDN
-
-### Backend Optimization
-- **Database Connection Pooling**: Efficient database connection management
-- **Query Optimization**: Indexed queries and N+1 query prevention
-- **Caching Strategies**: Redis caching for frequently accessed data
-- **API Response Compression**: Gzip compression for reduced payload
-- **Async Processing**: Background tasks for heavy operations
-- **Load Balancing**: Multiple backend instances with health checks
-
-### Infrastructure Optimization
-- **Horizontal Pod Autoscaling**: Automatic scaling based on metrics
-- **Resource Optimization**: Right-sized containers with resource limits
-- **Database Tuning**: PostgreSQL configuration optimization
-- **Network Optimization**: Service mesh for traffic management
-- **Storage Optimization**: Persistent volume performance tuning
-
-## Testing Strategy
-
-### Frontend Testing
+### Testing Strategy
 ```bash
-# Unit tests with Jest and React Testing Library
-npm test
+# Frontend tests
+npm test                    # Unit tests with Jest
+npm run test:integration    # Integration tests
+npm run test:e2e           # End-to-end tests with Cypress
 
-# Integration tests
-npm run test:integration
-
-# E2E tests with Cypress
-npm run test:e2e
-
-# Coverage reports
-npm run test:coverage
+# Backend tests
+pytest tests/unit/         # Unit tests
+pytest tests/integration/  # Integration tests
+pytest tests/api/          # API tests
 ```
 
-### Backend Testing
-```bash
-# Unit tests with pytest
-pytest tests/unit/
+### Code Quality
+- TypeScript strict mode with ESLint + Prettier
+- Python PEP 8 compliance with type hints
+- Automated security scanning in CI/CD
+- Comprehensive test coverage (>80%)
 
-# Integration tests
-pytest tests/integration/
+</details>
 
-# API tests
-pytest tests/api/
-
-# Load testing with locust
-locust -f tests/load/locustfile.py
-```
-
-### Deployment Testing
-- **Smoke Tests**: Basic functionality validation after deployment
-- **Health Checks**: Automated endpoint testing
-- **Performance Tests**: Load testing in staging environment
-- **Security Tests**: Vulnerability scanning and penetration testing
-- **Rollback Tests**: Deployment rollback verification
-
-## Contributing
-
-We welcome contributions from the community! Here's how you can help:
+<details>
+<summary><strong>Contributing</strong></summary>
 
 ### Development Workflow
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/your-feature`
+3. Make changes and test locally
+4. Commit with clear messages: `git commit -m "feat: add new feature"`
+5. Push and create a pull request
 
-1. **Fork the Repository**
-   ```bash
-   git clone https://github.com/your-username/islamic-app.git
-   cd islamic-app
-   ```
+### Code Standards
+- Follow TypeScript/ESLint configuration for frontend
+- Follow PEP 8 standards for Python backend
+- Maintain test coverage above 80%
+- Update documentation for new features
 
-2. **Set Up Development Environment**
-   ```bash
-   # Complete setup with one command
-   docker-compose up -d
-   
-   # Or manual setup (see Quick Start Guide above)
-   ```
-
-3. **Create Feature Branch**
-   ```bash
-   git checkout -b feature/your-feature-name
-   git checkout -b bugfix/issue-description
-   git checkout -b docs/documentation-update
-   ```
-
-4. **Make Changes and Test**
-   ```bash
-   # Run tests
-   npm test                    # Frontend tests
-   pytest                      # Backend tests
-   
-   # Lint code
-   npm run lint               # Frontend linting
-   flake8 backend/            # Backend linting
-   
-   # Build and test locally
-   docker-compose up --build
-   ```
-
-5. **Commit and Push**
-   ```bash
-   git add .
-   git commit -m "feat: add new prayer notification feature"
-   git push origin feature/your-feature-name
-   ```
-
-6. **Create Pull Request**
-   - Use clear, descriptive titles
-   - Include screenshots for UI changes
-   - Reference related issues
-   - Ensure all checks pass
-
-###  Contribution Guidelines
-
-#### Code Standards
-- **Frontend**: TypeScript strict mode, ESLint + Prettier configuration
-- **Backend**: PEP 8 compliance, type hints, comprehensive docstrings
-- **Testing**: Maintain >80% code coverage
-- **Documentation**: Update relevant docs for new features
-
-#### Commit Message Format
+### Commit Message Format
 ```
 type(scope): description
 
-[optional body]
-
-[optional footer]
+Examples:
+feat(auth): add two-factor authentication
+fix(api): resolve prayer times calculation error
+docs(k8s): update deployment instructions
 ```
 
-**Types:** `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
+</details>
 
-**Examples:**
-- `feat(auth): add two-factor authentication`
-- `fix(api): resolve prayer times calculation error`
-- `docs(k8s): update deployment instructions`
-
-
-### Bug Reports
-
-When reporting bugs, please include:
-- **Environment**: OS, browser, Node.js/Python versions
-- **Steps to Reproduce**: Clear, numbered steps
-- **Expected Behavior**: What should happen
-- **Actual Behavior**: What actually happens
-- **Screenshots**: If applicable
-- **Logs**: Relevant error messages or logs
-
-### Feature Requests
-
-For new features, please provide:
-- **Use Case**: Why is this feature needed?
-- **Proposed Solution**: How should it work?
-- **Alternatives**: Other ways to solve the problem
-- **Implementation**: Any technical considerations
-
-## Support & Community
+<details>
+<summary><strong>Support</strong></summary>
 
 ### Getting Help
+- **Documentation**: Comprehensive guides in this repository
+- **Issues**: Create GitHub issues for bugs or feature requests
+- **Discussions**: Use GitHub Discussions for questions
+- **Email**: Contact maintainer for security issues
 
-1. **📚 Documentation**: Check the comprehensive docs in this repository
-2. **🐛 Issues**: Create a GitHub issue for bugs or feature requests
-3. **💬 Discussions**: Use GitHub Discussions for questions and ideas
-4. **📧 Email**: Contact maintainers for security issues
+### Project Status
+![GitHub Issues](https://img.shields.io/github/issues/khaledhawil/islamic-app)
+![GitHub Contributors](https://img.shields.io/github/contributors/khaledhawil/islamic-app)
+![GitHub Last Commit](https://img.shields.io/github/last-commit/khaledhawil/islamic-app)
 
-### Badges & Metrics
+</details>
 
-![GitHub Issues](https://img.shields.io/github/issues/your-org/islamic-app)
-![GitHub Pull Requests](https://img.shields.io/github/issues-pr/your-org/islamic-app)
-![GitHub Contributors](https://img.shields.io/github/contributors/your-org/islamic-app)
-![GitHub Last Commit](https://img.shields.io/github/last-commit/your-org/islamic-app)
-![GitHub Repo Size](https://img.shields.io/github/repo-size/your-org/islamic-app)
-![Code Quality](https://img.shields.io/codeclimate/maintainability/your-org/islamic-app)
-![Test Coverage](https://img.shields.io/codecov/c/github/your-org/islamic-app)
-
---
 ## Quick Reference
 
 ### Essential Commands
-
 ```bash
 # Development
 docker-compose up -d              # Start development environment
@@ -737,26 +522,18 @@ python app.py                     # Backend development server
 
 # Building
 npm run build                     # Build frontend for production
-docker build -t islamic-app .     # Build Docker images
 ./k8s/build-images.sh            # Build all images for Kubernetes
 
 # Deployment
 ./k8s/deploy.sh                  # Deploy to Kubernetes
 ./argocd/deploy.sh               # Setup GitOps deployment
-docker-compose up --build -d     # Deploy with Docker Compose
 
 # Maintenance
-kubectl get pods -n islamic-app   # Check Kubernetes status
+kubectl get all pods -n islamic-app -o wide   # Check Kubernetes status
 docker-compose logs -f            # View application logs
 ./k8s/cleanup.sh                 # Clean up resources
 ```
-## Project Information
-**Developer Contact:**
-- **GitHub:** [khaledhawil](https://github.com/khaledhawil)
-- **Email:** khaledhawil91@gmail.com
-- **LinkedIn:** [khaledhawi](https://linkedin.com/in/khaledhawi)
 
+---
 
-**🌟 Star this repository if you find it helpful!**
-
-**Built with ❤️ for the Muslim community by developers passionate about Islamic technology and DevOps excellence.**
+**Built for the Muslim community with modern technology and enterprise DevOps practices.**
