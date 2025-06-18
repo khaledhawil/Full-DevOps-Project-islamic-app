@@ -186,9 +186,10 @@ spec:
       name: postgres-storage
     spec:
       accessModes: ["ReadWriteOnce"]
+      volumeMode: Filesystem
       resources:
         requests:
-          storage: 5Gi
+          storage: 3Gi
 
 ---
 apiVersion: v1

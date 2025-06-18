@@ -6,7 +6,7 @@ metadata:
   labels:
     app: islamic-app-frontend
 spec:
-  replicas: 2  # Reduced from 3 to 1
+  replicas: 1  # Reduced from 3 to 1
   selector:
     matchLabels:
       app: islamic-app-frontend
