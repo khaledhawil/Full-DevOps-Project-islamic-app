@@ -1,0 +1,49 @@
+---
+# Main playbook for Islamic App infrastructure configuration
+- name: Configure Islamic App Infrastructure
+  hosts: localhost
+  gather_facts: false
+  vars:
+    terraform_dir: "../terraform"
+  tasks:
+    - name: Get Terraform outputs
+      shell: "cd {{ terraform_dir }} && terraform output -json"
+      register: terraform_output_raw
+      changed_when: false
+    
+    - name: Parse Terraform outputs
+      set_fact:
+        terraform_output: "{{ terraform_output_raw.stdout | from_json }}"
+    
+    - name: Display infrastructure information
+      debug:
+        msg:
+          - "EKS Cluster: {{ terraform_output.eks_cluster_name.value }}"
+          - "Jenkins URL: {{ terraform_output.jenkins_url.value }}"
+          - "RDS Endpoint: {{ terraform_output.rds_endpoint.value }}"
+
+- name: Configure Jenkins Server
+  hosts: role_Jenkins_Server
+  become: true
+  roles:
+    - common
+    - docker
+    - jenkins
+    - cloudwatch
+  vars:
+    eks_cluster_name: "{{ hostvars['localhost']['terraform_output']['eks_cluster_name']['value'] }}"
+    rds_endpoint: "{{ hostvars['localhost']['terraform_output']['rds_endpoint']['value'] }}"
+
+- name: Configure Kubernetes Applications
+  hosts: localhost
+  gather_facts: false
+  roles:
+    - kubernetes
+  vars:
+    eks_cluster_name: "{{ terraform_output.eks_cluster_name.value }}"
+
+- name: Deploy Applications
+  hosts: localhost
+  gather_facts: false
+  roles:
+    - islamic_app_deployment
