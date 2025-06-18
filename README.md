@@ -1,298 +1,381 @@
-# Islamic Digital Companion
+# Islamic App - Full-Stack DevOps Project
 
-A comprehensive full-stack Islamic application providing digital tools for Muslim worship and learning. This project demonstrates modern DevOps practices with a React TypeScript frontend, Flask backend, PostgreSQL database, and complete CI/CD pipeline using Jenkins, Docker, and Kubernetes.
+A comprehensive Islamic application providing digital tools for Muslim worship and learning, featuring prayer times, Quran reading, Hadith collections, digital Tasbeh counter, and Azkar. This project demonstrates modern full-stack development with complete DevOps pipeline implementation using Jenkins, Docker, Kubernetes, and ArgoCD.
 
 ## Table of Contents
 
-- [Overview](#overview)
+- [Project Overview](#project-overview)
 - [Features](#features)
 - [Technology Stack](#technology-stack)
-- [Architecture](#architecture)
+- [Project Structure](#project-structure)
 - [Prerequisites](#prerequisites)
-- [Installation](#installation)
-- [Usage](#usage)
-- [DevOps Pipeline](#devops-pipeline)
+- [Local Development Setup](#local-development-setup)
+- [Docker Deployment](#docker-deployment)
+- [Kubernetes Deployment](#kubernetes-deployment)
+- [CI/CD Pipeline](#cicd-pipeline)
 - [API Documentation](#api-documentation)
 - [Contributing](#contributing)
-- [License](#license)
 
-## Overview
+## Project Overview
 
-The Islamic Digital Companion is a modern web application designed to serve the Muslim community with essential digital tools for daily Islamic practices. It combines traditional Islamic resources with contemporary technology to provide an accessible and comprehensive platform for worship, learning, and spiritual growth.
+This Islamic application serves the Muslim community with essential digital tools for daily Islamic practices. It combines traditional Islamic resources with modern web technologies to provide an accessible platform for worship, learning, and spiritual growth.
+
+The project showcases enterprise-level DevOps practices including containerization, orchestration, continuous integration, and GitOps deployment strategies.
 
 ## Features
 
-### Core Functionality
-- **Digital Tasbeh Counter**: Advanced counter with achievement system, sound effects, and progress tracking
-- **Quran Reader**: Complete Quran with Arabic text, audio recitation, and translation support
+### Frontend Application (React TypeScript)
+- **Home Dashboard**: Welcome page with navigation to all features
+- **Digital Tasbeh Counter**: Advanced counter with achievement system and progress tracking
+- **Quran Reader**: Complete Quran with Arabic text and translation support
+- **Quran Audio**: Audio recitation with playback controls
 - **Hadith Collection**: Searchable database with authentic hadiths from major collections (Bukhari, Muslim, etc.)
-- **Prayer Times**: Location-based prayer time calculations with notifications
+- **Prayer Times**: Location-based prayer time calculations
 - **Azkar and Duas**: Collection of Islamic supplications and remembrances
-- **User Authentication**: Secure registration and login system with JWT tokens
-
-### Advanced Features
-- **Multi-language Support**: Arabic, English, and Indonesian translations
-- **Dark/Light Theme**: Responsive theme switching with user preferences
-- **Offline Support**: Progressive Web App capabilities for offline usage
-- **Achievement System**: Gamified progress tracking for spiritual activities
-- **Audio Integration**: Recitation playback with playback controls
-- **User Preferences**: Customizable settings and favorites management
-
-### Technical Features
+- **User Authentication**: Secure registration and login system
+- **User Profile**: Personal settings and preferences management
+- **Dark/Light Theme**: Theme switching with user preferences
 - **Responsive Design**: Mobile-first approach with cross-device compatibility
-- **Real-time Data**: Live updates and synchronization
-- **Secure API**: JWT-based authentication with role-based access control
-- **Database Optimization**: Efficient data storage and retrieval
-- **Containerization**: Docker support for consistent deployment
-- **CI/CD Pipeline**: Automated testing, building, and deployment
+
+### Backend API (Flask Python)
+- **User Management**: Registration, authentication, and profile management
+- **Tasbeh Tracking**: Personal counter data with achievements
+- **Prayer Times Integration**: Real-time prayer time calculations
+- **Quran API Integration**: Verse retrieval and audio resources
+- **User Preferences**: Customizable settings storage
+- **JWT Authentication**: Secure token-based authentication
+- **Database Models**: Comprehensive data modeling for all features
+
+### DevOps Infrastructure
+- **Containerization**: Docker containers for all services
+- **Orchestration**: Kubernetes deployment with auto-scaling
+- **CI/CD Pipeline**: Jenkins automated build and deployment
+- **GitOps**: ArgoCD for continuous delivery
+- **Load Balancing**: Nginx reverse proxy configuration
+- **Database**: PostgreSQL with persistent storage
+- **Monitoring**: Health checks and application monitoring
 
 ## Technology Stack
 
 ### Frontend
-- **React 18**: Modern React with hooks and functional components
-- **TypeScript**: Type-safe development with enhanced IDE support
-- **React Router**: Client-side routing for single-page application
-- **Zustand**: Lightweight state management
-- **CSS3**: Modern styling with flexbox and grid
-- **Web Audio API**: Sound effects and audio playback
+- **React 18.2.0**: Modern React with hooks and functional components
+- **TypeScript 4.9.5**: Type-safe development
+- **React Router DOM 6.18.0**: Client-side routing
+- **Zustand 4.4.6**: Lightweight state management
+- **Axios 1.5.2**: HTTP client for API communication
+- **Material-UI 5.13.0**: UI components and icons
+- **Date-fns 2.30.0**: Date manipulation library
 
 ### Backend
-- **Flask**: Python web framework with RESTful API design
-- **Flask-JWT-Extended**: JSON Web Token authentication
-- **Flask-SQLAlchemy**: Object-relational mapping
+- **Flask**: Python web framework
+- **Flask-JWT-Extended**: JWT authentication
+- **Flask-SQLAlchemy**: Database ORM
 - **Flask-CORS**: Cross-origin resource sharing
-- **PostgreSQL**: Relational database with advanced features
-- **Gunicorn**: WSGI HTTP Server for production
+- **Flask-Migrate**: Database migrations
+- **PostgreSQL**: Primary database
+- **Gunicorn**: WSGI HTTP server
 
-### DevOps & Infrastructure
-- **Docker**: Containerization for consistent environments
-- **Docker Compose**: Multi-container orchestration
-- **Kubernetes**: Container orchestration and scaling
+### DevOps Tools
+- **Docker & Docker Compose**: Containerization
+- **Kubernetes**: Container orchestration
 - **Jenkins**: Continuous integration and deployment
 - **ArgoCD**: GitOps continuous delivery
 - **Nginx**: Reverse proxy and load balancer
+- **Trivy**: Security vulnerability scanning
+- **Discord Webhooks**: Build notifications
 
-### External APIs
+### External Integrations
 - **Islamic Prayer Times API**: Accurate prayer time calculations
-- **Quran API**: Verse retrieval and audio resources
+- **Quran API**: Verse retrieval and translations
 - **Hadith APIs**: Authentic hadith collections
 
-## Architecture
+## Project Structure
 
 ```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Frontend      │    │    Backend      │    │   Database      │
-│   (React TS)    │◄──►│   (Flask API)   │◄──►│  (PostgreSQL)   │
-│   Port: 3000    │    │   Port: 5000    │    │   Port: 5432    │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-         │                       │                       │
-         │                       │                       │
-         ▼                       ▼                       ▼
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│     Nginx       │    │   External      │    │    Volume       │
-│  (Port: 80/443) │    │     APIs        │    │   Persistence   │
-│                 │    │                 │    │                 │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
+Full-DevOps-Project-islamic-app/
+├── frontend/                    # React TypeScript application
+│   ├── src/
+│   │   ├── components/         # Reusable UI components
+│   │   │   ├── AudioWidget.tsx
+│   │   │   ├── DarkModeToggle.tsx
+│   │   │   └── Navbar.tsx
+│   │   ├── contexts/           # React contexts for global state
+│   │   │   ├── AudioContext.tsx
+│   │   │   ├── AuthContext.tsx
+│   │   │   ├── ThemeContext.tsx
+│   │   │   └── UserDataContext.tsx
+│   │   ├── hooks/              # Custom React hooks
+│   │   │   ├── useUserPreferences.ts
+│   │   │   └── useUserSpecificData.ts
+│   │   ├── pages/              # Main application pages
+│   │   │   ├── Azkar.tsx
+│   │   │   ├── Hadith.tsx
+│   │   │   ├── Home.tsx
+│   │   │   ├── Login.tsx
+│   │   │   ├── PrayerTimes.tsx
+│   │   │   ├── Profile.tsx
+│   │   │   ├── Quran.tsx
+│   │   │   ├── QuranAudio.tsx
+│   │   │   ├── Register.tsx
+│   │   │   ├── Settings.tsx
+│   │   │   └── Tasbeh.tsx
+│   │   ├── services/           # API service layer
+│   │   │   ├── api.ts
+│   │   │   └── userService.ts
+│   │   ├── stores/             # Zustand state stores
+│   │   │   └── authStore.ts
+│   │   └── utils/              # Utility functions
+│   │       └── userStorage.ts
+│   ├── public/                 # Static assets
+│   ├── Dockerfile
+│   └── package.json
+├── backend/                     # Flask Python API
+│   ├── models/                 # Database models
+│   │   ├── user.py
+│   │   ├── tasbeh_count.py
+│   │   ├── user_achievement.py
+│   │   ├── user_location.py
+│   │   ├── user_phrase.py
+│   │   ├── user_preference.py
+│   │   └── user_reading_stats.py
+│   ├── routes/                 # API endpoints
+│   │   ├── auth.py
+│   │   ├── prayer_times_new.py
+│   │   ├── quran_new.py
+│   │   ├── tasbeh.py
+│   │   └── user.py
+│   ├── schemas/                # Data validation schemas
+│   ├── utils/                  # Utility functions
+│   │   └── islamic_data.py
+│   ├── app.py                  # Main Flask application
+│   ├── database.py             # Database configuration
+│   ├── Dockerfile
+│   └── requirements.txt
+├── database/                    # Database setup and migrations
+│   ├── init.sql
+│   ├── migrate.sh
+│   └── migrations/
+├── k8s/                        # Kubernetes manifests
+│   ├── 00-namespace.yaml
+│   ├── 01-secrets-configmap.yaml
+│   ├── 02-persistent-storage.yaml
+│   ├── 03-postgres.yaml
+│   ├── 04-backend.yaml
+│   ├── 05-frontend.yaml
+│   ├── 06-nginx.yaml
+│   ├── 07-ingress.yaml
+│   ├── 08-hpa.yaml
+│   ├── build-images.sh
+│   ├── cleanup.sh
+│   ├── deploy-only.sh
+│   ├── deploy.sh
+│   └── setup.sh
+├── argocd/                     # ArgoCD GitOps configuration
+│   ├── application.yaml
+│   ├── application-staging.yaml
+│   ├── project.yaml
+│   └── deploy.sh
+├── nginx/                      # Nginx configuration
+│   └── nginx.conf
+├── docker-compose.yml          # Local development setup
+├── Jenkinsfile                 # CI/CD pipeline definition
+└── JENKINS_PIPELINE_GUIDE.md   # Detailed pipeline documentation
 ```
 
 ## Prerequisites
 
-- Node.js 16+ and npm
-- Python 3.9+
-- PostgreSQL 12+
-- Docker and Docker Compose
-- Git
+- **Node.js 16+** and npm
+- **Python 3.9+**
+- **PostgreSQL 12+**
+- **Docker** and **Docker Compose**
+- **Kubernetes cluster** (for production deployment)
+- **Jenkins** (for CI/CD)
+- **ArgoCD** (for GitOps deployment)
 
-## Installation
+## Local Development Setup
 
-### Local Development Setup
+### 1. Clone the Repository
+```bash
+git clone <repository-url>
+cd Full-DevOps-Project-islamic-app
+```
 
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd Full-DevOps-Project-islamic-app
-   ```
+### 2. Database Setup
+```bash
+# Start PostgreSQL database
+docker-compose up database -d
 
-2. **Database Setup**
-   ```bash
-   # Start PostgreSQL database
-   docker-compose up database -d
-   
-   # Run database migrations
-   cd database
-   chmod +x migrate.sh
-   ./migrate.sh
-   ```
+# Run database migrations
+cd database
+chmod +x migrate.sh
+./migrate.sh
+```
 
-3. **Backend Setup**
-   ```bash
-   cd backend
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   pip install -r requirements.txt
-   
-   # Set environment variables
-   export FLASK_APP=app.py
-   export FLASK_ENV=development
-   export DATABASE_URL=postgresql://islamic_user:islamic_pass123@localhost:5432/islamic_app
-   
-   # Start the backend server
-   python app.py
-   ```
+### 3. Backend Setup
+```bash
+cd backend
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+pip install -r requirements.txt
 
-4. **Frontend Setup**
-   ```bash
-   cd frontend
-   npm install
-   npm start
-   ```
+# Set environment variables
+export FLASK_APP=app.py
+export FLASK_ENV=development
+export DATABASE_URL=postgresql://islamic_user:islamic_pass123@localhost:5432/islamic_app
 
-5. **Access the application**
-   - Frontend: http://localhost:3000
-   - Backend API: http://localhost:5000
-   - Database: localhost:5432
+# Start backend server
+python app.py
+```
 
-### Docker Deployment
+### 4. Frontend Setup
+```bash
+cd frontend
+npm install
+npm start
+```
 
-1. **Build and start all services**
-   ```bash
-   docker-compose up --build
-   ```
+### 5. Access Application
+- **Frontend**: http://localhost:3000
+- **Backend API**: http://localhost:5000
+- **Database**: localhost:5432
 
-2. **Access the application**
-   - Application: http://localhost:80
-   - API: http://localhost:80/api
+## Docker Deployment
 
-### Kubernetes Deployment
+### Full Stack Deployment
+```bash
+# Build and start all services
+docker-compose up --build
 
-1. **Setup cluster**
-   ```bash
-   cd k8s
-   chmod +x setup.sh
-   ./setup.sh
-   ```
+# Access application
+# Frontend: http://localhost:80
+# API: http://localhost:80/api
+```
 
-2. **Deploy application**
-   ```bash
-   ./deploy.sh
-   ```
+### Individual Service Deployment
+```bash
+# Backend only
+docker-compose up backend database
 
-## Usage
+# Frontend only  
+docker-compose up frontend nginx
+```
 
-### User Registration and Authentication
-1. Navigate to the registration page
-2. Create an account with email and password
-3. Login with your credentials
-4. Access personalized features and preferences
+## Kubernetes Deployment
 
-### Digital Tasbeh Counter
-1. Select from various Islamic phrases
-2. Tap the counter button or use auto-increment
-3. Track daily goals and achievements
-4. View statistics and progress
+### Quick Setup
+```bash
+cd k8s
+chmod +x setup.sh deploy.sh
+./deploy.sh
+```
 
-### Quran Reading
-1. Browse surahs and verses
-2. Listen to audio recitations
-3. Read translations in multiple languages
-4. Search for specific verses
+### Manual Deployment Steps
+```bash
+# 1. Setup cluster
+./setup.sh
 
-### Hadith Study
-1. Browse hadith collections
-2. Search by keyword or topic
-3. Switch between Arabic and English translations
-4. Save favorite hadiths
+# 2. Build Docker images
+./build-images.sh
 
-### Prayer Times
-1. Allow location access or set manually
-2. View daily prayer schedules
-3. Receive prayer notifications
-4. Track prayer completion
+# 3. Deploy to Kubernetes
+./deploy-only.sh
 
-## DevOps Pipeline
+# 4. Verify deployment
+kubectl get pods -n islamic-app
+kubectl get services -n islamic-app
+```
 
-### Continuous Integration
-- **Jenkins Pipeline**: Automated builds triggered by Git commits
-- **Unit Testing**: Comprehensive test suite for backend and frontend
-- **Code Quality**: Linting and static analysis
-- **Security Scanning**: Vulnerability assessment
+### Cleanup
+```bash
+./cleanup.sh
+```
 
-### Continuous Deployment
-- **ArgoCD**: GitOps-based deployment to Kubernetes
-- **Blue-Green Deployment**: Zero-downtime deployments
-- **Rollback Capability**: Quick reversion to previous versions
-- **Environment Promotion**: Dev → Staging → Production pipeline
+## CI/CD Pipeline
 
-### Monitoring and Observability
-- **Health Checks**: Application and database monitoring
-- **Logging**: Centralized log aggregation
-- **Metrics**: Performance and usage analytics
-- **Alerting**: Automated incident response
+### Jenkins Pipeline Features
+- **Automated Builds**: Triggered by Git commits
+- **Docker Image Building**: Multi-stage builds for frontend and backend
+- **Security Scanning**: Trivy vulnerability scanning
+- **Kubernetes Deployment**: Automated deployment to cluster
+- **Notifications**: Discord webhook notifications
+- **Build Optimization**: Change detection and selective building
+
+### Pipeline Stages
+1. **Checkout**: Source code retrieval
+2. **Build Detection**: Detect changes in frontend/backend
+3. **Docker Build**: Create optimized container images
+4. **Security Scan**: Vulnerability assessment with Trivy
+5. **Push Images**: Upload to Docker registry
+6. **Deploy**: Kubernetes deployment
+7. **Notification**: Build status updates
+
+### ArgoCD GitOps
+- **Production**: Automatic sync from master branch
+- **Staging**: Automatic sync from develop branch
+- **Self-healing**: Automatic drift correction
+- **Rollback**: Quick reversion capabilities
 
 ## API Documentation
 
 ### Authentication Endpoints
-- `POST /api/auth/register` - User registration
-- `POST /api/auth/login` - User login
-- `POST /api/auth/logout` - User logout
-- `GET /api/auth/profile` - Get user profile
+```
+POST /api/auth/register    # User registration
+POST /api/auth/login       # User login
+POST /api/auth/logout      # User logout
+GET  /api/auth/profile     # Get user profile
+```
 
-### Tasbeh Endpoints
-- `GET /api/tasbeh/phrases` - Get user's tasbeh counts
-- `POST /api/tasbeh/increment` - Increment phrase count
-- `PUT /api/tasbeh/reset` - Reset specific phrase count
+### Tasbeh Counter Endpoints
+```
+GET  /api/tasbeh/phrases   # Get user's tasbeh counts
+POST /api/tasbeh/increment # Increment phrase count
+PUT  /api/tasbeh/reset     # Reset specific phrase count
+```
 
-### User Preference Endpoints
-- `GET /api/user/preferences` - Get user preferences
-- `PUT /api/user/preferences` - Update user preferences
-- `POST /api/user/favorites` - Manage favorites
+### User Management Endpoints
+```
+GET  /api/user/preferences        # Get user preferences
+PUT  /api/user/preferences        # Update preferences
+POST /api/user/favorites          # Manage favorites
+GET  /api/user/reading-stats      # Get reading statistics
+POST /api/user/achievements       # Track achievements
+```
 
-### External API Integration
-- Prayer times calculation
-- Quran verse retrieval
-- Hadith collection access
-- Audio recitation services
+### Prayer Times Endpoints
+```
+GET  /api/prayer-times            # Get prayer times for location
+POST /api/prayer-times/location   # Update user location
+```
 
 ## Contributing
 
-1. **Fork the repository**
-2. **Create a feature branch**
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
-3. **Make your changes**
-4. **Add tests** for new functionality
-5. **Commit your changes**
-   ```bash
-   git commit -m "Add: your feature description"
-   ```
-6. **Push to the branch**
-   ```bash
-   git push origin feature/your-feature-name
-   ```
-7. **Create a Pull Request**
+### Development Workflow
+1. Fork the repository
+2. Create feature branch: `git checkout -b feature/your-feature`
+3. Make changes and add tests
+4. Commit: `git commit -m "Add: feature description"`
+5. Push: `git push origin feature/your-feature`
+6. Create Pull Request
 
-### Development Guidelines
-- Follow TypeScript/Python coding standards
-- Write comprehensive tests
-- Update documentation
-- Ensure responsive design
-- Maintain API compatibility
+### Code Standards
+- **Frontend**: TypeScript strict mode, ESLint configuration
+- **Backend**: Python PEP 8, Flask best practices
+- **Testing**: Unit tests for critical functionality
+- **Documentation**: Update README for new features
+
+### DevOps Guidelines
+- Update Kubernetes manifests for infrastructure changes
+- Test Docker builds locally before pushing
+- Verify CI/CD pipeline changes in staging environment
+- Follow semantic versioning for releases
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License. See LICENSE file for details.
 
 ## Support
 
-For support, questions, or suggestions:
-- Create an issue in the repository
-- Contact the development team
-- Check the documentation wiki
-
-## Acknowledgments
-
-- Islamic prayer time calculation algorithms
-- Quran and Hadith data providers
-- Open source community contributions
-- Islamic scholars and traditional sources
+- **Issues**: Create GitHub issues for bugs or feature requests
+- **Documentation**: Check JENKINS_PIPELINE_GUIDE.md for CI/CD details
+- **Kubernetes**: See k8s/README.md for deployment specifics
+- **ArgoCD**: Check argocd/README.md for GitOps configuration
