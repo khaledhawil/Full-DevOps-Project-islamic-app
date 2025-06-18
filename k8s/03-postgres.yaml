@@ -178,18 +178,12 @@ spec:
         #     memory: "256Mi"  # Reduced from 512Mi
         #     cpu: "200m"      # Reduced from 500m
       volumes:
+      - name: postgres-storage
+        persistentVolumeClaim:
+          claimName: postgres-pvc
       - name: postgres-init
         configMap:
           name: postgres-init-script
-  volumeClaimTemplates:
-  - metadata:
-      name: postgres-storage
-    spec:
-      accessModes: ["ReadWriteOnce"]
-      volumeMode: Filesystem
-      resources:
-        requests:
-          storage: 3Gi
 
 ---
 apiVersion: v1
