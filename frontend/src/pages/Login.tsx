@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Login: React.FC = () => {
   const [username, setUsername] = useState('');
@@ -11,6 +11,7 @@ const Login: React.FC = () => {
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const { login, isLoading, error } = useAuth();
   const { isDarkMode } = useTheme();
+  const navigate = useNavigate();
 
   // Dynamic Islamic words for background animation
   const islamicWords = [
@@ -67,6 +68,8 @@ const Login: React.FC = () => {
 
     try {
       await login(username.trim(), password);
+      // Redirect to home page after successful login
+      navigate('/');
     } catch (err: any) {
       setLocalError(err.message || 'فشل تسجيل الدخول');
     }
