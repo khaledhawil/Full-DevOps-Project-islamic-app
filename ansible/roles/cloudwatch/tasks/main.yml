@@ -1,0 +1,72 @@
+---
+# CloudWatch Agent configuration
+- name: Download CloudWatch Agent
+  get_url:
+    url: "https://s3.amazonaws.com/amazoncloudwatch-agent/amazon_linux/amd64/latest/amazon-cloudwatch-agent.rpm"
+    dest: /tmp/amazon-cloudwatch-agent.rpm
+    mode: '0644'
+  tags: cloudwatch_download
+
+- name: Install CloudWatch Agent
+  yum:
+    name: /tmp/amazon-cloudwatch-agent.rpm
+    state: present
+  tags: cloudwatch_install
+
+- name: Create CloudWatch Agent configuration
+  template:
+    src: cloudwatch-agent-config.json.j2
+    dest: /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json
+    mode: '0644'
+  notify: restart cloudwatch agent
+  tags: cloudwatch_config
+
+- name: Start CloudWatch Agent
+  command: |
+    /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl \
+    -a fetch-config \
+    -m ec2 \
+    -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json \
+    -s
+  tags: cloudwatch_start
+
+- name: Enable CloudWatch Agent service
+  systemd:
+    name: amazon-cloudwatch-agent
+    enabled: true
+    state: started
+  tags: cloudwatch_service
+
+- name: Create custom metrics script
+  template:
+    src: custom-metrics.sh.j2
+    dest: /opt/islamic-app/scripts/custom-metrics.sh
+    owner: ec2-user
+    group: ec2-user
+    mode: '0755'
+  tags: custom_metrics
+
+- name: Schedule custom metrics collection
+  cron:
+    name: "Custom metrics collection"
+    minute: "*/5"
+    job: "/opt/islamic-app/scripts/custom-metrics.sh"
+    user: ec2-user
+  tags: custom_metrics
+
+- name: Create log monitoring script
+  template:
+    src: log-monitoring.sh.j2
+    dest: /opt/islamic-app/scripts/log-monitoring.sh
+    owner: ec2-user
+    group: ec2-user
+    mode: '0755'
+  tags: log_monitoring
+
+- name: Schedule log monitoring
+  cron:
+    name: "Log monitoring"
+    minute: "*/1"
+    job: "/opt/islamic-app/scripts/log-monitoring.sh"
+    user: ec2-user
+  tags: log_monitoring

@@ -1,0 +1,28 @@
+# Dynamic AWS EC2 Inventory
+plugin: aws_ec2
+regions:
+  - us-west-2
+filters:
+  tag:Project: Islamic-App
+  instance-state-name: running
+
+keyed_groups:
+  # Group by instance type
+  - key: instance_type
+    prefix: type
+  # Group by environment
+  - key: tags.Environment
+    prefix: env
+  # Group by role
+  - key: tags.Type
+    prefix: role
+
+compose:
+  ansible_host: public_ip_address
+  ansible_user: ec2-user
+  instance_name: tags.Name
+  environment: tags.Environment
+
+hostnames:
+  - tag:Name
+  - ip-address

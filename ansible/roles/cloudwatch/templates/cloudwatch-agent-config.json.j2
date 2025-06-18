@@ -1,0 +1,89 @@
+{
+  "agent": {
+    "metrics_collection_interval": 60,
+    "run_as_user": "cwagent"
+  },
+  "metrics": {
+    "namespace": "Islamic-App/{{ ansible_hostname }}",
+    "metrics_collected": {
+      "cpu": {
+        "measurement": [
+          "cpu_usage_idle",
+          "cpu_usage_iowait",
+          "cpu_usage_user",
+          "cpu_usage_system"
+        ],
+        "metrics_collection_interval": 60,
+        "totalcpu": false
+      },
+      "disk": {
+        "measurement": [
+          "used_percent"
+        ],
+        "metrics_collection_interval": 60,
+        "resources": [
+          "*"
+        ]
+      },
+      "diskio": {
+        "measurement": [
+          "io_time",
+          "read_bytes",
+          "write_bytes"
+        ],
+        "metrics_collection_interval": 60,
+        "resources": [
+          "*"
+        ]
+      },
+      "mem": {
+        "measurement": [
+          "mem_used_percent",
+          "mem_available_percent"
+        ],
+        "metrics_collection_interval": 60
+      },
+      "netstat": {
+        "measurement": [
+          "tcp_established",
+          "tcp_time_wait"
+        ],
+        "metrics_collection_interval": 60
+      },
+      "swap": {
+        "measurement": [
+          "swap_used_percent"
+        ],
+        "metrics_collection_interval": 60
+      }
+    }
+  },
+  "logs": {
+    "logs_collected": {
+      "files": {
+        "collect_list": [
+          {
+            "file_path": "/var/log/messages",
+            "log_group_name": "/aws/ec2/{{ ansible_hostname }}",
+            "log_stream_name": "{instance_id}/messages"
+          },
+          {
+            "file_path": "/var/log/docker",
+            "log_group_name": "/aws/ec2/{{ ansible_hostname }}",
+            "log_stream_name": "{instance_id}/docker"
+          },
+          {
+            "file_path": "/opt/islamic-app/logs/*.log",
+            "log_group_name": "/aws/ec2/{{ ansible_hostname }}",
+            "log_stream_name": "{instance_id}/islamic-app"
+          },
+          {
+            "file_path": "/var/jenkins_home/logs/jenkins.log",
+            "log_group_name": "/aws/ec2/{{ ansible_hostname }}",
+            "log_stream_name": "{instance_id}/jenkins"
+          }
+        ]
+      }
+    }
+  }
+}

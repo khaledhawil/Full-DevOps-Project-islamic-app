@@ -1,0 +1,137 @@
+---
+# Common system configuration tasks
+- name: Update system packages
+  yum:
+    name: "*"
+    state: latest
+    update_cache: true
+  tags: packages
+
+- name: Install essential packages
+  yum:
+    name:
+      - git
+      - curl
+      - wget
+      - unzip
+      - vim
+      - htop
+      - tree
+      - jq
+      - python3
+      - python3-pip
+    state: present
+  tags: packages
+
+- name: Install AWS CLI v2
+  block:
+    - name: Download AWS CLI v2
+      get_url:
+        url: "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip"
+        dest: /tmp/awscliv2.zip
+        mode: '0644'
+    
+    - name: Extract AWS CLI v2
+      unarchive:
+        src: /tmp/awscliv2.zip
+        dest: /tmp
+        remote_src: true
+    
+    - name: Install AWS CLI v2
+      command: /tmp/aws/install
+      args:
+        creates: /usr/local/bin/aws
+  tags: aws_cli
+
+- name: Create application directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: ec2-user
+    group: ec2-user
+    mode: '0755'
+  loop:
+    - /opt/islamic-app
+    - /opt/islamic-app/configs
+    - /opt/islamic-app/scripts
+    - /opt/islamic-app/logs
+  tags: directories
+
+- name: Configure timezone
+  timezone:
+    name: UTC
+  tags: timezone
+
+- name: Configure NTP
+  service:
+    name: chronyd
+    state: started
+    enabled: true
+  tags: ntp
+
+- name: Set up log rotation
+  copy:
+    content: |
+      /opt/islamic-app/logs/*.log {
+          daily
+          rotate 7
+          compress
+          delaycompress
+          missingok
+          notifempty
+          create 0644 ec2-user ec2-user
+      }
+    dest: /etc/logrotate.d/islamic-app
+    mode: '0644'
+  tags: logrotate
+
+- name: Configure system limits
+  blockinfile:
+    path: /etc/security/limits.conf
+    block: |
+      # Islamic App limits
+      ec2-user soft nofile 65536
+      ec2-user hard nofile 65536
+      ec2-user soft nproc 4096
+      ec2-user hard nproc 4096
+    marker: "# {mark} ISLAMIC APP LIMITS"
+  tags: limits
+
+- name: Install kubectl
+  get_url:
+    url: "https://dl.k8s.io/release/v{{ kubectl_version | default('1.28.0') }}/bin/linux/amd64/kubectl"
+    dest: /usr/local/bin/kubectl
+    mode: '0755'
+  tags: kubectl
+
+- name: Install Helm
+  get_url:
+    url: "https://get.helm.sh/helm-v{{ helm_version | default('3.12.0') }}-linux-amd64.tar.gz"
+    dest: /tmp/helm.tar.gz
+  register: helm_download
+  tags: helm
+
+- name: Extract and install Helm
+  block:
+    - name: Extract Helm
+      unarchive:
+        src: /tmp/helm.tar.gz
+        dest: /tmp
+        remote_src: true
+    
+    - name: Install Helm binary
+      copy:
+        src: /tmp/linux-amd64/helm
+        dest: /usr/local/bin/helm
+        mode: '0755'
+        remote_src: true
+  when: helm_download is succeeded
+  tags: helm
+
+- name: Create SSH key for ec2-user if not exists
+  user:
+    name: ec2-user
+    generate_ssh_key: true
+    ssh_key_bits: 2048
+    ssh_key_file: .ssh/id_rsa
+  tags: ssh_key

@@ -1,0 +1,7 @@
+---
+# CloudWatch handlers
+- name: restart cloudwatch agent
+  systemd:
+    name: amazon-cloudwatch-agent
+    state: restarted
+  tags: cloudwatch_restart

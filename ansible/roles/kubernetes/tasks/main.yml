@@ -1,0 +1,188 @@
+---
+# Kubernetes cluster configuration
+- name: Install Kubernetes Python client
+  pip:
+    name: kubernetes
+    executable: pip3
+  delegate_to: localhost
+  tags: k8s_client
+
+- name: Configure kubectl for EKS cluster
+  shell: |
+    aws eks update-kubeconfig --region {{ aws_region }} --name {{ eks_cluster_name }}
+  delegate_to: localhost
+  tags: k8s_config
+
+- name: Create Islamic App namespace
+  kubernetes.core.k8s:
+    name: islamic-app
+    api_version: v1
+    kind: Namespace
+    state: present
+  delegate_to: localhost
+  tags: k8s_namespace
+
+- name: Create ArgoCD namespace
+  kubernetes.core.k8s:
+    name: argocd
+    api_version: v1
+    kind: Namespace
+    state: present
+  delegate_to: localhost
+  tags: k8s_namespace
+
+- name: Install ArgoCD
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: argocd-install
+        namespace: argocd
+      data:
+        install.sh: |
+          #!/bin/bash
+          kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+  delegate_to: localhost
+  tags: argocd_install
+
+- name: Apply ArgoCD installation
+  shell: |
+    kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+  delegate_to: localhost
+  tags: argocd_install
+
+- name: Wait for ArgoCD to be ready
+  kubernetes.core.k8s_info:
+    api_version: apps/v1
+    kind: Deployment
+    name: argocd-server
+    namespace: argocd
+    wait: true
+    wait_condition:
+      type: Available
+      status: "True"
+    wait_timeout: 600
+  delegate_to: localhost
+  tags: argocd_wait
+
+- name: Create ArgoCD ingress
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: networking.k8s.io/v1
+      kind: Ingress
+      metadata:
+        name: argocd-server-ingress
+        namespace: argocd
+        annotations:
+          kubernetes.io/ingress.class: "nginx"
+          nginx.ingress.kubernetes.io/ssl-redirect: "false"
+          nginx.ingress.kubernetes.io/backend-protocol: "GRPC"
+      spec:
+        rules:
+        - host: argocd.{{ ansible_host | default('localhost') }}
+          http:
+            paths:
+            - path: /
+              pathType: Prefix
+              backend:
+                service:
+                  name: argocd-server
+                  port:
+                    number: 80
+  delegate_to: localhost
+  tags: argocd_ingress
+
+- name: Install NGINX Ingress Controller
+  shell: |
+    kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.1/deploy/static/provider/aws/deploy.yaml
+  delegate_to: localhost
+  tags: nginx_ingress
+
+- name: Create persistent volumes for applications
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: PersistentVolume
+      metadata:
+        name: "{{ item.name }}"
+      spec:
+        capacity:
+          storage: "{{ item.size }}"
+        accessModes:
+          - ReadWriteOnce
+        persistentVolumeReclaimPolicy: Retain
+        storageClassName: gp2
+        awsElasticBlockStore:
+          volumeID: "{{ item.volume_id }}"
+          fsType: ext4
+  loop:
+    - name: islamic-app-backend-pv
+      size: 10Gi
+      volume_id: "vol-backend-placeholder"
+    - name: islamic-app-frontend-pv
+      size: 5Gi
+      volume_id: "vol-frontend-placeholder"
+  delegate_to: localhost
+  tags: k8s_storage
+  ignore_errors: true
+
+- name: Get ArgoCD admin password
+  shell: |
+    kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
+  register: argocd_password
+  delegate_to: localhost
+  tags: argocd_password
+
+- name: Display ArgoCD information
+  debug:
+    msg:
+      - "ArgoCD is ready!"
+      - "Access ArgoCD at: https://argocd.{{ ansible_host | default('localhost') }}"
+      - "Username: admin"
+      - "Password: {{ argocd_password.stdout | default('Check manually with: kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath=\"{.data.password}\" | base64 -d') }}"
+  tags: argocd_info
+
+- name: Create monitoring namespace
+  kubernetes.core.k8s:
+    name: monitoring
+    api_version: v1
+    kind: Namespace
+    state: present
+  delegate_to: localhost
+  tags: monitoring
+
+- name: Add Prometheus Helm repository
+  kubernetes.core.helm_repository:
+    name: prometheus-community
+    repo_url: https://prometheus-community.github.io/helm-charts
+  delegate_to: localhost
+  tags: monitoring
+
+- name: Install Prometheus and Grafana
+  kubernetes.core.helm:
+    name: kube-prometheus-stack
+    chart_ref: prometheus-community/kube-prometheus-stack
+    release_namespace: monitoring
+    create_namespace: true
+    values:
+      grafana:
+        adminPassword: islamic-app-admin
+        service:
+          type: LoadBalancer
+      prometheus:
+        prometheusSpec:
+          retention: 30d
+          storageSpec:
+            volumeClaimTemplate:
+              spec:
+                storageClassName: gp2
+                accessModes: ["ReadWriteOnce"]
+                resources:
+                  requests:
+                    storage: 50Gi
+  delegate_to: localhost
+  tags: monitoring

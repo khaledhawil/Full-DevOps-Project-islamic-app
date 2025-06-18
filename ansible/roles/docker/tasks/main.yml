@@ -1,0 +1,81 @@
+---
+# Docker installation and configuration
+- name: Install Docker
+  yum:
+    name: docker
+    state: present
+  tags: docker_install
+
+- name: Start and enable Docker service
+  systemd:
+    name: docker
+    state: started
+    enabled: true
+  tags: docker_service
+
+- name: Add ec2-user to docker group
+  user:
+    name: ec2-user
+    groups: docker
+    append: true
+  tags: docker_user
+
+- name: Install Docker Compose
+  get_url:
+    url: "https://github.com/docker/compose/releases/latest/download/docker-compose-Linux-x86_64"
+    dest: /usr/local/bin/docker-compose
+    mode: '0755'
+  tags: docker_compose
+
+- name: Create docker-compose symlink
+  file:
+    src: /usr/local/bin/docker-compose
+    dest: /usr/bin/docker-compose
+    state: link
+  tags: docker_compose
+
+- name: Configure Docker daemon
+  copy:
+    content: |
+      {
+        "log-driver": "json-file",
+        "log-opts": {
+          "max-size": "100m",
+          "max-file": "3"
+        },
+        "storage-driver": "overlay2",
+        "live-restore": true,
+        "userland-proxy": false,
+        "experimental": false,
+        "metrics-addr": "127.0.0.1:9323",
+        "insecure-registries": []
+      }
+    dest: /etc/docker/daemon.json
+    mode: '0644'
+  notify: restart docker
+  tags: docker_config
+
+- name: Create Docker network for Islamic App
+  docker_network:
+    name: islamic-app-network
+    driver: bridge
+  tags: docker_network
+
+- name: Install Docker Python module
+  pip:
+    name: 
+      - docker
+      - docker-compose
+    executable: pip3
+  tags: docker_python
+
+- name: Test Docker installation
+  command: docker --version
+  register: docker_version
+  changed_when: false
+  tags: docker_test
+
+- name: Display Docker version
+  debug:
+    msg: "Docker version: {{ docker_version.stdout }}"
+  tags: docker_test

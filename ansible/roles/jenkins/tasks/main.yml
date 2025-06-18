@@ -1,0 +1,131 @@
+---
+# Jenkins configuration and setup
+- name: Ensure Jenkins is running
+  docker_container:
+    name: jenkins
+    state: started
+  tags: jenkins_start
+
+- name: Wait for Jenkins to be ready
+  uri:
+    url: "http://localhost:8080/login"
+    method: GET
+    status_code: 200
+  register: jenkins_ready
+  until: jenkins_ready.status == 200
+  retries: 30
+  delay: 10
+  tags: jenkins_wait
+
+- name: Create Jenkins configuration directory
+  file:
+    path: /opt/islamic-app/jenkins
+    state: directory
+    owner: ec2-user
+    group: ec2-user
+    mode: '0755'
+  tags: jenkins_config
+
+- name: Copy Jenkins configuration files
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: ec2-user
+    group: ec2-user
+    mode: '0644'
+  loop:
+    - src: jenkins-cli-config.xml.j2
+      dest: /opt/islamic-app/jenkins/cli-config.xml
+    - src: islamic-app-pipeline.xml.j2
+      dest: /opt/islamic-app/jenkins/islamic-app-pipeline.xml
+  tags: jenkins_config
+
+- name: Create Jenkins jobs directory
+  file:
+    path: /var/jenkins_home/jobs
+    state: directory
+    owner: 1000
+    group: 1000
+    mode: '0755'
+  tags: jenkins_jobs
+
+- name: Install Jenkins plugins
+  shell: |
+    docker exec jenkins java -jar /var/jenkins_home/war/WEB-INF/jenkins-cli.jar \
+    -s http://localhost:8080/ install-plugin {{ item }} -deploy
+  loop:
+    - blueocean
+    - docker-workflow
+    - kubernetes
+    - pipeline-stage-view
+    - git
+    - github
+    - github-branch-source
+    - workflow-aggregator
+    - pipeline-utility-steps
+    - discord-notifier
+    - build-timeout
+    - timestamper
+    - ws-cleanup
+    - ant
+    - gradle
+    - nodejs
+  ignore_errors: true
+  tags: jenkins_plugins
+
+- name: Configure AWS credentials for Jenkins
+  shell: |
+    docker exec jenkins aws configure set region {{ aws_region }}
+    docker exec jenkins aws configure set output json
+  tags: jenkins_aws
+
+- name: Update EKS kubeconfig for Jenkins
+  shell: |
+    docker exec jenkins aws eks update-kubeconfig \
+    --region {{ aws_region }} \
+    --name {{ eks_cluster_name }}
+  when: eks_cluster_name is defined
+  tags: jenkins_kubectl
+
+- name: Create Jenkins backup script
+  template:
+    src: jenkins-backup.sh.j2
+    dest: /opt/islamic-app/scripts/jenkins-backup.sh
+    owner: ec2-user
+    group: ec2-user
+    mode: '0755'
+  tags: jenkins_backup
+
+- name: Schedule Jenkins backup
+  cron:
+    name: "Jenkins backup"
+    minute: "0"
+    hour: "2"
+    job: "/opt/islamic-app/scripts/jenkins-backup.sh"
+    user: ec2-user
+  tags: jenkins_backup
+
+- name: Create Jenkins pipeline job
+  uri:
+    url: "http://localhost:8080/createItem?name=islamic-app-pipeline"
+    method: POST
+    body: "{{ lookup('file', '/opt/islamic-app/jenkins/islamic-app-pipeline.xml') }}"
+    headers:
+      Content-Type: "application/xml"
+    status_code: [200, 302]
+  ignore_errors: true
+  tags: jenkins_pipeline
+
+- name: Get Jenkins initial admin password
+  shell: docker exec jenkins cat /var/jenkins_home/secrets/initialAdminPassword
+  register: jenkins_password
+  ignore_errors: true
+  tags: jenkins_password
+
+- name: Display Jenkins information
+  debug:
+    msg:
+      - "Jenkins is ready at: http://{{ ansible_host }}:8080"
+      - "Initial admin password: {{ jenkins_password.stdout | default('Check manually') }}"
+      - "SSH to server and run: docker exec jenkins cat /var/jenkins_home/secrets/initialAdminPassword"
+  tags: jenkins_info
