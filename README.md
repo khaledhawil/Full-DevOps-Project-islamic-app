@@ -10,7 +10,7 @@
 
 This comprehensive Islamic application serves the Muslim community with essential digital tools for daily Islamic practices while showcasing modern DevOps methodologies including Infrastructure as Code, continuous integration, automated security scanning, and GitOps-based deployments.
 
-## 🎯 Project Overview
+## Project Overview
 
 The Islamic App is a full-stack web application that combines traditional Islamic resources with cutting-edge technology to provide an accessible platform for worship, learning, and spiritual growth. Built with modern architecture principles and enterprise DevOps practices, this project serves as both a functional application and a demonstration of professional software development and deployment practices.
 
@@ -21,7 +21,7 @@ The Islamic App is a full-stack web application that combines traditional Islami
 - **Security**: Integrated security scanning and best practices
 - **Maintainability**: Comprehensive documentation and monitoring
 
-## 📚 Documentation Hub
+## Documentation Hub
 
 This project includes extensive documentation for all components:
 
@@ -39,38 +39,38 @@ This project includes extensive documentation for all components:
 | **Nginx** | [`nginx/nginx-documentation.md`](nginx/nginx-documentation.md) | Load balancer configuration |
 | **Scripts** | [`k8s/SCRIPTS.md`](k8s/SCRIPTS.md) | Deployment automation scripts |
 
-## ✨ Application Features
+## Application Features
 
 ### 🕌 Islamic Features
-- **📿 Digital Tasbeh Counter**: Advanced counter with achievement system and progress tracking
-- **📖 Quran Reader**: Complete Quran with Arabic text, translations, and search functionality
-- **🎵 Quran Audio**: High-quality recitations with multiple reciters and playback controls
-- **📚 Hadith Collection**: Searchable database with authentic hadiths from major collections
-- **🕐 Prayer Times**: Location-based prayer time calculations with notifications
-- **🤲 Azkar and Duas**: Collection of Islamic supplications and daily remembrances
-- **👤 User Profiles**: Personal settings, preferences, and spiritual progress tracking
-- **🌙 Islamic Calendar**: Hijri calendar integration with important Islamic dates
+- **Digital Tasbeh Counter**: Advanced counter with achievement system and progress tracking
+- **Quran Reader**: Complete Quran with Arabic text, translations, and search functionality
+- **Quran Audio**: High-quality recitations with multiple reciters and playback controls
+- **Hadith Collection**: Searchable database with authentic hadiths from major collections
+- **Prayer Times**: Location-based prayer time calculations with notifications
+- **Azkar and Duas**: Collection of Islamic supplications and daily remembrances
+- **User Profiles**: Personal settings, preferences, and spiritual progress tracking
+- **Islamic Calendar**: Hijri calendar integration with important Islamic dates
 
-### 🎨 User Experience
-- **🌗 Theme Support**: Dark/light mode with user preferences
-- **📱 Responsive Design**: Mobile-first approach with cross-device compatibility
-- **🔐 Secure Authentication**: JWT-based authentication with user management
-- **⚡ Performance**: Optimized loading with lazy loading and caching
-- **🌍 Internationalization**: Multi-language support for global Muslim community
+### User Experience
+- **Theme Support**: Dark/light mode with user preferences
+- **Responsive Design**: Mobile-first approach with cross-device compatibility
+- **Secure Authentication**: JWT-based authentication with user management
+- **Performance**: Optimized loading with lazy loading and caching
+- **Internationalization**: Multi-language support for global Muslim community
 - **♿ Accessibility**: WCAG compliant design for inclusive user experience
 
 ### 🔧 DevOps Infrastructure
-- **🐳 Containerization**: Docker containers for all services with multi-stage builds
-- **☸️ Orchestration**: Kubernetes deployment with auto-scaling and self-healing
-- **🔄 CI/CD Pipeline**: Jenkins automated build, test, and deployment
-- **📦 GitOps**: ArgoCD for continuous delivery and configuration management
-- **⚖️ Load Balancing**: Nginx reverse proxy with SSL termination
-- **🛢️ Database**: PostgreSQL with persistent storage and automated backups
-- **🔍 Security Scanning**: Trivy vulnerability assessment in CI/CD pipeline
-- **📊 Monitoring**: Application health checks and performance monitoring
-- **📢 Notifications**: Discord webhook integration for build status updates
+- **Containerization**: Docker containers for all services with multi-stage builds
+- **Orchestration**: Kubernetes deployment with auto-scaling and self-healing
+- **CI/CD Pipeline**: Jenkins automated build, test, and deployment
+- **GitOps**: ArgoCD for continuous delivery and configuration management
+- **Load Balancing**: Nginx reverse proxy with SSL termination
+- **Database**: PostgreSQL with persistent storage and automated backups
+- **Security Scanning**: Trivy vulnerability assessment in CI/CD pipeline
+- **Monitoring**: Application health checks and performance monitoring
+- **Notifications**: Discord webhook integration for build status updates
 
-## 🏗️ Architecture Overview
+## Architecture Overview
 
 ```mermaid
 graph TB
@@ -104,8 +104,8 @@ graph TB
     end
 ```
 
-## 🛠️ Technology Stack
-### 💻 Frontend Stack
+##  Technology Stack
+### Frontend Stack
 | Technology | Version | Purpose |
 |------------|---------|---------|
 | **React** | 18.2.0 | Modern UI framework with hooks and concurrent features |
@@ -116,7 +116,7 @@ graph TB
 | **Axios** | 1.5.2 | Promise-based HTTP client with interceptors |
 | **Date-fns** | 2.30.0 | Modern JavaScript date utility library |
 
-### 🔧 Backend Stack
+### Backend Stack
 | Technology | Version | Purpose |
 |------------|---------|---------|
 | **Flask** | 2.2+ | Lightweight and flexible Python web framework |
@@ -127,7 +127,7 @@ graph TB
 | **Flask-CORS** | Latest | Cross-Origin Resource Sharing support |
 | **Marshmallow** | Latest | Object serialization and validation |
 
-### 🚀 DevOps & Infrastructure
+###  DevOps & Infrastructure
 | Tool | Purpose | Environment |
 |------|---------|-------------|
 | **Docker** | Containerization platform | All environments |
@@ -139,13 +139,13 @@ graph TB
 | **Trivy** | Vulnerability scanner for containers | Security |
 | **PostgreSQL** | Primary database with persistence | All environments |
 
-### 🔗 External Integrations
+###  External Integrations
 - **Islamic Prayer Times API**: Accurate prayer time calculations based on location
 - **Quran API**: Complete Quran text with multiple translations
 - **Hadith APIs**: Authentic hadith collections from major sources
 - **Discord Webhooks**: Real-time build notifications and alerts
 
-## 📂 Project Structure
+## Project Structure
 
 ```
 islamic-app/
@@ -202,9 +202,9 @@ islamic-app/
 └── 📄 README.md                    # This file
 ```
 
-## 🚀 Quick Start Guide
+## Quick Start Guide
 
-### 📋 Prerequisites
+### Prerequisites
 
 | Requirement | Version | Purpose |
 |-------------|---------|---------|
@@ -230,7 +230,7 @@ cd Full-DevOps-Project-islamic-app
 docker-compose up -d
 ```
 
-**🎉 Access your application:**
+**Access your application:**
 - **Frontend**: http://localhost:3000
 - **API**: http://localhost:5000
 - **Database**: localhost:5432
@@ -238,7 +238,7 @@ docker-compose up -d
 ### 🔧 Manual Development Setup
 
 <details>
-<summary><strong>📱 Frontend Development</strong></summary>
+<summary><strong>Frontend Development</strong></summary>
 
 ```bash
 # Navigate to frontend directory
@@ -314,9 +314,9 @@ cd database && chmod +x migrate.sh && ./migrate.sh
 ```
 </details>
 
-## 🚢 Deployment Options
+##  Deployment Options
 
-### 🐳 Docker Compose (Recommended for Development)
+###  Docker Compose (Recommended for Development)
 
 ```bash
 # Start all services
@@ -342,7 +342,7 @@ docker-compose down -v && docker-compose up --build -d
 - Nginx load balancer
 - Health checks and monitoring
 
-### ☸️ Kubernetes (Production Ready)
+### Kubernetes (Production Ready)
 
 ```bash
 # Quick deployment
@@ -374,7 +374,7 @@ kubectl get ingress -n islamic-app
 - Health checks and readiness probes
 - Rolling updates with zero downtime
 
-### 🔄 GitOps with ArgoCD
+### GitOps with ArgoCD
 
 ```bash
 # Deploy ArgoCD applications
@@ -396,19 +396,19 @@ argocd app sync islamic-app-staging
 - Multi-environment support
 - Rollback capabilities
 
-## 🔄 CI/CD Pipeline
+## CI/CD Pipeline
 
-### 🏗️ Jenkins Pipeline Features
+### Jenkins Pipeline Features
 
 The Jenkins pipeline (`Jenkinsfile`) provides enterprise-grade CI/CD automation:
 
 **Pipeline Stages:**
-1. **🔍 Checkout & Change Detection**: Smart detection of frontend/backend changes
-2. **🔨 Build**: Multi-architecture Docker image builds
-3. **🛡️ Security Scan**: Trivy vulnerability assessment
-4. **📤 Push**: Registry upload with semantic versioning
-5. **🚀 Deploy**: Automated Kubernetes deployment
-6. **📢 Notify**: Discord webhook notifications
+1. **Checkout & Change Detection**: Smart detection of frontend/backend changes
+2. **Build**: Multi-architecture Docker image builds
+3. **Security Scan**: Trivy vulnerability assessment
+4. **Push**: Registry upload with semantic versioning
+5. **Deploy**: Automated Kubernetes deployment
+6. **Notify**: Discord webhook notifications
 
 **Key Features:**
 - **Smart Building**: Only builds changed components
@@ -426,7 +426,7 @@ curl -X POST "https://jenkins.yourdomain.com/job/islamic-app/buildWithParameters
   -d "BUILD_TYPE=frontend-only"
 ```
 
-### 📊 Pipeline Monitoring
+### Pipeline Monitoring
 
 **Build Status Dashboard:**
 - Build success/failure rates
@@ -436,7 +436,7 @@ curl -X POST "https://jenkins.yourdomain.com/job/islamic-app/buildWithParameters
 
 ## 🔌 API Documentation
 
-### 🔐 Authentication Endpoints
+### Authentication Endpoints
 
 | Method | Endpoint | Description | Request Body |
 |--------|----------|-------------|--------------|
@@ -446,7 +446,7 @@ curl -X POST "https://jenkins.yourdomain.com/job/islamic-app/buildWithParameters
 | `GET` | `/api/auth/profile` | Get user profile | Headers: `Authorization: Bearer <token>` |
 | `PUT` | `/api/auth/profile` | Update profile | `{username, preferences}` |
 
-### 📿 Tasbeh Counter API
+### Tasbeh Counter API
 
 | Method | Endpoint | Description | Parameters |
 |--------|----------|-------------|------------|
@@ -455,7 +455,7 @@ curl -X POST "https://jenkins.yourdomain.com/job/islamic-app/buildWithParameters
 | `PUT` | `/api/tasbeh/reset` | Reset specific phrase | `{phrase}` |
 | `DELETE` | `/api/tasbeh/phrase/{id}` | Remove phrase | `phrase_id` |
 
-### 👤 User Management API
+###  User Management API
 
 | Method | Endpoint | Description | Request Body |
 |--------|----------|-------------|--------------|
@@ -466,7 +466,7 @@ curl -X POST "https://jenkins.yourdomain.com/job/islamic-app/buildWithParameters
 | `GET` | `/api/user/location` | Get user location | - |
 | `PUT` | `/api/user/location` | Update location | `{latitude, longitude, city}` |
 
-### 🕐 Prayer Times API
+### Prayer Times API
 
 | Method | Endpoint | Description | Parameters |
 |--------|----------|-------------|------------|
@@ -475,7 +475,7 @@ curl -X POST "https://jenkins.yourdomain.com/job/islamic-app/buildWithParameters
 | `GET` | `/api/prayer-times/settings` | Get notification settings | - |
 | `PUT` | `/api/prayer-times/settings` | Update notifications | `{enabled, offset_minutes}` |
 
-### 📖 Islamic Content API
+###  Islamic Content API
 
 | Method | Endpoint | Description | Parameters |
 |--------|----------|-------------|------------|
@@ -487,7 +487,7 @@ curl -X POST "https://jenkins.yourdomain.com/job/islamic-app/buildWithParameters
 | `GET` | `/api/azkar/categories` | Get Azkar categories | - |
 | `GET` | `/api/azkar/{category}` | Get Azkar by category | `category_name` |
 
-### 📊 Health & Monitoring
+### Health & Monitoring
 
 | Method | Endpoint | Description | Response |
 |--------|----------|-------------|----------|
@@ -495,9 +495,9 @@ curl -X POST "https://jenkins.yourdomain.com/job/islamic-app/buildWithParameters
 | `GET` | `/api/health/detailed` | Detailed health status | `{database, external_apis, cache}` |
 | `GET` | `/metrics` | Prometheus metrics | Metrics in Prometheus format |
 
-## 🔒 Security Features
+## Security Features
 
-### 🛡️ Application Security
+###  Application Security
 - **JWT Authentication**: Secure token-based authentication with refresh tokens
 - **Password Hashing**: bcrypt with configurable rounds
 - **CORS Configuration**: Secure cross-origin resource sharing
@@ -505,7 +505,7 @@ curl -X POST "https://jenkins.yourdomain.com/job/islamic-app/buildWithParameters
 - **SQL Injection Prevention**: SQLAlchemy ORM with parameterized queries
 - **Rate Limiting**: API endpoint rate limiting to prevent abuse
 
-### 🔍 Container Security
+### Container Security
 - **Multi-stage Builds**: Minimal production images
 - **Non-root Users**: Containers run as non-privileged users
 - **Vulnerability Scanning**: Trivy integration in CI/CD pipeline
@@ -513,7 +513,7 @@ curl -X POST "https://jenkins.yourdomain.com/job/islamic-app/buildWithParameters
 - **Secrets Management**: Kubernetes secrets for sensitive data
 - **Network Policies**: Kubernetes network segmentation
 
-### 🔐 Infrastructure Security
+### Infrastructure Security
 - **TLS Encryption**: End-to-end encryption with Let's Encrypt
 - **RBAC**: Role-based access control in Kubernetes
 - **Pod Security Standards**: Kubernetes security policies
@@ -521,32 +521,32 @@ curl -X POST "https://jenkins.yourdomain.com/job/islamic-app/buildWithParameters
 - **Audit Logging**: Comprehensive security event logging
 - **Backup Encryption**: Encrypted database backups
 
-## 📊 Monitoring & Observability
+## Monitoring & Observability
 
-### 📈 Application Monitoring
+### Application Monitoring
 - **Health Checks**: Multi-level health endpoints for comprehensive status monitoring
 - **Performance Metrics**: Response times, throughput, and error rates
 - **Resource Usage**: CPU, memory, and disk utilization tracking
 - **User Analytics**: Feature usage and user behavior insights
 - **Error Tracking**: Centralized error logging and alerting
 
-### 🔍 Infrastructure Monitoring
+### Infrastructure Monitoring
 - **Kubernetes Metrics**: Pod, node, and cluster-level monitoring
 - **Container Insights**: Resource usage and performance per container
 - **Database Monitoring**: Query performance and connection pooling
 - **Network Monitoring**: Traffic patterns and latency analysis
 - **Storage Monitoring**: Persistent volume usage and performance
 
-### 📊 Alerting & Notifications
+### Alerting & Notifications
 - **Discord Integration**: Real-time build and deployment notifications
 - **Slack Integration**: Monitoring alerts and incident management
 - **Email Notifications**: Critical system alerts and reports
 - **PagerDuty Integration**: On-call management for production issues
 - **Custom Webhooks**: Integration with external monitoring systems
 
-## 🚀 Performance Optimization
+## Performance Optimization
 
-### ⚡ Frontend Optimization
+### Frontend Optimization
 - **Code Splitting**: Dynamic imports for reduced initial bundle size
 - **Lazy Loading**: On-demand component loading for better performance
 - **Service Workers**: Offline support and caching strategies
@@ -554,7 +554,7 @@ curl -X POST "https://jenkins.yourdomain.com/job/islamic-app/buildWithParameters
 - **Bundle Analysis**: Webpack bundle analyzer for size optimization
 - **CDN Integration**: Static asset delivery through global CDN
 
-### 🔧 Backend Optimization
+### Backend Optimization
 - **Database Connection Pooling**: Efficient database connection management
 - **Query Optimization**: Indexed queries and N+1 query prevention
 - **Caching Strategies**: Redis caching for frequently accessed data
@@ -562,16 +562,16 @@ curl -X POST "https://jenkins.yourdomain.com/job/islamic-app/buildWithParameters
 - **Async Processing**: Background tasks for heavy operations
 - **Load Balancing**: Multiple backend instances with health checks
 
-### 🏗️ Infrastructure Optimization
+### Infrastructure Optimization
 - **Horizontal Pod Autoscaling**: Automatic scaling based on metrics
 - **Resource Optimization**: Right-sized containers with resource limits
 - **Database Tuning**: PostgreSQL configuration optimization
 - **Network Optimization**: Service mesh for traffic management
 - **Storage Optimization**: Persistent volume performance tuning
 
-## 🧪 Testing Strategy
+## Testing Strategy
 
-### 🔍 Frontend Testing
+### Frontend Testing
 ```bash
 # Unit tests with Jest and React Testing Library
 npm test
@@ -586,7 +586,7 @@ npm run test:e2e
 npm run test:coverage
 ```
 
-### 🧪 Backend Testing
+### Backend Testing
 ```bash
 # Unit tests with pytest
 pytest tests/unit/
@@ -601,18 +601,18 @@ pytest tests/api/
 locust -f tests/load/locustfile.py
 ```
 
-### 🚀 Deployment Testing
+### Deployment Testing
 - **Smoke Tests**: Basic functionality validation after deployment
 - **Health Checks**: Automated endpoint testing
 - **Performance Tests**: Load testing in staging environment
 - **Security Tests**: Vulnerability scanning and penetration testing
 - **Rollback Tests**: Deployment rollback verification
 
-## 🤝 Contributing
+## Contributing
 
 We welcome contributions from the community! Here's how you can help:
 
-### 🛠️ Development Workflow
+### Development Workflow
 
 1. **Fork the Repository**
    ```bash
@@ -662,7 +662,7 @@ We welcome contributions from the community! Here's how you can help:
    - Reference related issues
    - Ensure all checks pass
 
-### 📝 Contribution Guidelines
+###  Contribution Guidelines
 
 #### Code Standards
 - **Frontend**: TypeScript strict mode, ESLint + Prettier configuration
@@ -686,14 +686,8 @@ type(scope): description
 - `fix(api): resolve prayer times calculation error`
 - `docs(k8s): update deployment instructions`
 
-#### Pull Request Process
-1. ✅ All CI/CD checks must pass
-2. 👀 Code review by at least one maintainer
-3. 📝 Updated documentation if applicable
-4. 🧪 Tests for new functionality
-5. 📊 Performance impact assessment
 
-### 🐛 Bug Reports
+### Bug Reports
 
 When reporting bugs, please include:
 - **Environment**: OS, browser, Node.js/Python versions
@@ -703,7 +697,7 @@ When reporting bugs, please include:
 - **Screenshots**: If applicable
 - **Logs**: Relevant error messages or logs
 
-### 💡 Feature Requests
+### Feature Requests
 
 For new features, please provide:
 - **Use Case**: Why is this feature needed?
@@ -711,37 +705,16 @@ For new features, please provide:
 - **Alternatives**: Other ways to solve the problem
 - **Implementation**: Any technical considerations
 
-## 📜 License
+## Support & Community
 
-This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
-
-### License Summary
-- ✅ Commercial use
-- ✅ Modification
-- ✅ Distribution
-- ✅ Private use
-- ❌ Liability
-- ❌ Warranty
-
-## 🆘 Support & Community
-
-### 📞 Getting Help
+### Getting Help
 
 1. **📚 Documentation**: Check the comprehensive docs in this repository
 2. **🐛 Issues**: Create a GitHub issue for bugs or feature requests
 3. **💬 Discussions**: Use GitHub Discussions for questions and ideas
 4. **📧 Email**: Contact maintainers for security issues
 
-### 🔗 Useful Links
-
-| Resource | Description | Link |
-|----------|-------------|------|
-| **Live Demo** | Production application | [https://islamic-app.yourdomain.com](https://islamic-app.yourdomain.com) |
-| **API Docs** | Swagger/OpenAPI documentation | [https://api.islamic-app.yourdomain.com/docs](https://api.islamic-app.yourdomain.com/docs) |
-| **Status Page** | Service uptime and incidents | [https://status.islamic-app.yourdomain.com](https://status.islamic-app.yourdomain.com) |
-| **Monitoring** | Grafana dashboards | [https://monitoring.islamic-app.yourdomain.com](https://monitoring.islamic-app.yourdomain.com) |
-
-### 🏷️ Badges & Metrics
+### Badges & Metrics
 
 ![GitHub Issues](https://img.shields.io/github/issues/your-org/islamic-app)
 ![GitHub Pull Requests](https://img.shields.io/github/issues-pr/your-org/islamic-app)
@@ -751,11 +724,10 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 ![Code Quality](https://img.shields.io/codeclimate/maintainability/your-org/islamic-app)
 ![Test Coverage](https://img.shields.io/codecov/c/github/your-org/islamic-app)
 
----
+--
+## Quick Reference
 
-## 📋 Quick Reference
-
-### 🚀 Essential Commands
+### Essential Commands
 
 ```bash
 # Development
@@ -778,19 +750,12 @@ kubectl get pods -n islamic-app   # Check Kubernetes status
 docker-compose logs -f            # View application logs
 ./k8s/cleanup.sh                 # Clean up resources
 ```
+## Project Information
+**Developer Contact:**
+- **GitHub:** [khaledhawil](https://github.com/khaledhawil)
+- **Email:** khaledhawil91@gmail.com
+- **LinkedIn:** [khaledhawi](https://linkedin.com/in/khaledhawi)
 
-### 📚 Documentation Navigation
-
-- 🏠 **Start Here**: [README.md](README.md) (this file)
-- 🎯 **Master Guide**: [DEVOPS_GUIDE.md](DEVOPS_GUIDE.md)
-- 📁 **File Reference**: [FILE_INDEX.md](FILE_INDEX.md)
-- 🏗️ **Build Guides**: [frontend/BUILD.md](frontend/BUILD.md), [backend/BUILD.md](backend/BUILD.md)
-- 🐳 **Containers**: [docker-compose.md](docker-compose.md)
-- ☸️ **Kubernetes**: [k8s/k8s-documentation.md](k8s/k8s-documentation.md)
-- 🔄 **CI/CD**: [Jenkinsfile.md](Jenkinsfile.md)
-- 📦 **GitOps**: [argocd/argocd-documentation.md](argocd/argocd-documentation.md)
-
----
 
 **🌟 Star this repository if you find it helpful!**
 
