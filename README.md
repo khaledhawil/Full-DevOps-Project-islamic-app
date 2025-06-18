@@ -467,6 +467,68 @@ pytest tests/api/          # API tests
 
 </details>
 
+## 📸 Screenshots & Documentation
+
+<details>
+<summary><strong>🕌 Application Features</strong></summary>
+
+### Main Application Interface
+![Home Page](images/home-page.png)
+*Main dashboard with Islamic resources and navigation*
+
+### Authentication System
+| Login Interface | Registration Interface |
+|----------------|----------------------|
+| ![Login](images/login-page.png) | ![Signup](images/sginup-page.png) |
+
+### Islamic Features
+| Prayer Times | Digital Tasbeh |
+|-------------|----------------|
+| ![Prayer Times](images/prayer-time.png) | ![Tasbeh](images/tasbeh-page.png) |
+
+| Quran Audio | Quran Reader |
+|-------------|--------------|
+| ![Quran Audio](images/quran-mp3-page.png) | ![Quran Reader](images/reading-quran-page-with-audio.png) |
+
+| Hadith Collection | Azkar & Duas |
+|------------------|--------------|
+| ![Hadith](images/hadith-page.png) | ![Azkar](images/azkar-page.png) |
+
+</details>
+
+<details>
+<summary><strong>🚀 DevOps Pipeline & Infrastructure</strong></summary>
+
+### Jenkins CI/CD Pipeline
+![Pipeline Frontend & Backend](images/pipeline-stages-with-frontend-build.png)
+*Complete CI/CD pipeline with frontend and backend build stages*
+
+![Pipeline with Security Scanning](images/pipeline-stages-with-build-front-and-backend-withScanImages.png)
+*Advanced pipeline with security image scanning using Trivy*
+
+### Build Notifications
+![Discord Notifications](images/Discord-Notofications-with-build-status.png)
+*Real-time build status notifications via Discord integration*
+
+### Kubernetes & GitOps
+![Kubernetes Resources](images/all-islamic-resources-in-k8s.png)
+*All application resources deployed in Kubernetes cluster*
+
+![ArgoCD Dashboard](images/argocd-page.png)
+*ArgoCD GitOps interface showing deployment status*
+
+![Node Usage](images/node-usage.png)
+*Kubernetes cluster resource monitoring*
+
+### Development Environment
+![VS Code IDE](images/vscode.png)
+*Development environment with project structure*
+
+![Ngrok Tunnel](images/ngrok.png)
+*Ngrok tunnel for GitHub webhook forwarding*
+
+</details>
+
 <details>
 <summary><strong>Contributing</strong></summary>
 
