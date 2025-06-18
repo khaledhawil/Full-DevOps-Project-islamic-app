@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import { useState, useEffect } from 'react';
 import { useTheme } from '../contexts/ThemeContext';
 import { useAuthStore } from '../stores/authStore';
 import { useAudioPlayer } from '../contexts/AudioContext';
@@ -175,7 +176,7 @@ const QuranAudio: React.FC = () => {
       return;
     }
 
-    const surahInfo = surahs.find(s => s.number === surahNumber);
+    const surahInfo = surahs.find((s: Surah) => s.number === surahNumber);
     const surahName = surahInfo ? surahInfo.name : `سورة رقم ${surahNumber}`;
     
     setLoading(true);
@@ -315,7 +316,7 @@ const QuranAudio: React.FC = () => {
     }
     
     const newFavorites = favorites.includes(reciterId) 
-      ? favorites.filter(id => id !== reciterId)
+      ? favorites.filter((id: string) => id !== reciterId)
       : [...favorites, reciterId];
       
     setFavorites(newFavorites);
@@ -385,7 +386,7 @@ const QuranAudio: React.FC = () => {
       return;
     }
 
-    const surahInfo = surahs.find(s => s.number === surahNumber);
+    const surahInfo = surahs.find((s: Surah) => s.number === surahNumber);
     const surahName = surahInfo ? surahInfo.name : `سورة رقم ${surahNumber}`;
     
     setLoading(true);
@@ -586,7 +587,7 @@ const QuranAudio: React.FC = () => {
               <input
                 type="text"
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e: any) => setSearchTerm(e.target.value)}
                 placeholder="ابحث بالاسم أو البلد أو النوع..."
                 style={{
                   width: '100%',
@@ -612,7 +613,7 @@ const QuranAudio: React.FC = () => {
               </label>
               <select 
                 value={selectedReciter} 
-                onChange={(e) => setSelectedReciter(e.target.value)}
+                onChange={(e: any) => setSelectedReciter(e.target.value)}
                 style={{
                   width: '100%',
                   padding: '0.75rem',
