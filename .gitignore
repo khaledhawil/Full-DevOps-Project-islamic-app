@@ -11,7 +11,7 @@ build/
 dist/
 */build/
 */dist/
-
+myfile
 # Environment variables
 .env
 .env.local
