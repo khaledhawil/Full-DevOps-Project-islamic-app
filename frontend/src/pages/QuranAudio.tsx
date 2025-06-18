@@ -31,36 +31,73 @@ const QuranAudio: React.FC = () => {
   
   // State management
   const [surahs, setSurahs] = useState<Surah[]>([]);
-  const [selectedReciter, setSelectedReciter] = useState<string>('ar.alafasy');
+  const [selectedReciter, setSelectedReciter] = useState<string>('ghamdi');
   const [loading, setLoading] = useState<boolean>(false);
   const [currentPlayingSurah, setCurrentPlayingSurah] = useState<number | null>(null);
   const [audioError, setAudioError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [favorites, setFavorites] = useState<string[]>([]);
 
-  // Updated reciters list using alquran.cloud API - all working and verified
+  // Updated reciters list using mp3quran.net servers - all working and verified
   const reciters: Reciter[] = [
-    // Using alquran.cloud API for reliable audio sources
-    { id: 'ar.alafasy', name: 'مشاري راشد العفاسي', style: 'مرتل', description: 'قراءة مؤثرة وهادئة', country: 'الكويت', quality: 'ممتازة', audioUrl: 'https://cdn.islamic.network/quran/audio/128/ar.alafasy/' },
-    { id: 'ar.abdulbasitmurattal', name: 'عبد الباسط عبد الصمد', style: 'مرتل', description: 'الصوت الذهبي المميز', country: 'مصر', quality: 'ممتازة', audioUrl: 'https://cdn.islamic.network/quran/audio/128/ar.abdulbasitmurattal/' },
-    { id: 'ar.husary', name: 'محمود خليل الحصري', style: 'مرتل', description: 'من أعظم قراء القرآن الكريم', country: 'مصر', quality: 'ممتازة', audioUrl: 'https://cdn.islamic.network/quran/audio/128/ar.husary/' },
-    { id: 'ar.mahermuaiqly', name: 'ماهر المعيقلي', style: 'مرتل', description: 'إمام الحرم المكي الشريف', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://cdn.islamic.network/quran/audio/128/ar.mahermuaiqly/' },
-    { id: 'ar.abdurrahmansudais', name: 'عبد الرحمن السديس', style: 'مرتل', description: 'إمام الحرم المكي الشريف', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://cdn.islamic.network/quran/audio/128/ar.abdurrahmansudais/' },
-    { id: 'ar.saoodshuraym', name: 'سعود الشريم', style: 'مرتل', description: 'إمام الحرم المكي الشريف', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://cdn.islamic.network/quran/audio/128/ar.saoodshuraym/' },
-    { id: 'ar.minshawi', name: 'محمد صديق المنشاوي', style: 'مرتل', description: 'من أعظم قراء القرآن', country: 'مصر', quality: 'ممتازة', audioUrl: 'https://cdn.islamic.network/quran/audio/128/ar.minshawi/' },
-    { id: 'ar.minshawimujawwad', name: 'محمد صديق المنشاوي (المجود)', style: 'مجود', description: 'قراءة مجودة رائعة', country: 'مصر', quality: 'ممتازة', audioUrl: 'https://cdn.islamic.network/quran/audio/128/ar.minshawimujawwad/' },
-    { id: 'ar.muhammadayyoub', name: 'محمد أيوب', style: 'مرتل', description: 'إمام الحرم المدني الشريف', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://cdn.islamic.network/quran/audio/128/ar.muhammadayyoub/' },
-    { id: 'ar.hudhaify', name: 'علي الحذيفي', style: 'مرتل', description: 'إمام الحرم المدني الشريف', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://cdn.islamic.network/quran/audio/128/ar.hudhaify/' },
-    { id: 'ar.ahmedajamy', name: 'أحمد بن علي العجمي', style: 'مرتل', description: 'صوت جميل ومتميز', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://cdn.islamic.network/quran/audio/128/ar.ahmedajamy/' },
-    { id: 'ar.hanirifai', name: 'هاني الرفاعي', style: 'مرتل', description: 'قراءة مؤثرة وعذبة', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://cdn.islamic.network/quran/audio/128/ar.hanirifai/' },
-    { id: 'ar.abdullahbasfar', name: 'عبد الله بصفر', style: 'مرتل', description: 'إمام الحرم المكي الشريف', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://cdn.islamic.network/quran/audio/128/ar.abdullahbasfar/' },
-    { id: 'ar.shaatree', name: 'أبو بكر الشاطري', style: 'مرتل', description: 'قراءة مؤثرة ومتميزة', country: 'اليمن', quality: 'ممتازة', audioUrl: 'https://cdn.islamic.network/quran/audio/128/ar.shaatree/' },
-    { id: 'ar.muhammadjibreel', name: 'محمد جبريل', style: 'مرتل', description: 'قراءة عذبة ومؤثرة', country: 'مصر', quality: 'ممتازة', audioUrl: 'https://cdn.islamic.network/quran/audio/128/ar.muhammadjibreel/' },
-    { id: 'ar.husarymujawwad', name: 'محمود خليل الحصري (المجود)', style: 'مجود', description: 'قراءة مجودة من أعظم القراء', country: 'مصر', quality: 'ممتازة', audioUrl: 'https://cdn.islamic.network/quran/audio/128/ar.husarymujawwad/' },
-    { id: 'ar.abdulsamad', name: 'عبد الباسط عبد الصمد', style: 'مرتل', description: 'قراءة مرتلة مميزة', country: 'مصر', quality: 'ممتازة', audioUrl: 'https://cdn.islamic.network/quran/audio/128/ar.abdulsamad/' },
-    { id: 'ar.ibrahimakhbar', name: 'إبراهيم الأخضر', style: 'مرتل', description: 'قراءة هادئة ومؤثرة', country: 'السودان', quality: 'جيدة جداً', audioUrl: 'https://cdn.islamic.network/quran/audio/128/ar.ibrahimakhbar/' },
-    { id: 'ar.aymanswoaid', name: 'أيمن سويد', style: 'تعليمي', description: 'قراءة تعليمية واضحة', country: 'سوريا', quality: 'ممتازة', audioUrl: 'https://cdn.islamic.network/quran/audio/128/ar.aymanswoaid/' },
-    { id: 'ar.parhizgar', name: 'شهريار پرهیزگار', style: 'مرتل', description: 'قراءة جميلة ومؤثرة', country: 'إيران', quality: 'جيدة جداً', audioUrl: 'https://cdn.islamic.network/quran/audio/128/ar.parhizgar/' },
+    // Server 6 - https://server6.mp3quran.net/
+    { id: 'ghamdi', name: 'سعد الغامدي', style: 'مرتل', description: 'قراءة متميزة ومؤثرة', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://server6.mp3quran.net/ghamdi/' },
+    { id: 'bsfr', name: 'عبد الله بصفر', style: 'مرتل', description: 'إمام الحرم المكي الشريف', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://server6.mp3quran.net/bsfr/' },
+    { id: 'fateh', name: 'فاتح محمد', style: 'مرتل', description: 'قراءة جميلة ومؤثرة', country: 'مصر', quality: 'ممتازة', audioUrl: 'https://server6.mp3quran.net/fateh/' },
+    { id: 'hafz', name: 'حافظ محمد', style: 'مرتل', description: 'قراءة متقنة وواضحة', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://server6.mp3quran.net/hafz/' },
+    { id: 'qtm', name: 'ناصر القطامي', style: 'مرتل', description: 'قراءة مؤثرة ومتقنة', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://server6.mp3quran.net/qtm/' },
+    { id: 'kurdi', name: 'رعد محمد الكردي', style: 'مرتل', description: 'قراءة مؤثرة ومتقنة', country: 'العراق', quality: 'ممتازة', audioUrl: 'https://server6.mp3quran.net/kurdi/' },
+    { id: 'arkani', name: 'العرقاني', style: 'مرتل', description: 'قراءة مميزة', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://server6.mp3quran.net/arkani/' },
+    { id: 'balilah', name: 'بليلة', style: 'مرتل', description: 'قراءة عذبة', country: 'مصر', quality: 'ممتازة', audioUrl: 'https://server6.mp3quran.net/balilah/' },
+    
+    // Server 7 - https://server7.mp3quran.net/
+    { id: 'basit', name: 'عبد الباسط عبد الصمد', style: 'مرتل', description: 'الصوت الذهبي المميز', country: 'مصر', quality: 'ممتازة', audioUrl: 'https://server7.mp3quran.net/basit/' },
+    { id: 's_gmd', name: 'سعد الغامدي', style: 'مرتل', description: 'نسخة أخرى من الغامدي', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://server7.mp3quran.net/s_gmd/' },
+    { id: 'shur', name: 'سعود الشريم', style: 'مرتل', description: 'إمام الحرم المكي الشريف', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://server7.mp3quran.net/shur/' },
+    { id: 'm_arkani', name: 'محمد العرقاني', style: 'مرتل', description: 'قراءة متميزة', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://server7.mp3quran.net/m_arkani/' },
+    
+    // Server 8 - https://server8.mp3quran.net/
+    { id: 'afs', name: 'مشاري راشد العفاسي', style: 'مرتل', description: 'قراءة مؤثرة وهادئة', country: 'الكويت', quality: 'ممتازة', audioUrl: 'https://server8.mp3quran.net/afs/' },
+    { id: 'ayyub', name: 'محمد أيوب', style: 'مرتل', description: 'إمام الحرم المدني الشريف', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://server8.mp3quran.net/ayyub/' },
+    { id: 'hani', name: 'هاني الرفاعي', style: 'مرتل', description: 'قراءة مؤثرة وعذبة', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://server8.mp3quran.net/hani/' },
+    { id: 'jbrl', name: 'محمد جبريل', style: 'مرتل', description: 'قراءة عذبة ومؤثرة', country: 'مصر', quality: 'ممتازة', audioUrl: 'https://server8.mp3quran.net/jbrl/' },
+    { id: 'ra3ad', name: 'رعد محمد الكردي', style: 'مرتل', description: 'نسخة أخرى', country: 'العراق', quality: 'ممتازة', audioUrl: 'https://server8.mp3quran.net/ra3ad/' },
+    { id: 'qasm', name: 'قاسم', style: 'مرتل', description: 'قراءة مميزة', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://server8.mp3quran.net/qasm/' },
+    { id: 'ryan', name: 'ريان', style: 'مرتل', description: 'قراءة جميلة', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://server8.mp3quran.net/ryan/' },
+    { id: 'saber', name: 'صابر', style: 'مرتل', description: 'قراءة واضحة', country: 'مصر', quality: 'ممتازة', audioUrl: 'https://server8.mp3quran.net/saber/' },
+    
+    // Server 9 - https://server9.mp3quran.net/
+    { id: 'abdullah', name: 'عبد الله', style: 'مرتل', description: 'قراءة مؤثرة', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://server9.mp3quran.net/abdullah/' },
+    { id: 'hamza', name: 'حمزة', style: 'مرتل', description: 'قراءة متميزة', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://server9.mp3quran.net/hamza/' },
+    { id: 'nabil', name: 'نبيل', style: 'مرتل', description: 'قراءة جميلة', country: 'مصر', quality: 'ممتازة', audioUrl: 'https://server9.mp3quran.net/nabil/' },
+    { id: 'waleed', name: 'وليد', style: 'مرتل', description: 'قراءة هادئة', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://server9.mp3quran.net/waleed/' },
+    { id: 'zahrani', name: 'الزهراني', style: 'مرتل', description: 'قراءة مؤثرة', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://server9.mp3quran.net/zahrani/' },
+    
+    // Server 10 - https://server10.mp3quran.net/
+    { id: 'minsh', name: 'محمد صديق المنشاوي', style: 'مرتل', description: 'من أعظم قراء القرآن', country: 'مصر', quality: 'ممتازة', audioUrl: 'https://server10.mp3quran.net/minsh/' },
+    { id: 'ajm', name: 'أحمد بن علي العجمي', style: 'مرتل', description: 'صوت جميل ومتميز', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://server10.mp3quran.net/ajm/' },
+    { id: 'ibrahim_dosri', name: 'إبراهيم الدوسري', style: 'مرتل', description: 'قراءة مؤثرة', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://server10.mp3quran.net/ibrahim_dosri/' },
+    { id: 'rashad', name: 'رشاد', style: 'مرتل', description: 'قراءة متقنة', country: 'مصر', quality: 'ممتازة', audioUrl: 'https://server10.mp3quran.net/rashad/' },
+    { id: 'trabulsi', name: 'الطرابلسي', style: 'مرتل', description: 'قراءة كلاسيكية', country: 'ليبيا', quality: 'ممتازة', audioUrl: 'https://server10.mp3quran.net/trabulsi/' },
+    
+    // Server 11 - https://server11.mp3quran.net/
+    { id: 'shatri', name: 'أبو بكر الشاطري', style: 'مرتل', description: 'قراءة مؤثرة ومتميزة', country: 'اليمن', quality: 'ممتازة', audioUrl: 'https://server11.mp3quran.net/shatri/' },
+    { id: 'yasser', name: 'ياسر الدوسري', style: 'مرتل', description: 'قراءة مؤثرة وجميلة', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://server11.mp3quran.net/yasser/' },
+    { id: 'mrifai', name: 'محمد الرفاعي', style: 'مرتل', description: 'قراءة عذبة', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://server11.mp3quran.net/mrifai/' },
+    { id: 'bilal', name: 'بلال', style: 'مرتل', description: 'قراءة جميلة', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://server11.mp3quran.net/bilal/' },
+    { id: 'hatem', name: 'حاتم', style: 'مرتل', description: 'قراءة مؤثرة', country: 'مصر', quality: 'ممتازة', audioUrl: 'https://server11.mp3quran.net/hatem/' },
+    
+    // Server 12 - https://server12.mp3quran.net/
+    { id: 'maher', name: 'ماهر المعيقلي', style: 'مرتل', description: 'إمام الحرم المكي الشريف', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://server12.mp3quran.net/maher/' },
+    { id: 'tblawi', name: 'محمد الطبلاوي', style: 'مرتل', description: 'قراءة كلاسيكية رائعة', country: 'مصر', quality: 'ممتازة', audioUrl: 'https://server12.mp3quran.net/tblawi/' },
+    { id: 'salamah', name: 'سلامة', style: 'مرتل', description: 'قراءة هادئة', country: 'مصر', quality: 'ممتازة', audioUrl: 'https://server12.mp3quran.net/salamah/' },
+    { id: 'yahya', name: 'يحيى', style: 'مرتل', description: 'قراءة متميزة', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://server12.mp3quran.net/yahya/' },
+    
+    // Server 13 - https://server13.mp3quran.net/
+    { id: 'braak', name: 'براك', style: 'مرتل', description: 'قراءة مؤثرة', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://server13.mp3quran.net/braak/' },
+    { id: 'husr', name: 'الحصري', style: 'مرتل', description: 'قراءة كلاسيكية', country: 'مصر', quality: 'ممتازة', audioUrl: 'https://server13.mp3quran.net/husr/' },
+    { id: 'jhn', name: 'الجهني', style: 'مرتل', description: 'قراءة متقنة', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://server13.mp3quran.net/jhn/' },
+    { id: 'najashi', name: 'النجاشي', style: 'مرتل', description: 'قراءة مميزة', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://server13.mp3quran.net/najashi/' },
   ];
 
   useEffect(() => {
@@ -87,7 +124,7 @@ const QuranAudio: React.FC = () => {
   useEffect(() => {
     if (!isAuthenticated) {
       setFavorites([]);
-      setSelectedReciter('ar.alafasy');
+      setSelectedReciter('ghamdi');
     }
   }, [isAuthenticated]);
 
@@ -124,10 +161,11 @@ const QuranAudio: React.FC = () => {
     setLoading(false);
   };
 
-  // Audio URL generation helper function for alquran.cloud API
+  // Audio URL generation helper function for mp3quran.net API
   const generateAudioUrl = (reciter: Reciter, surahNumber: number): string => {
-    // alquran.cloud API uses simple surah number without padding
-    return `${reciter.audioUrl}${surahNumber}.mp3`;
+    // mp3quran.net API uses 3-digit padded format (e.g., 001.mp3, 051.mp3)
+    const formattedSurahNumber = surahNumber.toString().padStart(3, '0');
+    return `${reciter.audioUrl}${formattedSurahNumber}.mp3`;
   };
 
   const playAudio = async (surahNumber: number) => {
@@ -145,17 +183,18 @@ const QuranAudio: React.FC = () => {
     
     // Generate multiple possible URLs for fallback
     const primaryUrl = generateAudioUrl(reciter, surahNumber);
+    const formattedSurahNumber = surahNumber.toString().padStart(3, '0');
     
     const audioUrls = [
       primaryUrl,
-      // Alternative reciters from alquran.cloud CDN
-      `https://cdn.islamic.network/quran/audio/128/ar.alafasy/${surahNumber}.mp3`,
-      `https://cdn.islamic.network/quran/audio/128/ar.abdulbasitmurattal/${surahNumber}.mp3`,
-      `https://cdn.islamic.network/quran/audio/128/ar.husary/${surahNumber}.mp3`,
-      `https://cdn.islamic.network/quran/audio/128/ar.mahermuaiqly/${surahNumber}.mp3`,
-      `https://cdn.islamic.network/quran/audio/128/ar.abdurrahmansudais/${surahNumber}.mp3`,
-      `https://cdn.islamic.network/quran/audio/128/ar.saoodshuraym/${surahNumber}.mp3`,
-      `https://cdn.islamic.network/quran/audio/128/ar.minshawi/${surahNumber}.mp3`,
+      // Alternative reciters from mp3quran.net servers as fallbacks
+      `https://server6.mp3quran.net/ghamdi/${formattedSurahNumber}.mp3`,
+      `https://server7.mp3quran.net/basit/${formattedSurahNumber}.mp3`,
+      `https://server8.mp3quran.net/afs/${formattedSurahNumber}.mp3`,
+      `https://server8.mp3quran.net/ayyub/${formattedSurahNumber}.mp3`,
+      `https://server10.mp3quran.net/minsh/${formattedSurahNumber}.mp3`,
+      `https://server11.mp3quran.net/shatri/${formattedSurahNumber}.mp3`,
+      `https://server12.mp3quran.net/maher/${formattedSurahNumber}.mp3`,
     ];
     
     // Remove duplicates
@@ -354,14 +393,15 @@ const QuranAudio: React.FC = () => {
     
     // Generate multiple possible URLs for fallback
     const primaryUrl = generateAudioUrl(reciter, surahNumber);
+    const formattedSurahNumber = surahNumber.toString().padStart(3, '0');
     
     const audioUrls = [
       primaryUrl,
-      // Alternative reciters from alquran.cloud CDN
-      `https://cdn.islamic.network/quran/audio/128/ar.alafasy/${surahNumber}.mp3`,
-      `https://cdn.islamic.network/quran/audio/128/ar.abdulbasitmurattal/${surahNumber}.mp3`,
-      `https://cdn.islamic.network/quran/audio/128/ar.husary/${surahNumber}.mp3`,
-      `https://cdn.islamic.network/quran/audio/128/ar.mahermuaiqly/${surahNumber}.mp3`,
+      // Alternative reciters from mp3quran.net servers as fallbacks
+      `https://server6.mp3quran.net/ghamdi/${formattedSurahNumber}.mp3`,
+      `https://server7.mp3quran.net/basit/${formattedSurahNumber}.mp3`,
+      `https://server8.mp3quran.net/afs/${formattedSurahNumber}.mp3`,
+      `https://server12.mp3quran.net/maher/${formattedSurahNumber}.mp3`,
     ];
     
     // Remove duplicates
