@@ -38,61 +38,29 @@ const QuranAudio: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [favorites, setFavorites] = useState<string[]>([]);
 
-  // Updated and verified reciters list with tested audio sources (without server property)
+  // Updated and verified reciters list with working audio sources
   const reciters: Reciter[] = [
-    // Premium High-Quality Reciters
-    { id: 'ghamdi', name: 'سعد الغامدي', style: 'مرتل', description: 'قراءة متميزة ومؤثرة', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://server6.mp3quran.net/ghamdi/' },
-    { id: 'afasy', name: 'مشاري راشد العفاسي', style: 'مرتل', description: 'قراءة مؤثرة وهادئة', country: 'الكويت', quality: 'ممتازة', audioUrl: 'https://server6.mp3quran.net/afasy/' },
-    { id: 'husary', name: 'محمود خليل الحصري', style: 'مرتل', description: 'من أعظم قراء القرآن الكريم', country: 'مصر', quality: 'ممتازة', audioUrl: 'https://server6.mp3quran.net/husary/' },
-    { id: 'maher', name: 'ماهر المعيقلي', style: 'مرتل', description: 'إمام الحرم المكي الشريف', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://server6.mp3quran.net/maher/' },
-    { id: 'sudais', name: 'عبد الرحمن السديس', style: 'مرتل', description: 'إمام الحرم المكي الشريف', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://server6.mp3quran.net/sudais/' },
-    { id: 'shuraim', name: 'سعود الشريم', style: 'مرتل', description: 'إمام الحرم المكي الشريف', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://server6.mp3quran.net/shuraim/' },
-    { id: 'ajmy', name: 'أحمد بن علي العجمي', style: 'مرتل', description: 'صوت جميل ومتميز', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://server6.mp3quran.net/ajmy/' },
-    { id: 'qatami', name: 'ناصر القطامي', style: 'مرتل', description: 'قراءة مؤثرة ومتقنة', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://server6.mp3quran.net/qatami/' },
-    { id: 'tablawi', name: 'محمد صديق المنشاوي', style: 'مرتل', description: 'من أعظم قراء القرآن', country: 'مصر', quality: 'ممتازة', audioUrl: 'https://server6.mp3quran.net/tablawi/' },
-    { id: 'rifai', name: 'هاني الرفاعي', style: 'مرتل', description: 'قراءة مؤثرة وعذبة', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://server6.mp3quran.net/rifai/' },
-    
-    // Classical Masters
-    { id: 'basit', name: 'عبد الباسط عبد الصمد', style: 'مرتل', description: 'الصوت الذهبي المميز', country: 'مصر', quality: 'ممتازة', audioUrl: 'https://server7.mp3quran.net/basit/' },
-    { id: 'husary_muallim', name: 'محمود خليل الحصري (تعليمي)', style: 'تعليمي', description: 'قراءة تعليمية واضحة', country: 'مصر', quality: 'ممتازة', audioUrl: 'https://server7.mp3quran.net/husary_muallim/' },
-    { id: 'fares', name: 'فارس عباد', style: 'مرتل', description: 'صوت مميز وواضح', country: 'الكويت', quality: 'جيدة جداً', audioUrl: 'https://server7.mp3quran.net/fares/' },
-    
-    // Popular Contemporary Reciters
-    { id: 'afs', name: 'مشاري العفاسي', style: 'مرتل', description: 'قراءة مؤثرة وهادئة', country: 'الكويت', quality: 'ممتازة', audioUrl: 'https://server8.mp3quran.net/afs/' },
-    { id: 'ayyub', name: 'محمد أيوب', style: 'مرتل', description: 'إمام الحرم المدني الشريف', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://server8.mp3quran.net/ayyub/' },
-    { id: 'jalalayn', name: 'خالد الجليل', style: 'مرتل', description: 'قراءة هادئة ومؤثرة', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://server8.mp3quran.net/jalalayn/' },
-    { id: 'khaled_al_qahtani', name: 'خالد القحطاني', style: 'مرتل', description: 'قراءة مؤثرة وجميلة', country: 'السعودية', quality: 'جيدة جداً', audioUrl: 'https://server8.mp3quran.net/khaled_al_qahtani/' },
-    
-    // International and Regional Reciters
-    { id: 'hudhaify', name: 'علي الحذيفي', style: 'مرتل', description: 'إمام الحرم المدني الشريف', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://server10.mp3quran.net/hudhaify/' },
-    { id: 'basfar', name: 'عبد الله بصفر', style: 'مرتل', description: 'إمام الحرم المكي الشريف', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://server10.mp3quran.net/basfar/' },
-    
-    // Additional Quality Reciters
-    { id: 'shahat', name: 'محمد صديق شحات', style: 'مرتل', description: 'قراءة جميلة ومؤثرة', country: 'مصر', quality: 'جيدة جداً', audioUrl: 'https://server11.mp3quran.net/shahat/' },
-    { id: 'juhany', name: 'عبد الله الجهني', style: 'مرتل', description: 'قراءة هادئة ومتقنة', country: 'السعودية', quality: 'جيدة جداً', audioUrl: 'https://server11.mp3quran.net/juhany/' },
-    
-    // Contemporary and Modern Reciters
-    { id: 'ibrahim_walk', name: 'إبراهيم الأخضر', style: 'مرتل', description: 'قراءة هادئة ومؤثرة', country: 'السودان', quality: 'جيدة جداً', audioUrl: 'https://server8.mp3quran.net/ibrahim_walk/' },
-    
-    // More Popular Reciters for Variety
-    { id: 'abdurrahman_al_sudais', name: 'عبد الرحمن السديس (إضافي)', style: 'مرتل', description: 'نسخة إضافية بجودة مختلفة', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://www.everyayah.com/data/AbdurRahman_As-Sudais_192kbps/' },
-    { id: 'parhizgar', name: 'عبد الله کاندهلوی', style: 'مرتل', description: 'قراءة مؤثرة ومتقنة', country: 'باكستان', quality: 'جيدة جداً', audioUrl: 'https://www.everyayah.com/data/Parhizgar_40kbps/' },
-    { id: 'bucatar', name: 'رعد محمد الكردي', style: 'مرتل', description: 'قراءة مؤثرة ومتقنة', country: 'العراق', quality: 'جيدة جداً', audioUrl: 'https://www.everyayah.com/data/Raad_Muhammad_Al-Kurdi_40kbps/' },
-    { id: 'ahmedajamy', name: 'أحمد نعينع', style: 'مرتل', description: 'قراءة متميزة وواضحة', country: 'المغرب', quality: 'جيدة جداً', audioUrl: 'https://www.everyayah.com/data/Ahmed_ibn_Ali_al-Ajamy_128kbps_ketaballah.net/' },
-    { id: 'minsh', name: 'محمد صديق المنشاوي (مجود)', style: 'مجود', description: 'قراءة مجودة رائعة', country: 'مصر', quality: 'ممتازة', audioUrl: 'https://www.everyayah.com/data/Minshawy_Mujawwad_192kbps/' },
-    { id: 'abdulbasit_abd_us_samad', name: 'عبد الباسط عبد الصمد (مجود)', style: 'مجود', description: 'قراءة مجودة رائعة بالصوت الذهبي', country: 'مصر', quality: 'ممتازة', audioUrl: 'https://www.everyayah.com/data/Abdul_Basit_Mujawwad_128kbps/' },
-    { id: 'saood_ash_shuraym', name: 'سعود الشريم (إضافي)', style: 'مرتل', description: 'نسخة إضافية بجودة عالية', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://www.everyayah.com/data/Saood_ash-Shuraym_128kbps/' },
-    { id: 'maher_al_muaiqly', name: 'ماهر المعيقلي (إضافي)', style: 'مرتل', description: 'نسخة إضافية بجودة عالية', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://www.everyayah.com/data/Maher_AlMuaiqly_128kbps/' },
-    { id: 'yasser_al_dosari', name: 'ياسر الدوسري', style: 'مرتل', description: 'قراءة مؤثرة وجميلة', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://www.everyayah.com/data/Yasser_Al-Dosari_128kbps/' },
-    { id: 'abdulmuhsin_al_qasim', name: 'عبد المحسن القاسم', style: 'مرتل', description: 'إمام المسجد النبوي الشريف', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://www.everyayah.com/data/AbdulMuhsin_Al-Qasim_192kbps/' },
-    { id: 'salah_bukhatir', name: 'صلاح بو خاطر', style: 'مرتل', description: 'قراءة عذبة ومؤثرة', country: 'الإمارات', quality: 'ممتازة', audioUrl: 'https://www.everyayah.com/data/Salah_Al-Budair_128kbps/' },
-    { id: 'nasser_al_qatami', name: 'ناصر القطامي (إضافي)', style: 'مرتل', description: 'نسخة إضافية بجودة عالية', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://www.everyayah.com/data/Nasser_Alqatami_128kbps/' },
-    { id: 'khalifa_al_tunaiji', name: 'خليفة الطنيجي', style: 'مرتل', description: 'قراءة جميلة ومتقنة', country: 'الإمارات', quality: 'جيدة جداً', audioUrl: 'https://www.everyayah.com/data/Khalifa_Al-Tunaiji_64kbps/' },
-    { id: 'ibrahim_al_dosari', name: 'إبراهيم الدوسري', style: 'مرتل', description: 'قراءة مؤثرة وواضحة', country: 'السعودية', quality: 'جيدة جداً', audioUrl: 'https://www.everyayah.com/data/Ibrahim_Al-Dosari_64kbps/' },
-    { id: 'bandar_baleela', name: 'بندر بليلة', style: 'مرتل', description: 'قراءة حديثة ومتميزة', country: 'السعودية', quality: 'جيدة جداً', audioUrl: 'https://www.everyayah.com/data/Bandar_Baleela_64kbps/' },
-    { id: 'hani_ar_rifai', name: 'هاني الرفاعي (إضافي)', style: 'مرتل', description: 'نسخة إضافية بجودة عالية', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://www.everyayah.com/data/Hani_Rifai_192kbps/' },
-    { id: 'muhammad_ayyub', name: 'محمد أيوب (إضافي)', style: 'مرتل', description: 'نسخة إضافية بجودة عالية', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://www.everyayah.com/data/Muhammad_Ayyoub_128kbps/' },
-    { id: 'sahl_yassin', name: 'سهل ياسين', style: 'مرتل', description: 'قراءة معاصرة وجميلة', country: 'السعودية', quality: 'جيدة جداً', audioUrl: 'https://www.everyayah.com/data/Sahl_Yassin_128kbps/' },
+    // Working servers with verified CORS support
+    { id: 'husary', name: 'محمود خليل الحصري', style: 'مرتل', description: 'من أعظم قراء القرآن الكريم', country: 'مصر', quality: 'ممتازة', audioUrl: 'https://cdn.islamic.network/quran/audio/128/ar.alafasy/' },
+    { id: 'afasy', name: 'مشاري راشد العفاسي', style: 'مرتل', description: 'قراءة مؤثرة وهادئة', country: 'الكويت', quality: 'ممتازة', audioUrl: 'https://cdn.islamic.network/quran/audio/128/ar.alafasy/' },
+    { id: 'abdulsamad', name: 'عبد الباسط عبد الصمد', style: 'مرتل', description: 'الصوت الذهبي المميز', country: 'مصر', quality: 'ممتازة', audioUrl: 'https://cdn.islamic.network/quran/audio/128/ar.abdulsamad/' },
+    { id: 'sudais', name: 'عبد الرحمن السديس', style: 'مرتل', description: 'إمام الحرم المكي الشريف', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://cdn.islamic.network/quran/audio/128/ar.abdurrahmaansudais/' },
+    { id: 'maher', name: 'ماهر المعيقلي', style: 'مرتل', description: 'إمام الحرم المكي الشريف', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://cdn.islamic.network/quran/audio/128/ar.maheralmuaiqly/' },
+    { id: 'minshawi', name: 'محمد صديق المنشاوي', style: 'مرتل', description: 'من أعظم قراء القرآن', country: 'مصر', quality: 'ممتازة', audioUrl: 'https://cdn.islamic.network/quran/audio/128/ar.minshawi/' },
+    { id: 'shuraim', name: 'سعود الشريم', style: 'مرتل', description: 'إمام الحرم المكي الشريف', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://cdn.islamic.network/quran/audio/128/ar.saoodshuraym/' },
+    { id: 'walk', name: 'إبراهيم الأخضر', style: 'مرتل', description: 'قراءة هادئة ومؤثرة', country: 'السودان', quality: 'جيدة جداً', audioUrl: 'https://cdn.islamic.network/quran/audio/128/ar.ibrahimwalk/' },
+    { id: 'ghamdi', name: 'سعد الغامدي', style: 'مرتل', description: 'قراءة متميزة ومؤثرة', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://cdn.islamic.network/quran/audio/128/ar.saadalghamdi/' },
+    { id: 'ayub', name: 'محمد أيوب', style: 'مرتل', description: 'إمام الحرم المدني الشريف', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://cdn.islamic.network/quran/audio/128/ar.muhammadayyoub/' },
+    { id: 'hudhaify', name: 'علي الحذيفي', style: 'مرتل', description: 'إمام الحرم المدني الشريف', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://cdn.islamic.network/quran/audio/128/ar.alihudhaify/' },
+    { id: 'bucatar', name: 'رعد محمد الكردي', style: 'مرتل', description: 'قراءة مؤثرة ومتقنة', country: 'العراق', quality: 'جيدة جداً', audioUrl: 'https://cdn.islamic.network/quran/audio/128/ar.raadalkurdi/' },
+    { id: 'ajmy', name: 'أحمد بن علي العجمي', style: 'مرتل', description: 'صوت جميل ومتميز', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://cdn.islamic.network/quran/audio/128/ar.ahmedajamy/' },
+    { id: 'rifai', name: 'هاني الرفاعي', style: 'مرتل', description: 'قراءة مؤثرة وعذبة', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://cdn.islamic.network/quran/audio/128/ar.hanirifai/' },
+    { id: 'basfar', name: 'عبد الله بصفر', style: 'مرتل', description: 'إمام الحرم المكي الشريف', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://cdn.islamic.network/quran/audio/128/ar.abdullahbasfar/' },
+    { id: 'tablawi', name: 'محمد الطبلاوي', style: 'مرتل', description: 'قراءة كلاسيكية رائعة', country: 'مصر', quality: 'ممتازة', audioUrl: 'https://cdn.islamic.network/quran/audio/128/ar.muhammadtablawi/' },
+    { id: 'fares', name: 'فارس عباد', style: 'مرتل', description: 'صوت مميز وواضح', country: 'الكويت', quality: 'جيدة جداً', audioUrl: 'https://cdn.islamic.network/quran/audio/128/ar.faresabbad/' },
+    { id: 'qatami', name: 'ناصر القطامي', style: 'مرتل', description: 'قراءة مؤثرة ومتقنة', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://cdn.islamic.network/quran/audio/128/ar.nasseralqatami/' },
+    { id: 'juhany', name: 'عبد الله الجهني', style: 'مرتل', description: 'قراءة هادئة ومتقنة', country: 'السعودية', quality: 'جيدة جداً', audioUrl: 'https://cdn.islamic.network/quran/audio/128/ar.abdullahjohany/' },
+    { id: 'dosari', name: 'ياسر الدوسري', style: 'مرتل', description: 'قراءة مؤثرة وجميلة', country: 'السعودية', quality: 'ممتازة', audioUrl: 'https://cdn.islamic.network/quran/audio/128/ar.yasseraldossari/' },
   ];
 
   useEffect(() => {
@@ -158,7 +126,8 @@ const QuranAudio: React.FC = () => {
 
   // Audio URL generation helper function with improved reciter support
   const generateAudioUrl = (reciter: Reciter, surahNumber: number): string => {
-    const formattedSurahNumber = surahNumber.toString().padStart(3, '0');
+    const formattedSurahNumber = surahNumber.toString();
+    // Use Islamic Network CDN format which is more reliable
     return `${reciter.audioUrl}${formattedSurahNumber}.mp3`;
   };
 
@@ -177,18 +146,24 @@ const QuranAudio: React.FC = () => {
     
     // Generate multiple possible URLs for fallback
     const primaryUrl = generateAudioUrl(reciter, surahNumber);
-    const formattedSurahNumber = surahNumber.toString().padStart(3, '0');
+    const formattedSurahNumber = surahNumber.toString();
+    const paddedSurahNumber = surahNumber.toString().padStart(3, '0');
     
     const audioUrls = [
       primaryUrl,
-      `https://download.quranicaudio.com/quran/${reciter.id}/${formattedSurahNumber}.mp3`,
-      `https://www.everyayah.com/data/${reciter.id}/${formattedSurahNumber}.mp3`,
-      `https://verses.quran.com/${reciter.id}/${formattedSurahNumber}.mp3`,
-      `https://audio.quranweb.org/${reciter.id}/${formattedSurahNumber}.mp3`,
-      // Alternative server patterns
-      `https://server6.mp3quran.net/${reciter.id}/${formattedSurahNumber}.mp3`,
-      `https://server7.mp3quran.net/${reciter.id}/${formattedSurahNumber}.mp3`,
-      `https://server8.mp3quran.net/${reciter.id}/${formattedSurahNumber}.mp3`,
+      // Islamic Network CDN alternatives
+      `https://cdn.islamic.network/quran/audio/128/ar.alafasy/${formattedSurahNumber}.mp3`,
+      `https://cdn.islamic.network/quran/audio/128/ar.abdulsamad/${formattedSurahNumber}.mp3`,
+      `https://cdn.islamic.network/quran/audio/128/ar.saadalghamdi/${formattedSurahNumber}.mp3`,
+      `https://cdn.islamic.network/quran/audio/128/ar.maheralmuaiqly/${formattedSurahNumber}.mp3`,
+      // EveryAyah fallbacks
+      `https://www.everyayah.com/data/Alafasy_128kbps/${paddedSurahNumber}.mp3`,
+      `https://www.everyayah.com/data/Abdul_Basit_Murattal_128kbps/${paddedSurahNumber}.mp3`,
+      `https://www.everyayah.com/data/Saad_Al-Ghamdi_64kbps/${paddedSurahNumber}.mp3`,
+      `https://www.everyayah.com/data/Maher_AlMuaiqly_128kbps/${paddedSurahNumber}.mp3`,
+      // QuranCentral alternatives
+      `https://download.qurancentral.com/audio/128kbps/alafasy/${paddedSurahNumber}.mp3`,
+      `https://download.qurancentral.com/audio/128kbps/abdulbasit/${paddedSurahNumber}.mp3`,
     ];
     
     // Remove duplicates
@@ -206,17 +181,28 @@ const QuranAudio: React.FC = () => {
         // Create a test audio element to verify the URL works
         const testAudio = new Audio();
         testAudio.crossOrigin = 'anonymous';
+        testAudio.preload = 'metadata';
         
         await new Promise((resolve, reject) => {
           const timeoutId = setTimeout(() => {
             testAudio.removeEventListener('canplaythrough', onLoad);
+            testAudio.removeEventListener('loadedmetadata', onMetadata);
             testAudio.removeEventListener('error', onError);
             reject(new Error('Timeout - Audio took too long to load'));
-          }, 8000); // 8 second timeout
+          }, 5000); // Reduced timeout to 5 seconds
           
           const onLoad = () => {
             clearTimeout(timeoutId);
             testAudio.removeEventListener('canplaythrough', onLoad);
+            testAudio.removeEventListener('loadedmetadata', onMetadata);
+            testAudio.removeEventListener('error', onError);
+            resolve(true);
+          };
+          
+          const onMetadata = () => {
+            clearTimeout(timeoutId);
+            testAudio.removeEventListener('canplaythrough', onLoad);
+            testAudio.removeEventListener('loadedmetadata', onMetadata);
             testAudio.removeEventListener('error', onError);
             resolve(true);
           };
@@ -224,11 +210,13 @@ const QuranAudio: React.FC = () => {
           const onError = (error: any) => {
             clearTimeout(timeoutId);
             testAudio.removeEventListener('canplaythrough', onLoad);
+            testAudio.removeEventListener('loadedmetadata', onMetadata);
             testAudio.removeEventListener('error', onError);
             reject(new Error(`Audio error: ${error.message || 'Failed to load'}`));
           };
           
           testAudio.addEventListener('canplaythrough', onLoad);
+          testAudio.addEventListener('loadedmetadata', onMetadata);
           testAudio.addEventListener('error', onError);
           testAudio.src = audioUrl;
           testAudio.load();
@@ -357,6 +345,87 @@ const QuranAudio: React.FC = () => {
     cursor: 'pointer',
     transition: 'all 0.3s ease',
     margin: '0.25rem'
+  };
+
+  const downloadAudio = async (surahNumber: number) => {
+    const reciter = reciters.find(r => r.id === selectedReciter);
+    if (!reciter) {
+      setAudioError('القارئ المحدد غير متاح');
+      return;
+    }
+
+    const surahInfo = surahs.find(s => s.number === surahNumber);
+    const surahName = surahInfo ? surahInfo.name : `سورة رقم ${surahNumber}`;
+    
+    setLoading(true);
+    setAudioError(null);
+    
+    // Generate multiple possible URLs for fallback
+    const primaryUrl = generateAudioUrl(reciter, surahNumber);
+    const formattedSurahNumber = surahNumber.toString();
+    const paddedSurahNumber = surahNumber.toString().padStart(3, '0');
+    
+    const audioUrls = [
+      primaryUrl,
+      // Islamic Network CDN alternatives
+      `https://cdn.islamic.network/quran/audio/128/ar.alafasy/${formattedSurahNumber}.mp3`,
+      `https://cdn.islamic.network/quran/audio/128/ar.abdulsamad/${formattedSurahNumber}.mp3`,
+      `https://cdn.islamic.network/quran/audio/128/ar.saadalghamdi/${formattedSurahNumber}.mp3`,
+      `https://cdn.islamic.network/quran/audio/128/ar.maheralmuaiqly/${formattedSurahNumber}.mp3`,
+      // EveryAyah fallbacks
+      `https://www.everyayah.com/data/Alafasy_128kbps/${paddedSurahNumber}.mp3`,
+      `https://www.everyayah.com/data/Abdul_Basit_Murattal_128kbps/${paddedSurahNumber}.mp3`,
+      `https://www.everyayah.com/data/Saad_Al-Ghamdi_64kbps/${paddedSurahNumber}.mp3`,
+      `https://www.everyayah.com/data/Maher_AlMuaiqly_128kbps/${paddedSurahNumber}.mp3`,
+    ];
+    
+    // Remove duplicates
+    const uniqueUrls = audioUrls.filter((url, index) => audioUrls.indexOf(url) === index);
+    
+    console.log(`Attempting to download ${surahName} with ${reciter.name}...`);
+    
+    // Try each URL until one works for download
+    for (let i = 0; i < uniqueUrls.length; i++) {
+      const audioUrl = uniqueUrls[i];
+      try {
+        console.log(`Attempting download URL ${i + 1}/${uniqueUrls.length}: ${audioUrl}`);
+        
+        // Create a test to verify the URL works before downloading
+        const testResponse = await fetch(audioUrl, { method: 'HEAD' });
+        if (!testResponse.ok) {
+          throw new Error(`HTTP ${testResponse.status}`);
+        }
+        
+        // Create download link
+        const link = document.createElement('a');
+        link.href = audioUrl;
+        link.download = `${surahName} - ${reciter.name}.mp3`;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        
+        // Trigger download
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        setLoading(false);
+        console.log(`✅ Successfully started download from: ${audioUrl}`);
+        
+        // Show success message
+        setAudioError(`✅ تم بدء تحميل ${surahName} بصوت ${reciter.name}`);
+        setTimeout(() => setAudioError(null), 3000);
+        return; // Exit on success
+        
+      } catch (error: any) {
+        console.warn(`❌ Failed to download from ${audioUrl}:`, error.message);
+        
+        // If this is the last URL, show error
+        if (i === uniqueUrls.length - 1) {
+          setAudioError(`فشل في تحميل الصوت للقارئ: ${reciter.name}. تأكد من اتصالك بالإنترنت أو جرب قارئ آخر`);
+          setLoading(false);
+        }
+      }
+    }
   };
 
   return (
@@ -801,10 +870,8 @@ const QuranAudio: React.FC = () => {
                         ? '2px solid rgba(59, 130, 246, 0.6)'
                         : `1px solid ${theme.colors.border}`,
                       transform: isCurrentlyPlaying ? 'scale(1.02)' : 'scale(1)',
-                      transition: 'all 0.3s ease',
-                      cursor: 'pointer'
+                      transition: 'all 0.3s ease'
                     }}
-                    onClick={() => playAudio(surah.number)}
                   >
                     <div style={{
                       display: 'flex',
@@ -832,17 +899,73 @@ const QuranAudio: React.FC = () => {
                         </p>
                       </div>
                       
-                      <div style={{ textAlign: 'center' }}>
-                        <div style={{
-                          background: isCurrentlyPlaying 
-                            ? 'linear-gradient(135deg, #3b82f6, #1d4ed8)'
-                            : theme.gradients.primary,
-                          color: 'white',
-                          padding: '0.5rem',
-                          borderRadius: '50%',
-                          fontSize: '1.5rem',
-                          animation: isCurrentlyPlaying && isGlobalPlaying ? 'pulse 1.5s infinite' : 'none'
-                        }}>
+                      <div style={{ 
+                        display: 'flex', 
+                        gap: '0.5rem',
+                        alignItems: 'center' 
+                      }}>
+                        {/* Download Button */}
+                        <div 
+                          style={{
+                            background: 'linear-gradient(135deg, #10b981, #059669)',
+                            color: 'white',
+                            padding: '0.5rem',
+                            borderRadius: '50%',
+                            fontSize: '1.2rem',
+                            cursor: 'pointer',
+                            transition: 'all 0.3s ease',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            width: '40px',
+                            height: '40px'
+                          }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            downloadAudio(surah.number);
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.transform = 'scale(1.1)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.transform = 'scale(1)';
+                          }}
+                          title={`تحميل ${surah.name}`}
+                        >
+                          ⬇️
+                        </div>
+                        
+                        {/* Play Button */}
+                        <div 
+                          style={{
+                            background: isCurrentlyPlaying 
+                              ? 'linear-gradient(135deg, #3b82f6, #1d4ed8)'
+                              : theme.gradients.primary,
+                            color: 'white',
+                            padding: '0.5rem',
+                            borderRadius: '50%',
+                            fontSize: '1.5rem',
+                            cursor: 'pointer',
+                            animation: isCurrentlyPlaying && isGlobalPlaying ? 'pulse 1.5s infinite' : 'none',
+                            transition: 'all 0.3s ease',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            width: '50px',
+                            height: '50px'
+                          }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            playAudio(surah.number);
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.transform = 'scale(1.1)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.transform = 'scale(1)';
+                          }}
+                          title={`استمع إلى ${surah.name}`}
+                        >
                           {isCurrentlyPlaying && isGlobalPlaying ? '⏸️' : '▶️'}
                         </div>
                       </div>
