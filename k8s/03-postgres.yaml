@@ -110,7 +110,7 @@ metadata:
     app: postgres
 spec:
   serviceName: postgres
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: postgres
@@ -209,7 +209,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: postgres-service
+  name: postgres
   namespace: islamic-app
   labels:
     app: postgres
