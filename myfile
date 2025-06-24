@@ -1,6 +1,0 @@
-git/github,docker,docker-compose,k8s with kubeadm,
-jenkins in contianer and i used a tool ngrok for Forwarding      https://911d-41-129-24-45.ngrok-free.app -------------->http://localhost:8080   to enable webhook in github 
-argocd in k8s , vscode, vagrant for kubadm with 3 nodes, discord for build status notification,   i used a multibranch pipeline and used a  ignore git committer in it to avoid infinity loop of webhook   and create a access tokine in github for jenkins, nignx,bash scripting for easy use  
-add this info in the ptoject readmefile by clean way                                                                                      
-
-i will tell u the tools i used for this project
