@@ -30,7 +30,7 @@ spec:
         command: ['sh', '-c']
         args:
         - |
-          until pg_isready -h {{ include "islamic-app.fullname" . }}-postgresql -p {{ .Values.service.postgres.port }} -U {{ .Values.postgresql.auth.postgresUser }}; do
+          until pg_isready -h postgres -p {{ .Values.service.postgres.port }} -U {{ .Values.postgresql.auth.postgresUser }}; do
             echo "Waiting for postgres..."
             sleep 2
           done

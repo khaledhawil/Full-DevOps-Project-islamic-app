@@ -21,7 +21,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ include "islamic-app.fullname" . }}-postgres-pvc
+  name: postgres-pvc  # Keep original PVC name for compatibility
   namespace: {{ include "islamic-app.namespace" . }}
   labels:
     {{- include "islamic-app.postgresql.labels" . | nindent 4 }}

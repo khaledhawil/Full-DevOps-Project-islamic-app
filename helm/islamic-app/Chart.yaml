@@ -10,10 +10,10 @@ keywords:
   - quran
   - hadith
   - tasbeh
-home: https://github.com/your-org/islamic-app
+home: https://github.com/khaledhawil/islamic-app
 sources:
-  - https://github.com/your-org/islamic-app
+  - https://github.com/khaledhawil/islamic-app
 maintainers:
-  - name: Your Name
-    email: your.email@example.com
+  - name: Khaled Hawil
+    email: khaledhawil91@gmail.com
 dependencies: []
