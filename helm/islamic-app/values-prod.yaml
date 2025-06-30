@@ -1,0 +1,90 @@
+# Production environment values
+replicaCount:
+  backend: 3
+  frontend: 3
+
+image:
+  backend:
+    tag: "1.0.0"  # Use specific version tags in production
+    pullPolicy: IfNotPresent
+  frontend:
+    tag: "1.0.0"
+    pullPolicy: IfNotPresent
+
+# Enable autoscaling in production
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+# Production resource limits
+resources:
+  backend:
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+    requests:
+      cpu: 500m
+      memory: 512Mi
+  frontend:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+
+# Production configuration
+app:
+  config:
+    flaskEnv: production
+    nodeEnv: production
+    corsOrigins: "https://islamic-app.example.com"
+  secrets:
+    # These should be set via external secret management or CI/CD
+    secretKey: "CHANGE-ME-IN-PRODUCTION"
+    jwtSecretKey: "CHANGE-ME-IN-PRODUCTION"
+
+# Production PostgreSQL settings
+postgresql:
+  auth:
+    postgresPassword: "CHANGE-ME-IN-PRODUCTION"
+
+# Larger storage for production
+persistence:
+  size: 20Gi
+  storageClass: "fast-ssd"  # Use appropriate storage class
+
+# Production ingress with TLS
+ingress:
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+  hosts:
+    - host: islamic-app.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+          service: frontend
+        - path: /api
+          pathType: Prefix
+          service: backend
+  tls:
+    - secretName: islamic-app-tls
+      hosts:
+        - islamic-app.example.com
+
+# Production node selection (optional)
+nodeSelector:
+  node-type: application
+
+# Production tolerations (optional)
+tolerations:
+  - key: "application"
+    operator: "Equal"
+    value: "true"
+    effect: "NoSchedule"

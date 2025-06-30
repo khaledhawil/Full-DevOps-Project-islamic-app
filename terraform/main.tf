@@ -119,7 +119,7 @@ module "eks" {
   tags = local.tags
 }
 
-# Jenkins EC2 Module
+# Jenkins EC2 Module (Basic setup only)
 module "jenkins" {
   source = "./modules/jenkins"
 
@@ -131,9 +131,55 @@ module "jenkins" {
   instance_type = var.jenkins_instance_type
   key_name      = var.key_pair_name
   
-  rds_endpoint = module.rds.endpoint
   eks_cluster_name = module.eks.cluster_name
   
+  tags = local.tags
+}
+
+# ECR Repository
+resource "aws_ecr_repository" "islamic_app_backend" {
+  name                 = "${local.name}-backend"
+  image_tag_mutability = "MUTABLE"
+
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+
+  tags = local.tags
+}
+
+resource "aws_ecr_repository" "islamic_app_frontend" {
+  name                 = "${local.name}-frontend"
+  image_tag_mutability = "MUTABLE"
+
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+
+  tags = local.tags
+}
+
+# ECR Repository for SonarQube
+resource "aws_ecr_repository" "sonarqube" {
+  name                 = "${local.name}-sonarqube"
+  image_tag_mutability = "MUTABLE"
+
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+
+  tags = local.tags
+}
+
+# ECR Repository for SonarQube Database
+resource "aws_ecr_repository" "sonarqube_db" {
+  name                 = "${local.name}-sonarqube-db"
+  image_tag_mutability = "MUTABLE"
+
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+
   tags = local.tags
 }
 
@@ -168,4 +214,33 @@ module "cloudwatch" {
   cluster_name       = module.eks.cluster_name
   
   tags = local.tags
+}
+
+# Create Ansible Inventory File
+resource "local_file" "ansible_inventory" {
+  content = templatefile("${path.module}/templates/inventory.tpl", {
+    jenkins_ip       = module.jenkins.public_ip
+    jenkins_private_ip = module.jenkins.private_ip
+    eks_cluster_name = module.eks.cluster_name
+    aws_region      = var.aws_region
+    environment     = var.environment
+  })
+  filename = "${path.module}/../ansible/inventories/production/hosts.yml"
+  
+  depends_on = [module.jenkins]
+}
+
+# Create Ansible group vars
+resource "local_file" "ansible_group_vars" {
+  content = templatefile("${path.module}/templates/group_vars.tpl", {
+    eks_cluster_name     = module.eks.cluster_name
+    aws_region          = var.aws_region
+    environment         = var.environment
+    ecr_backend_repo    = aws_ecr_repository.islamic_app_backend.repository_url
+    ecr_frontend_repo   = aws_ecr_repository.islamic_app_frontend.repository_url
+    jenkins_instance_id = module.jenkins.instance_id
+  })
+  filename = "${path.module}/../ansible/inventories/production/group_vars/all.yml"
+  
+  depends_on = [module.jenkins, aws_ecr_repository.islamic_app_backend, aws_ecr_repository.islamic_app_frontend]
 }

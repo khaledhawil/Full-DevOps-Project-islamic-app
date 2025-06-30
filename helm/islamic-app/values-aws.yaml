@@ -1,0 +1,93 @@
+# AWS EKS cluster values
+environment:
+  type: "aws"
+  domain: "islamic-app.example.com"
+
+replicaCount:
+  backend: 2
+  frontend: 2
+
+# Service configuration for AWS
+service:
+  frontend:
+    type: ClusterIP  # Use LoadBalancer if you want external access without ingress
+
+# Ingress configuration for AWS (using AWS Load Balancer Controller)
+ingress:
+  enabled: true
+  className: "alb"  # AWS Application Load Balancer
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    # AWS ALB annotations
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/certificate-arn: "arn:aws:acm:region:account:certificate/certificate-id"  # Update with your cert ARN
+  hosts:
+    - host: islamic-app.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+          service: frontend
+        - path: /api
+          pathType: Prefix
+          service: backend
+  tls:
+    - secretName: islamic-app-tls
+      hosts:
+        - islamic-app.example.com
+
+# Production resources for AWS
+resources:
+  backend:
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+    requests:
+      cpu: 500m
+      memory: 512Mi
+  frontend:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+
+# Autoscaling for production
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+
+# AWS storage configuration
+persistence:
+  enabled: true
+  storageClass: "gp3"  # AWS GP3 storage class
+  size: 20Gi
+
+# Production secrets (use AWS Secrets Manager or external-secrets operator)
+app:
+  config:
+    flaskEnv: production
+    nodeEnv: production
+    corsOrigins: "https://islamic-app.example.com"
+  secrets:
+    secretKey: "CHANGE-ME-USE-AWS-SECRETS-MANAGER"
+    jwtSecretKey: "CHANGE-ME-USE-AWS-SECRETS-MANAGER"
+
+postgresql:
+  auth:
+    postgresPassword: "CHANGE-ME-USE-AWS-SECRETS-MANAGER"
+
+# Node selection for production
+nodeSelector:
+  node-type: application
+
+# Tolerations for dedicated nodes
+tolerations:
+  - key: "application"
+    operator: "Equal"
+    value: "true"
+    effect: "NoSchedule"

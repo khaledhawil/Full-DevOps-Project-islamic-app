@@ -1,0 +1,89 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "islamic-app.fullname" . }}-frontend
+  namespace: {{ include "islamic-app.namespace" . }}
+  labels:
+    {{- include "islamic-app.frontend.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount.frontend }}
+  selector:
+    matchLabels:
+      {{- include "islamic-app.frontend.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "islamic-app.frontend.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+      - name: frontend
+        image: "{{ .Values.image.frontend.repository }}:{{ .Values.image.frontend.tag }}"
+        imagePullPolicy: {{ .Values.image.frontend.pullPolicy }}
+        env:
+        - name: REACT_APP_API_URL
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "islamic-app.fullname" . }}-config
+              key: REACT_APP_API_URL
+        - name: NODE_ENV
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "islamic-app.fullname" . }}-config
+              key: NODE_ENV
+        ports:
+        - containerPort: {{ .Values.service.frontend.port }}
+          name: http
+        livenessProbe:
+          httpGet:
+            path: /
+            port: {{ .Values.service.frontend.port }}
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: {{ .Values.service.frontend.port }}
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        {{- with .Values.resources.frontend }}
+        resources:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "islamic-app.fullname" . }}-frontend
+  namespace: {{ include "islamic-app.namespace" . }}
+  labels:
+    {{- include "islamic-app.frontend.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.frontend.type }}
+  ports:
+  - port: {{ .Values.service.frontend.port }}
+    targetPort: http
+    protocol: TCP
+    name: http
+  selector:
+    {{- include "islamic-app.frontend.selectorLabels" . | nindent 4 }}

@@ -1,0 +1,198 @@
+{{- if .Values.postgresql.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "islamic-app.fullname" . }}-postgres-init-script
+  namespace: {{ include "islamic-app.namespace" . }}
+  labels:
+    {{- include "islamic-app.postgresql.labels" . | nindent 4 }}
+data:
+  init.sql: |
+    -- Create the database if it doesn't exist
+    CREATE DATABASE {{ .Values.postgresql.auth.postgresDatabase }};
+    
+    -- Connect to the islamic_app database
+    \c {{ .Values.postgresql.auth.postgresDatabase }};
+    
+    -- Create users table
+    CREATE TABLE IF NOT EXISTS users (
+        id SERIAL PRIMARY KEY,
+        username VARCHAR(80) UNIQUE NOT NULL,
+        email VARCHAR(120) UNIQUE NOT NULL,
+        password_hash VARCHAR(128) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+    
+    -- Create user_preferences table
+    CREATE TABLE IF NOT EXISTS user_preferences (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        theme VARCHAR(20) DEFAULT 'light',
+        language VARCHAR(10) DEFAULT 'en',
+        notifications_enabled BOOLEAN DEFAULT true,
+        prayer_reminders BOOLEAN DEFAULT true,
+        volume_level FLOAT DEFAULT 0.5,
+        quran_audio_favorites JSON DEFAULT '[]',
+        hadith_favorites JSON DEFAULT '[]',
+        azkar_favorites JSON DEFAULT '[]',
+        last_reciter VARCHAR(100),
+        last_server VARCHAR(100),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(user_id)
+    );
+    
+    -- Create user_reading_stats table
+    CREATE TABLE IF NOT EXISTS user_reading_stats (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        surah_number INTEGER NOT NULL,
+        ayah_number INTEGER NOT NULL,
+        read_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        reading_time INTEGER DEFAULT 0
+    );
+    
+    -- Create tasbeh_count table
+    CREATE TABLE IF NOT EXISTS tasbeh_count (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        count INTEGER DEFAULT 0,
+        phrase TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+    
+    -- Create user_phrases table
+    CREATE TABLE IF NOT EXISTS user_phrases (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        phrase TEXT NOT NULL,
+        count INTEGER DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+    
+    -- Create user_locations table
+    CREATE TABLE IF NOT EXISTS user_locations (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        latitude DECIMAL(10, 8),
+        longitude DECIMAL(11, 8),
+        city VARCHAR(100),
+        country VARCHAR(100),
+        timezone VARCHAR(50),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(user_id)
+    );
+    
+    -- Create user_achievements table
+    CREATE TABLE IF NOT EXISTS user_achievements (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        achievement_type VARCHAR(50) NOT NULL,
+        achievement_name VARCHAR(100) NOT NULL,
+        description TEXT,
+        earned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        metadata JSON DEFAULT '{}'
+    );
+    
+    -- Create indexes for better performance
+    CREATE INDEX IF NOT EXISTS idx_user_reading_stats_user_id ON user_reading_stats(user_id);
+    CREATE INDEX IF NOT EXISTS idx_user_reading_stats_surah ON user_reading_stats(surah_number);
+    CREATE INDEX IF NOT EXISTS idx_tasbeh_count_user_id ON tasbeh_count(user_id);
+    CREATE INDEX IF NOT EXISTS idx_user_phrases_user_id ON user_phrases(user_id);
+    CREATE INDEX IF NOT EXISTS idx_user_achievements_user_id ON user_achievements(user_id);
+    CREATE INDEX IF NOT EXISTS idx_user_achievements_type ON user_achievements(achievement_type);
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "islamic-app.fullname" . }}-postgresql
+  namespace: {{ include "islamic-app.namespace" . }}
+  labels:
+    {{- include "islamic-app.postgresql.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "islamic-app.postgresql.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "islamic-app.postgresql.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+      - name: postgresql
+        image: "{{ .Values.image.postgres.repository }}:{{ .Values.image.postgres.tag }}"
+        imagePullPolicy: {{ .Values.image.postgres.pullPolicy }}
+        env:
+        - name: POSTGRES_USER
+          value: {{ .Values.postgresql.auth.postgresUser | quote }}
+        - name: POSTGRES_PASSWORD
+          value: {{ .Values.postgresql.auth.postgresPassword | quote }}
+        - name: POSTGRES_DB
+          value: {{ .Values.postgresql.auth.postgresDatabase | quote }}
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
+        ports:
+        - containerPort: {{ .Values.service.postgres.port }}
+          name: postgresql
+        {{- if .Values.persistence.enabled }}
+        volumeMounts:
+        - name: postgres-storage
+          mountPath: /var/lib/postgresql/data
+        - name: init-script
+          mountPath: /docker-entrypoint-initdb.d
+        {{- end }}
+        livenessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - exec pg_isready -U {{ .Values.postgresql.auth.postgresUser }} -d {{ .Values.postgresql.auth.postgresDatabase }} -h 127.0.0.1 -p {{ .Values.service.postgres.port }}
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+        readinessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - -e
+            - |
+              exec pg_isready -U {{ .Values.postgresql.auth.postgresUser }} -d {{ .Values.postgresql.auth.postgresDatabase }} -h 127.0.0.1 -p {{ .Values.service.postgres.port }}
+              [ -f /opt/bitnami/postgresql/tmp/.initialized ] || [ -f /bitnami/postgresql/.initialized ]
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          timeoutSeconds: 5
+      {{- if .Values.persistence.enabled }}
+      volumes:
+      - name: postgres-storage
+        persistentVolumeClaim:
+          claimName: {{ include "islamic-app.fullname" . }}-postgres-pvc
+      - name: init-script
+        configMap:
+          name: {{ include "islamic-app.fullname" . }}-postgres-init-script
+      {{- end }}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "islamic-app.fullname" . }}-postgresql
+  namespace: {{ include "islamic-app.namespace" . }}
+  labels:
+    {{- include "islamic-app.postgresql.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.postgres.type }}
+  ports:
+  - port: {{ .Values.service.postgres.port }}
+    targetPort: postgresql
+    protocol: TCP
+    name: postgresql
+  selector:
+    {{- include "islamic-app.postgresql.selectorLabels" . | nindent 4 }}
+{{- end }}

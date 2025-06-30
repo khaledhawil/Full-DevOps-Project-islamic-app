@@ -1,0 +1,103 @@
+---
+# Trivy Security Scanner installation and configuration
+- name: Add Trivy GPG key
+  rpm_key:
+    key: https://aquasecurity.github.io/trivy-repo/rpm/public.key
+    state: present
+  tags: trivy_install
+
+- name: Add Trivy repository
+  yum_repository:
+    name: trivy
+    description: Trivy repository
+    baseurl: https://aquasecurity.github.io/trivy-repo/rpm/releases/$basearch/
+    gpgcheck: yes
+    enabled: yes
+  tags: trivy_install
+
+- name: Install Trivy
+  yum:
+    name: trivy
+    state: latest
+  tags: trivy_install
+
+- name: Update Trivy database
+  command: trivy image --download-db-only
+  changed_when: false
+  tags: trivy_update
+
+- name: Create Trivy configuration directory
+  file:
+    path: /etc/trivy
+    state: directory
+    mode: '0755'
+  tags: trivy_config
+
+- name: Create Trivy configuration file
+  copy:
+    content: |
+      # Trivy Configuration
+      cache-dir: "/tmp/trivy"
+      debug: false
+      insecure: false
+      timeout: "5m"
+      severity: "UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL"
+      exit-code: 0
+      format: "json"
+      template: ""
+      input: ""
+      skip-update: false
+      clear-cache: false
+      quiet: false
+      no-progress: false
+      ignore-unfixed: false
+      remove-dev-deps: false
+      skip-files: ""
+      skip-dirs: ""
+      list-all-pkgs: false
+    dest: /etc/trivy/trivy.yaml
+    mode: '0644'
+  tags: trivy_config
+
+- name: Create Trivy scan script
+  copy:
+    content: |
+      #!/bin/bash
+      # Trivy Docker Image Scanner Script
+      
+      IMAGE_NAME=$1
+      OUTPUT_DIR="/tmp/trivy-reports"
+      
+      if [ -z "$IMAGE_NAME" ]; then
+        echo "Usage: $0 <image-name>"
+        exit 1
+      fi
+      
+      mkdir -p $OUTPUT_DIR
+      
+      echo "Scanning image: $IMAGE_NAME"
+      
+      # Scan for vulnerabilities
+      trivy image --format json --output $OUTPUT_DIR/vuln-$(date +%Y%m%d-%H%M%S).json $IMAGE_NAME
+      
+      # Scan for secrets
+      trivy image --scanners secret --format json --output $OUTPUT_DIR/secret-$(date +%Y%m%d-%H%M%S).json $IMAGE_NAME
+      
+      # Scan for misconfigurations
+      trivy image --scanners config --format json --output $OUTPUT_DIR/config-$(date +%Y%m%d-%H%M%S).json $IMAGE_NAME
+      
+      echo "Scan completed. Reports saved in $OUTPUT_DIR"
+    dest: /usr/local/bin/trivy-scan
+    mode: '0755'
+  tags: trivy_script
+
+- name: Verify Trivy installation
+  command: trivy --version
+  register: trivy_version
+  changed_when: false
+  tags: trivy_verify
+
+- name: Display Trivy version
+  debug:
+    msg: "Trivy installed successfully: {{ trivy_version.stdout }}"
+  tags: trivy_verify

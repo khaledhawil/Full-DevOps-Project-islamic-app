@@ -27,6 +27,7 @@ variable "key_name" {
 variable "rds_endpoint" {
   description = "RDS endpoint for database connection"
   type        = string
+  default     = ""
 }
 
 variable "eks_cluster_name" {

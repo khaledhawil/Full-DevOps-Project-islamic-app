@@ -1,0 +1,66 @@
+🕌 Islamic App has been successfully deployed! 🕌
+
+1. Get the application URL by running these commands:
+{{- if .Values.ingress.enabled }}
+{{- range $host := .Values.ingress.hosts }}
+  {{- range .paths }}
+  http{{ if $.Values.ingress.tls }}s{{ end }}://{{ $host.host }}{{ .path }}
+  {{- end }}
+{{- end }}
+
+  Note: Make sure to add the following to your /etc/hosts file for local development:
+  127.0.0.1 {{ (index .Values.ingress.hosts 0).host }}
+
+{{- else if contains "NodePort" .Values.service.frontend.type }}
+  export NODE_PORT=$(kubectl get --namespace {{ include "islamic-app.namespace" . }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "islamic-app.fullname" . }}-frontend)
+  export NODE_IP=$(kubectl get nodes --namespace {{ include "islamic-app.namespace" . }} -o jsonpath="{.items[0].status.addresses[0].address}")
+  echo http://$NODE_IP:$NODE_PORT
+
+{{- else if contains "LoadBalancer" .Values.service.frontend.type }}
+     NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+           You can watch the status of by running 'kubectl get --namespace {{ include "islamic-app.namespace" . }} svc -w {{ include "islamic-app.fullname" . }}-frontend'
+  export SERVICE_IP=$(kubectl get svc --namespace {{ include "islamic-app.namespace" . }} {{ include "islamic-app.fullname" . }}-frontend --template "{{"{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}"}}")
+  echo http://$SERVICE_IP:{{ .Values.service.frontend.port }}
+
+{{- else if contains "ClusterIP" .Values.service.frontend.type }}
+  export POD_NAME=$(kubectl get pods --namespace {{ include "islamic-app.namespace" . }} -l "app.kubernetes.io/name={{ include "islamic-app.name" . }},app.kubernetes.io/instance={{ .Release.Name }},app.kubernetes.io/component=frontend" -o jsonpath="{.items[0].metadata.name}")
+  export CONTAINER_PORT=$(kubectl get pod --namespace {{ include "islamic-app.namespace" . }} $POD_NAME -o jsonpath="{.spec.containers[0].ports[0].containerPort}")
+  echo "Visit http://127.0.0.1:3000 to use your application"
+  kubectl --namespace {{ include "islamic-app.namespace" . }} port-forward $POD_NAME 3000:$CONTAINER_PORT
+{{- end }}
+
+2. Check the status of your deployment:
+   kubectl get pods -n {{ include "islamic-app.namespace" . }}
+
+3. View application logs:
+   kubectl logs -f deployment/{{ include "islamic-app.fullname" . }}-backend -n {{ include "islamic-app.namespace" . }}
+   kubectl logs -f deployment/{{ include "islamic-app.fullname" . }}-frontend -n {{ include "islamic-app.namespace" . }}
+
+4. Access the database (for debugging):
+   kubectl port-forward svc/{{ include "islamic-app.fullname" . }}-postgresql 5432:5432 -n {{ include "islamic-app.namespace" . }}
+
+📚 Features available in your Islamic App:
+✅ Prayer Times with location-based calculations
+✅ Complete Quran with audio recitation
+✅ Hadith collections from authentic sources
+✅ Digital Tasbeh (dhikr counter)
+✅ Azkar (morning and evening supplications)
+✅ User authentication and preferences
+✅ Multi-language support
+✅ Responsive design for all devices
+
+🔧 Configuration:
+- Release Name: {{ .Release.Name }}
+- Namespace: {{ include "islamic-app.namespace" . }}
+- Chart Version: {{ .Chart.Version }}
+- App Version: {{ .Chart.AppVersion }}
+
+💡 Tips:
+- For production, make sure to change default passwords in values.yaml
+- Enable TLS/SSL for secure connections
+- Monitor resource usage and adjust HPA settings accordingly
+- Backup your database regularly
+
+🤲 May Allah bless your use of this application! 🤲
+
+For more information, visit: https://github.com/your-org/islamic-app

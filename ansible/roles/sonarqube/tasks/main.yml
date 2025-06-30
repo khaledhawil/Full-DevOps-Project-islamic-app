@@ -1,0 +1,171 @@
+---
+# SonarQube installation and configuration
+- name: Create SonarQube directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: ec2-user
+    group: ec2-user
+    mode: '0755'
+  with_items:
+    - /opt/sonarqube
+    - /opt/sonarqube/data
+    - /opt/sonarqube/logs
+    - /opt/sonarqube/extensions
+    - /opt/sonarqube/postgres-data
+  tags: sonarqube_setup
+
+- name: Create SonarQube Docker Compose file
+  copy:
+    content: |
+      version: '3.8'
+      services:
+        sonarqube-db:
+          image: postgres:13
+          container_name: sonarqube-db
+          restart: unless-stopped
+          environment:
+            POSTGRES_USER: sonar
+            POSTGRES_PASSWORD: sonar123
+            POSTGRES_DB: sonar
+          volumes:
+            - /opt/sonarqube/postgres-data:/var/lib/postgresql/data
+          networks:
+            - sonar-network
+          healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U sonar"]
+            interval: 30s
+            timeout: 10s
+            retries: 3
+
+        sonarqube:
+          image: sonarqube:{{ sonarqube_version }}
+          container_name: sonarqube
+          restart: unless-stopped
+          depends_on:
+            - sonarqube-db
+          environment:
+            SONAR_JDBC_URL: jdbc:postgresql://sonarqube-db:5432/sonar
+            SONAR_JDBC_USERNAME: sonar
+            SONAR_JDBC_PASSWORD: sonar123
+            SONAR_WEB_HOST: 0.0.0.0
+            SONAR_WEB_PORT: 9000
+            SONAR_ES_BOOTSTRAP_CHECKS_DISABLE: true
+          ports:
+            - "{{ sonarqube_port }}:9000"
+          volumes:
+            - /opt/sonarqube/data:/opt/sonarqube/data
+            - /opt/sonarqube/logs:/opt/sonarqube/logs
+            - /opt/sonarqube/extensions:/opt/sonarqube/extensions
+          networks:
+            - sonar-network
+          ulimits:
+            nofile:
+              soft: 65536
+              hard: 65536
+          healthcheck:
+            test: ["CMD-SHELL", "curl -f http://localhost:9000/api/system/status || exit 1"]
+            interval: 30s
+            timeout: 10s
+            retries: 5
+
+      networks:
+        sonar-network:
+          driver: bridge
+    dest: /opt/sonarqube/docker-compose.yml
+    mode: '0644'
+    owner: ec2-user
+    group: ec2-user
+  tags: sonarqube_compose
+
+- name: Set kernel parameters for SonarQube
+  sysctl:
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+    state: present
+    reload: yes
+  with_items:
+    - { name: 'vm.max_map_count', value: '524288' }
+    - { name: 'fs.file-max', value: '131072' }
+  tags: sonarqube_sysctl
+
+- name: Set ulimits for SonarQube user
+  lineinfile:
+    path: /etc/security/limits.conf
+    line: "{{ item }}"
+    create: yes
+  with_items:
+    - "ec2-user soft nofile 131072"
+    - "ec2-user hard nofile 131072"
+    - "ec2-user soft nproc 8192"
+    - "ec2-user hard nproc 8192"
+  tags: sonarqube_limits
+
+- name: Start SonarQube services
+  docker_compose:
+    project_src: /opt/sonarqube
+    state: present
+  tags: sonarqube_start
+
+- name: Wait for SonarQube to be ready
+  uri:
+    url: "http://localhost:{{ sonarqube_port }}/api/system/status"
+    method: GET
+    status_code: 200
+  register: sonarqube_ready
+  until: sonarqube_ready.status == 200
+  retries: 30
+  delay: 10
+  tags: sonarqube_wait
+
+- name: Create SonarQube admin user configuration script
+  copy:
+    content: |
+      #!/bin/bash
+      # SonarQube initial configuration script
+      
+      SONAR_URL="http://localhost:{{ sonarqube_port }}"
+      ADMIN_USER="admin"
+      OLD_PASSWORD="admin"
+      NEW_PASSWORD="{{ sonarqube_admin_password }}"
+      
+      echo "Waiting for SonarQube to be fully ready..."
+      sleep 30
+      
+      # Change default admin password
+      echo "Changing admin password..."
+      curl -u "$ADMIN_USER:$OLD_PASSWORD" -X POST \
+        "$SONAR_URL/api/users/change_password" \
+        -d "login=$ADMIN_USER&password=$NEW_PASSWORD&previousPassword=$OLD_PASSWORD"
+      
+      # Create project for Islamic App
+      echo "Creating project..."
+      curl -u "$ADMIN_USER:$NEW_PASSWORD" -X POST \
+        "$SONAR_URL/api/projects/create" \
+        -d "project=islamic-app&name=Islamic App"
+      
+      # Generate token for Jenkins
+      echo "Generating token for Jenkins..."
+      JENKINS_TOKEN=$(curl -u "$ADMIN_USER:$NEW_PASSWORD" -X POST \
+        "$SONAR_URL/api/user_tokens/generate" \
+        -d "name=jenkins-token" | jq -r '.token')
+      
+      echo "SonarQube Jenkins Token: $JENKINS_TOKEN"
+      echo "Save this token for Jenkins configuration!"
+      echo "$JENKINS_TOKEN" > /opt/sonarqube/jenkins-token.txt
+      
+      echo "SonarQube configuration completed!"
+    dest: /opt/sonarqube/configure-sonarqube.sh
+    mode: '0755'
+    owner: ec2-user
+    group: ec2-user
+  tags: sonarqube_config
+
+- name: Display SonarQube access information
+  debug:
+    msg:
+      - "SonarQube has been installed successfully!"
+      - "Access URL: http://{{ ansible_host }}:{{ sonarqube_port }}"
+      - "Default credentials: admin/admin"
+      - "Run configuration script: /opt/sonarqube/configure-sonarqube.sh"
+  tags: sonarqube_info

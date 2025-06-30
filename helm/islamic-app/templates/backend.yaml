@@ -1,0 +1,123 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "islamic-app.fullname" . }}-backend
+  namespace: {{ include "islamic-app.namespace" . }}
+  labels:
+    {{- include "islamic-app.backend.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount.backend }}
+  selector:
+    matchLabels:
+      {{- include "islamic-app.backend.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "islamic-app.backend.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.postgresql.enabled }}
+      initContainers:
+      - name: wait-for-postgres
+        image: "{{ .Values.image.postgres.repository }}:{{ .Values.image.postgres.tag }}"
+        command: ['sh', '-c']
+        args:
+        - |
+          until pg_isready -h {{ include "islamic-app.fullname" . }}-postgresql -p {{ .Values.service.postgres.port }} -U {{ .Values.postgresql.auth.postgresUser }}; do
+            echo "Waiting for postgres..."
+            sleep 2
+          done
+          echo "PostgreSQL is ready!"
+        env:
+        - name: PGPASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "islamic-app.fullname" . }}-secrets
+              key: postgres-password
+      {{- end }}
+      containers:
+      - name: backend
+        image: "{{ .Values.image.backend.repository }}:{{ .Values.image.backend.tag }}"
+        imagePullPolicy: {{ .Values.image.backend.pullPolicy }}
+        env:
+        - name: FLASK_ENV
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "islamic-app.fullname" . }}-config
+              key: FLASK_ENV
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "islamic-app.fullname" . }}-secrets
+              key: database-url
+        - name: SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "islamic-app.fullname" . }}-secrets
+              key: secret-key
+        - name: JWT_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "islamic-app.fullname" . }}-secrets
+              key: jwt-secret-key
+        - name: CORS_ORIGINS
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "islamic-app.fullname" . }}-config
+              key: CORS_ORIGINS
+        ports:
+        - containerPort: {{ .Values.service.backend.port }}
+          name: http
+        livenessProbe:
+          httpGet:
+            path: /api/health
+            port: {{ .Values.service.backend.port }}
+          initialDelaySeconds: 60
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /api/health
+            port: {{ .Values.service.backend.port }}
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        {{- with .Values.resources.backend }}
+        resources:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "islamic-app.fullname" . }}-backend
+  namespace: {{ include "islamic-app.namespace" . }}
+  labels:
+    {{- include "islamic-app.backend.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.backend.type }}
+  ports:
+  - port: {{ .Values.service.backend.port }}
+    targetPort: http
+    protocol: TCP
+    name: http
+  selector:
+    {{- include "islamic-app.backend.selectorLabels" . | nindent 4 }}

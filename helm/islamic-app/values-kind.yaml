@@ -1,0 +1,75 @@
+# Kind cluster values (same as values-dev.yaml but specifically for Kind)
+environment:
+  type: "kind"
+  domain: "islamic-app.local"
+
+replicaCount:
+  backend: 1
+  frontend: 1
+
+image:
+  backend:
+    tag: "36-18b4564"
+    pullPolicy: IfNotPresent
+  frontend:
+    tag: "36-18b4564"
+    pullPolicy: IfNotPresent
+
+# Service configuration for Kind
+service:
+  frontend:
+    type: NodePort
+    nodePort: 30000
+
+# Ingress configuration for Kind
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+  hosts:
+    - host: islamic-app.local
+      paths:
+        - path: /
+          pathType: Prefix
+          service: frontend
+        - path: /api
+          pathType: Prefix
+          service: backend
+
+# Disable autoscaling in Kind for simplicity
+autoscaling:
+  enabled: false
+
+# Smaller resource requests for Kind
+resources:
+  backend:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+  frontend:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+
+# Development configuration
+app:
+  config:
+    flaskEnv: production
+    nodeEnv: production
+    corsOrigins: "http://localhost:3000,http://localhost:8090,http://islamic-app.local"
+
+# Smaller storage for Kind
+persistence:
+  size: 5Gi
+  storageClass: "standard"
+
+# Namespace - let Helm handle it
+namespace:
+  create: false  # Helm will create it automatically

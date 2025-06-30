@@ -1,0 +1,113 @@
+---
+# ArgoCD installation on EKS using Helm
+- name: Install Helm
+  get_url:
+    url: https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+    dest: /tmp/get_helm.sh
+    mode: '0755'
+  delegate_to: localhost
+  tags: helm_install
+
+- name: Execute Helm installation script
+  shell: /tmp/get_helm.sh
+  delegate_to: localhost
+  tags: helm_install
+
+- name: Update EKS kubeconfig
+  shell: |
+    aws eks update-kubeconfig --region {{ aws_region }} --name {{ eks_cluster_name }}
+  delegate_to: localhost
+  tags: eks_config
+
+- name: Add ArgoCD Helm repository
+  kubernetes.core.helm_repository:
+    name: argo
+    repo_url: https://argoproj.github.io/argo-helm
+  delegate_to: localhost
+  tags: argocd_repo
+
+- name: Create ArgoCD namespace
+  kubernetes.core.k8s:
+    name: "{{ argocd_namespace }}"
+    api_version: v1
+    kind: Namespace
+    state: present
+  delegate_to: localhost
+  tags: argocd_namespace
+
+- name: Install ArgoCD using Helm
+  kubernetes.core.helm:
+    name: argocd
+    chart_ref: argo/argo-cd
+    chart_version: "{{ argocd_version }}"
+    release_namespace: "{{ argocd_namespace }}"
+    create_namespace: true
+    values:
+      server:
+        service:
+          type: "{{ argocd_server_service_type }}"
+        ingress:
+          enabled: false
+        config:
+          url: "https://argocd.{{ environment }}.local"
+      dex:
+        enabled: false
+      notifications:
+        enabled: true
+      applicationSet:
+        enabled: true
+      redis:
+        enabled: true
+  delegate_to: localhost
+  tags: argocd_install
+
+- name: Wait for ArgoCD pods to be ready
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: Pod
+    namespace: "{{ argocd_namespace }}"
+    label_selectors:
+      - app.kubernetes.io/name=argocd-server
+    wait: true
+    condition:
+      type: Ready
+      status: "True"
+    wait_timeout: 300
+  delegate_to: localhost
+  tags: argocd_wait
+
+- name: Get ArgoCD admin password
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: Secret
+    name: argocd-initial-admin-secret
+    namespace: "{{ argocd_namespace }}"
+  register: argocd_secret
+  delegate_to: localhost
+  tags: argocd_password
+
+- name: Display ArgoCD access information
+  debug:
+    msg:
+      - "ArgoCD has been installed successfully!"
+      - "Namespace: {{ argocd_namespace }}"
+      - "To access ArgoCD:"
+      - "kubectl port-forward svc/argocd-server -n {{ argocd_namespace }} 8080:443"
+      - "Then open: https://localhost:8080"
+      - "Username: admin"
+      - "Password: {{ argocd_secret.resources[0].data['password'] | b64decode if argocd_secret.resources else 'Check kubectl get secret argocd-initial-admin-secret -n argocd -o yaml' }}"
+  tags: argocd_info
+
+- name: Create ArgoCD CLI download script
+  copy:
+    content: |
+      #!/bin/bash
+      # Download ArgoCD CLI
+      curl -sSL -o /usr/local/bin/argocd https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
+      chmod +x /usr/local/bin/argocd
+      echo "ArgoCD CLI installed successfully!"
+      argocd version --client
+    dest: /tmp/install-argocd-cli.sh
+    mode: '0755'
+  delegate_to: localhost
+  tags: argocd_cli

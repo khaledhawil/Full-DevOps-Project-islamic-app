@@ -1,0 +1,69 @@
+# Local Kind cluster development environment values
+environment:
+  type: "kind"
+  domain: "islamic-app.local"
+
+replicaCount:
+  backend: 1
+  frontend: 1
+
+image:
+  backend:
+    tag: "latest"
+    pullPolicy: Always
+  frontend:
+    tag: "latest"
+    pullPolicy: Always
+
+# Service configuration for Kind
+service:
+  frontend:
+    type: NodePort
+    nodePort: 30000
+
+# Ingress configuration for Kind
+ingress:
+  enabled: true
+  className: "nginx"
+  hosts:
+    - host: islamic-app.local
+      paths:
+        - path: /
+          pathType: Prefix
+          service: frontend
+        - path: /api
+          pathType: Prefix
+          service: backend
+
+# Disable autoscaling in development
+autoscaling:
+  enabled: false
+
+# Smaller resource requests for development
+resources:
+  backend:
+    limits:
+      cpu: 200m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  frontend:
+    limits:
+      cpu: 200m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+# Development configuration
+app:
+  config:
+    flaskEnv: development
+    nodeEnv: development
+    corsOrigins: "http://localhost:3000,http://localhost:8090,http://islamic-app.local"
+
+# Smaller storage for development
+persistence:
+  size: 2Gi
+  storageClass: "standard"

@@ -1,0 +1,134 @@
+# Default values for islamic-app
+replicaCount:
+  backend: 1
+  frontend: 1
+
+image:
+  backend:
+    repository: khaledhawil/islamic-app_backend
+    tag: "36-18b4564"
+    pullPolicy: IfNotPresent
+  frontend:
+    repository: khaledhawil/islamic-app_frontend
+    tag: "36-18b4564"
+    pullPolicy: IfNotPresent
+  postgres:
+    repository: postgres
+    tag: "15-alpine"
+    pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: false
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+
+securityContext: {}
+
+service:
+  backend:
+    type: ClusterIP
+    port: 5000
+  frontend:
+    type: NodePort  # Changed to NodePort for better cloud compatibility
+    port: 3000
+    # NodePort configuration (used only when type is NodePort)
+    nodePort: 30030
+  postgres:
+    type: ClusterIP
+    port: 5432
+
+ingress:
+  enabled: true
+  className: ""  # Will be set per environment
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    # Additional annotations can be added per environment
+  hosts:
+    - host: islamic-app.local
+      paths:
+        - path: /
+          pathType: Prefix
+          service: frontend
+        - path: /api
+          pathType: Prefix
+          service: backend
+  tls: []  # TLS configuration for production
+
+resources:
+  backend:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+  frontend:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# PostgreSQL configuration
+postgresql:
+  enabled: true
+  auth:
+    postgresUser: islamic_user
+    postgresPassword: islamic_pass123
+    postgresDatabase: islamic_app
+  persistence:
+    enabled: true
+    size: 5Gi
+    storageClass: ""
+  service:
+    port: 5432
+
+# Application configuration
+app:
+  config:
+    flaskEnv: production
+    corsOrigins: "http://localhost:3000,http://localhost:8090,http://islamic-app-frontend:3000,http://localhost:32434,http://localhost:30080,http://controlplane:32434"
+    reactAppApiUrl: "/api"
+    nodeEnv: production
+  secrets:
+    secretKey: your-super-secret-key-change-in-production
+    jwtSecretKey: your-jwt-secret-key-change-in-production
+
+# Persistence for PostgreSQL
+persistence:
+  enabled: true
+  storageClass: ""  # Will use default storage class or specify per environment
+  accessMode: ReadWriteOnce
+  size: 5Gi
+
+# Environment-specific settings
+environment:
+  type: "local"  # Options: local, kind, aws, gcp, azure, generic
+  domain: "islamic-app.local"  # Base domain for the application
+
+# Namespace
+namespace:
+  create: false  # Let Helm manage namespace creation
+  name: islamic-app

@@ -1,0 +1,9 @@
+{{- if .Values.namespace.create }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ include "islamic-app.namespace" . }}
+  labels:
+    {{- include "islamic-app.labels" . | nindent 4 }}
+    name: {{ include "islamic-app.namespace" . }}
+{{- end }}

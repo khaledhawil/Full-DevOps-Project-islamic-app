@@ -23,6 +23,22 @@ output "jenkins_public_ip" {
   value       = module.jenkins.public_ip
 }
 
+output "jenkins_private_ip" {
+  description = "Jenkins private IP"
+  value       = module.jenkins.private_ip
+}
+
+# ECR Repository URLs
+output "ecr_backend_repository_url" {
+  description = "ECR repository URL for backend"
+  value       = aws_ecr_repository.islamic_app_backend.repository_url
+}
+
+output "ecr_frontend_repository_url" {
+  description = "ECR repository URL for frontend"
+  value       = aws_ecr_repository.islamic_app_frontend.repository_url
+}
+
 output "rds_endpoint" {
   description = "RDS instance endpoint"
   value       = module.rds.endpoint
@@ -48,31 +64,30 @@ output "next_steps" {
     📋 NEXT STEPS:
     
     1. 🔑 CREATE AWS KEY PAIR:
-       aws ec2 create-key-pair --key-name islamic-app-key --query 'KeyMaterial' --output text > islamic-app-key.pem
-       chmod 400 islamic-app-key.pem
+       aws ec2 create-key-pair --key-name islamic-app-key --query 'KeyMaterial' --output text > ~/.ssh/islamic-app-key.pem
+       chmod 400 ~/.ssh/islamic-app-key.pem
     
     2. 🛠️ CONFIGURE KUBECTL:
        aws eks update-kubeconfig --region ${var.aws_region} --name ${module.eks.cluster_name}
     
-    3. 🔐 GET JENKINS PASSWORD:
-       ssh -i islamic-app-key.pem ec2-user@${module.jenkins.public_ip}
-       sudo docker exec jenkins cat /var/jenkins_home/secrets/initialAdminPassword
+    3. 🎯 RUN ANSIBLE PLAYBOOK:
+       cd ../ansible
+       ansible-playbook -i inventories/production/hosts.yml site.yml
     
     4. 🌐 ACCESS SERVICES:
        Jenkins: ${module.jenkins.jenkins_url}
+       SonarQube: http://${module.jenkins.public_ip}:9000
        CloudWatch: ${module.cloudwatch.dashboard_url}
     
-    5. 🗄️ DATABASE CONNECTION:
-       Endpoint: ${module.rds.endpoint}
-       Get credentials: aws secretsmanager get-secret-value --secret-id ${module.rds.secret_arn}
+    5. 🔧 SETUP SONARQUBE INTEGRATION:
+       Run: ./setup-sonarqube.sh
     
-    6. ☸️ DEPLOY APPLICATIONS:
-       cd ../k8s && ./deploy.sh
+    📊 INFRASTRUCTURE DETAILS:
+       - EKS Cluster: ${module.eks.cluster_name}
+       - Jenkins IP: ${module.jenkins.public_ip}
+       - ECR Backend: ${aws_ecr_repository.islamic_app_backend.repository_url}
+       - ECR Frontend: ${aws_ecr_repository.islamic_app_frontend.repository_url}
     
-    7. 🔄 SETUP ARGOCD:
-       cd ../argocd && ./deploy.sh
-    
-    💡 TIP: Save this output for reference!
-    
+    ✅ Ansible inventory has been generated automatically!
   EOT
 }

@@ -1,0 +1,36 @@
+{{- if .Values.persistence.enabled }}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ include "islamic-app.fullname" . }}-postgres-pv
+  labels:
+    {{- include "islamic-app.postgresql.labels" . | nindent 4 }}
+    type: local
+spec:
+  storageClassName: {{ .Values.persistence.storageClass | default "manual" }}
+  capacity:
+    storage: {{ .Values.persistence.size }}
+  volumeMode: Filesystem
+  accessModes:
+    - {{ .Values.persistence.accessMode }}
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /home/vagrant/pv
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "islamic-app.fullname" . }}-postgres-pvc
+  namespace: {{ include "islamic-app.namespace" . }}
+  labels:
+    {{- include "islamic-app.postgresql.labels" . | nindent 4 }}
+spec:
+  storageClassName: {{ .Values.persistence.storageClass | default "manual" }}
+  accessModes:
+    - {{ .Values.persistence.accessMode }}
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: {{ .Values.persistence.size }}
+{{- end }}

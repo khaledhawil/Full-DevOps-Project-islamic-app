@@ -1,0 +1,85 @@
+# Azure AKS cluster values
+environment:
+  type: "azure"
+  domain: "islamic-app.example.com"
+
+replicaCount:
+  backend: 2
+  frontend: 2
+
+# Service configuration for Azure
+service:
+  frontend:
+    type: ClusterIP
+
+# Ingress configuration for Azure
+ingress:
+  enabled: true
+  className: "nginx"  # NGINX ingress controller for AKS
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    # Azure specific annotations
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+  hosts:
+    - host: islamic-app.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+          service: frontend
+        - path: /api
+          pathType: Prefix
+          service: backend
+  tls:
+    - secretName: islamic-app-tls
+      hosts:
+        - islamic-app.example.com
+
+# Production resources for Azure
+resources:
+  backend:
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+    requests:
+      cpu: 500m
+      memory: 512Mi
+  frontend:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+
+# Autoscaling for production
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+
+# Azure storage configuration
+persistence:
+  enabled: true
+  storageClass: "managed-premium"  # Azure premium SSD
+  size: 20Gi
+
+# Production configuration
+app:
+  config:
+    flaskEnv: production
+    nodeEnv: production
+    corsOrigins: "https://islamic-app.example.com"
+  secrets:
+    secretKey: "CHANGE-ME-USE-AZURE-KEY-VAULT"
+    jwtSecretKey: "CHANGE-ME-USE-AZURE-KEY-VAULT"
+
+postgresql:
+  auth:
+    postgresPassword: "CHANGE-ME-USE-AZURE-KEY-VAULT"
+
+# Node selection for production
+nodeSelector:
+  agentpool: application

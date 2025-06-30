@@ -1,14 +1,43 @@
 ---
-# Jenkins configuration and setup
-- name: Ensure Jenkins is running
+# Jenkins installation and configuration
+- name: Create Jenkins directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: ec2-user
+    group: ec2-user
+    mode: '0755'
+  with_items:
+    - /var/jenkins_home
+    - /opt/islamic-app/jenkins
+  tags: jenkins_setup
+
+- name: Install Jenkins using Docker
   docker_container:
     name: jenkins
+    image: jenkins/jenkins:{{ jenkins_version }}
     state: started
-  tags: jenkins_start
+    restart_policy: unless-stopped
+    ports:
+      - "{{ jenkins_port }}:8080"
+      - "50000:50000"
+    volumes:
+      - /var/jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /usr/local/bin/docker:/usr/bin/docker
+      - /usr/local/bin/docker-compose:/usr/bin/docker-compose
+      - /usr/local/bin/kubectl:/usr/local/bin/kubectl
+      - /root/.aws:/var/jenkins_home/.aws
+    env:
+      JENKINS_OPTS: "--httpPort=8080"
+      JAVA_OPTS: "-Xmx2048m -Xms1024m"
+    user: root
+    privileged: true
+  tags: jenkins_install
 
 - name: Wait for Jenkins to be ready
   uri:
-    url: "http://localhost:8080/login"
+    url: "http://localhost:{{ jenkins_port }}/login"
     method: GET
     status_code: 200
   register: jenkins_ready
@@ -17,115 +46,73 @@
   delay: 10
   tags: jenkins_wait
 
-- name: Create Jenkins configuration directory
-  file:
-    path: /opt/islamic-app/jenkins
-    state: directory
-    owner: ec2-user
-    group: ec2-user
-    mode: '0755'
-  tags: jenkins_config
-
-- name: Copy Jenkins configuration files
-  template:
-    src: "{{ item.src }}"
-    dest: "{{ item.dest }}"
-    owner: ec2-user
-    group: ec2-user
-    mode: '0644'
-  loop:
-    - src: jenkins-cli-config.xml.j2
-      dest: /opt/islamic-app/jenkins/cli-config.xml
-    - src: islamic-app-pipeline.xml.j2
-      dest: /opt/islamic-app/jenkins/islamic-app-pipeline.xml
-  tags: jenkins_config
-
-- name: Create Jenkins jobs directory
-  file:
-    path: /var/jenkins_home/jobs
-    state: directory
-    owner: 1000
-    group: 1000
-    mode: '0755'
-  tags: jenkins_jobs
-
-- name: Install Jenkins plugins
-  shell: |
-    docker exec jenkins java -jar /var/jenkins_home/war/WEB-INF/jenkins-cli.jar \
-    -s http://localhost:8080/ install-plugin {{ item }} -deploy
-  loop:
-    - blueocean
-    - docker-workflow
-    - kubernetes
-    - pipeline-stage-view
-    - git
-    - github
-    - github-branch-source
-    - workflow-aggregator
-    - pipeline-utility-steps
-    - discord-notifier
-    - build-timeout
-    - timestamper
-    - ws-cleanup
-    - ant
-    - gradle
-    - nodejs
-  ignore_errors: true
-  tags: jenkins_plugins
-
-- name: Configure AWS credentials for Jenkins
+- name: Configure AWS CLI for Jenkins
   shell: |
     docker exec jenkins aws configure set region {{ aws_region }}
-    docker exec jenkins aws configure set output json
   tags: jenkins_aws
 
 - name: Update EKS kubeconfig for Jenkins
   shell: |
-    docker exec jenkins aws eks update-kubeconfig \
-    --region {{ aws_region }} \
-    --name {{ eks_cluster_name }}
-  when: eks_cluster_name is defined
-  tags: jenkins_kubectl
+    docker exec jenkins aws eks update-kubeconfig --region {{ aws_region }} --name {{ eks_cluster_name }}
+  tags: jenkins_eks
 
-- name: Create Jenkins backup script
-  template:
-    src: jenkins-backup.sh.j2
-    dest: /opt/islamic-app/scripts/jenkins-backup.sh
+- name: Create Jenkins initial setup script
+  copy:
+    content: |
+      #!/bin/bash
+      # Jenkins initial setup script
+      
+      # Wait for Jenkins to be fully ready
+      sleep 60
+      
+      # Install required plugins
+      plugins=(
+          "blueocean"
+          "docker-workflow"
+          "kubernetes"
+          "pipeline-stage-view"
+          "git"
+          "workflow-aggregator"
+          "pipeline-utility-steps"
+          "github"
+          "github-branch-source"
+          "build-timeout"
+          "timestamper"
+      )
+      
+      for plugin in "${plugins[@]}"; do
+          echo "Installing plugin: $plugin"
+          docker exec jenkins jenkins-plugin-cli --plugins $plugin
+      done
+      
+      # Restart Jenkins to activate plugins
+      docker restart jenkins
+      
+      echo "Jenkins setup completed!"
+    dest: /home/ec2-user/setup-jenkins.sh
+    mode: '0755'
     owner: ec2-user
     group: ec2-user
+  tags: jenkins_setup_script
+
+- name: Create script to get Jenkins admin password
+  copy:
+    content: |
+      #!/bin/bash
+      echo "=== Jenkins Initial Admin Password ==="
+      docker exec jenkins cat /var/jenkins_home/secrets/initialAdminPassword
+      echo "======================================"
+    dest: /home/ec2-user/get-jenkins-password.sh
     mode: '0755'
-  tags: jenkins_backup
+    owner: ec2-user
+    group: ec2-user
+  tags: jenkins_password_script
 
-- name: Schedule Jenkins backup
-  cron:
-    name: "Jenkins backup"
-    minute: "0"
-    hour: "2"
-    job: "/opt/islamic-app/scripts/jenkins-backup.sh"
-    user: ec2-user
-  tags: jenkins_backup
-
-- name: Create Jenkins pipeline job
-  uri:
-    url: "http://localhost:8080/createItem?name=islamic-app-pipeline"
-    method: POST
-    body: "{{ lookup('file', '/opt/islamic-app/jenkins/islamic-app-pipeline.xml') }}"
-    headers:
-      Content-Type: "application/xml"
-    status_code: [200, 302]
-  ignore_errors: true
-  tags: jenkins_pipeline
-
-- name: Get Jenkins initial admin password
-  shell: docker exec jenkins cat /var/jenkins_home/secrets/initialAdminPassword
-  register: jenkins_password
-  ignore_errors: true
-  tags: jenkins_password
-
-- name: Display Jenkins information
+- name: Display Jenkins access information
   debug:
     msg:
-      - "Jenkins is ready at: http://{{ ansible_host }}:8080"
-      - "Initial admin password: {{ jenkins_password.stdout | default('Check manually') }}"
-      - "SSH to server and run: docker exec jenkins cat /var/jenkins_home/secrets/initialAdminPassword"
+      - "Jenkins has been installed successfully!"
+      - "Access URL: http://{{ ansible_host }}:{{ jenkins_port }}"
+      - "To get admin password: docker exec jenkins cat /var/jenkins_home/secrets/initialAdminPassword"
+      - "Or run: /home/ec2-user/get-jenkins-password.sh"
   tags: jenkins_info

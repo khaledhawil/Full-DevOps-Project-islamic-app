@@ -1,0 +1,79 @@
+# Generic cloud/on-premise cluster values
+environment:
+  type: "generic"
+  domain: "islamic-app.example.com"
+
+replicaCount:
+  backend: 2
+  frontend: 2
+
+# Service configuration - can be customized based on your setup
+service:
+  frontend:
+    type: LoadBalancer  # Change to NodePort or ClusterIP as needed
+    # loadBalancerIP: "YOUR_STATIC_IP"  # Uncomment if you have a static IP
+
+# Ingress configuration for generic setup
+ingress:
+  enabled: true
+  className: "nginx"  # Change based on your ingress controller
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    # Add your specific annotations here
+  hosts:
+    - host: islamic-app.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+          service: frontend
+        - path: /api
+          pathType: Prefix
+          service: backend
+  tls:
+    - secretName: islamic-app-tls
+      hosts:
+        - islamic-app.example.com
+
+# Production resources
+resources:
+  backend:
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+    requests:
+      cpu: 500m
+      memory: 512Mi
+  frontend:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+
+# Autoscaling
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 8
+  targetCPUUtilizationPercentage: 75
+
+# Storage configuration - adjust based on your storage classes
+persistence:
+  enabled: true
+  storageClass: "fast"  # Change to your preferred storage class
+  size: 20Gi
+
+# Production configuration
+app:
+  config:
+    flaskEnv: production
+    nodeEnv: production
+    corsOrigins: "https://islamic-app.example.com"
+  secrets:
+    secretKey: "CHANGE-ME-IN-PRODUCTION"
+    jwtSecretKey: "CHANGE-ME-IN-PRODUCTION"
+
+postgresql:
+  auth:
+    postgresPassword: "CHANGE-ME-IN-PRODUCTION"

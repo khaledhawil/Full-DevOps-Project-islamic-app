@@ -44,6 +44,14 @@ resource "aws_security_group" "jenkins" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  # SonarQube web interface
+  ingress {
+    from_port   = 9000
+    to_port     = 9000
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   # HTTP
   ingress {
     from_port   = 80
@@ -161,8 +169,8 @@ resource "aws_iam_instance_profile" "jenkins" {
 # User Data script for Jenkins installation
 locals {
   user_data = base64encode(templatefile("${path.module}/user_data.sh", {
-    rds_endpoint     = var.rds_endpoint
     eks_cluster_name = var.eks_cluster_name
+    aws_region       = "us-west-2"
   }))
 }
 

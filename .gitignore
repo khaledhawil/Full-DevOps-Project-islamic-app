@@ -48,6 +48,11 @@ coverage/
 *.lcov
 .nyc_output
 
+# SonarQube
+.sonar/
+.scannerwork/
+sonar-scanner-*/
+
 # ESLint cache
 .eslintcache
 
