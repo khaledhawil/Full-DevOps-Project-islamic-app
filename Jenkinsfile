@@ -31,6 +31,11 @@ pipeline {
             description: 'Force build even if no changes detected'
         )
         booleanParam(
+            name: 'TEST_INFRASTRUCTURE',
+            defaultValue: false,
+            description: 'Test infrastructure changes by building both components'
+        )
+        booleanParam(
             name: 'SKIP_SECURITY_SCAN',
             defaultValue: false,
             description: 'Skip security scanning'
@@ -51,9 +56,12 @@ pipeline {
                     env.GIT_COMMIT_SHORT = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
                     env.BUILD_TAG = "${env.BUILD_NUMBER}-${env.GIT_COMMIT_SHORT}"
                     
-                    sendSlackNotification("🚀 **Build Started**", 
-                        "Build #${env.BUILD_NUMBER} started\\nCommit: ${env.GIT_COMMIT_SHORT}", 
-                        "good")
+                    sendDetailedSlackNotification(
+                        "Pipeline Started", 
+                        "STARTED",
+                        "*Started by:* ${env.BUILD_USER ?: 'SCM Change'}\n*Commit:* ${env.GIT_COMMIT_SHORT}",
+                        ":rocket:"
+                    )
                 }
             }
         }
@@ -65,6 +73,14 @@ pipeline {
             steps {
                 script {
                     def changes = detectChanges()
+                    
+                    // Override detection if testing infrastructure
+                    if (params.TEST_INFRASTRUCTURE) {
+                        echo "🔧 TEST_INFRASTRUCTURE parameter enabled - building both components"
+                        changes.frontend = true
+                        changes.backend = true
+                    }
+                    
                     env.BUILD_FRONTEND = changes.frontend.toString()
                     env.BUILD_BACKEND = changes.backend.toString()
                     
@@ -74,9 +90,12 @@ pipeline {
                     
                     if (!changes.frontend && !changes.backend) {
                         echo "✅ No application code changes detected. Skipping builds."
-                        sendSlackNotification("✅ **No Changes - Build Skipped**", 
-                            "No frontend or backend changes detected in this commit. Pipeline completed without building.", 
-                            "good")
+                        sendDetailedSlackNotification(
+                            "Change Detection Complete", 
+                            "SUCCESS",
+                            ":mag: *No application changes detected*\n:fast_forward: Build will be skipped\n:white_check_mark: Pipeline completed without building",
+                            ":white_check_mark:"
+                        )
                         
                         env.BUILD_FRONTEND = 'false'
                         env.BUILD_BACKEND = 'false'
@@ -90,9 +109,13 @@ pipeline {
                         if (changes.frontend) buildMessage.add("Frontend")
                         if (changes.backend) buildMessage.add("Backend")
                         
-                        sendSlackNotification("🔄 **Starting Build**", 
-                            "Changes detected. Building: ${buildMessage.join(' and ')}", 
-                            "good")
+                        def buildComponents = buildMessage.join(' and ')
+                        sendDetailedSlackNotification(
+                            "Change Detection Complete", 
+                            "SUCCESS",
+                            ":mag: *Changes detected in:* ${buildComponents}\n:building_construction: Proceeding with build...",
+                            ":arrows_counterclockwise:"
+                        )
                     }
                 }
             }
@@ -114,11 +137,22 @@ pipeline {
                             env.BUILD_FRONTEND = 'true'
                             env.BUILD_BACKEND = 'true'
                             break
+                        case 'auto':
+                            // Keep existing values from change detection
+                            // But override if TEST_INFRASTRUCTURE is enabled
+                            if (params.TEST_INFRASTRUCTURE) {
+                                env.BUILD_FRONTEND = 'true'
+                                env.BUILD_BACKEND = 'true'
+                                echo "🔧 TEST_INFRASTRUCTURE enabled - overriding to build both"
+                            }
+                            break
                     }
                     
                     echo "📋 Build Configuration:"
                     echo "Build Frontend: ${env.BUILD_FRONTEND}"
                     echo "Build Backend: ${env.BUILD_BACKEND}"
+                    echo "Force Build: ${params.FORCE_BUILD}"
+                    echo "Test Infrastructure: ${params.TEST_INFRASTRUCTURE}"
                 }
             }
         }
@@ -174,33 +208,41 @@ sonar.test.inclusions=**/*test*/**,**/*spec*/**
                                     def qg = waitForQualityGate()
                                     if (qg.status != 'OK') {
                                         echo "⚠️ SonarQube Quality Gate: ${qg.status}"
-                                        sendSlackNotification(
-                                            "⚠️ **Code Quality Warning**", 
-                                            "SonarQube Quality Gate status: ${qg.status}", 
-                                            "warning"
+                                        sendDetailedSlackNotification(
+                                            "SonarQube Analysis", 
+                                            "WARNING",
+                                            ":warning: *Quality Gate Status:* ${qg.status}\n:chart_with_downwards_trend: Code quality issues detected\n:link: *SonarQube Dashboard:* ${SONAR_HOST_URL}/dashboard?id=islamic-app",
+                                            ":chart_with_upwards_trend:"
                                         )
                                     } else {
                                         echo "✅ SonarQube Quality Gate: PASSED"
-                                        sendSlackNotification(
-                                            "✅ **Code Quality Passed**", 
-                                            "SonarQube Quality Gate: PASSED", 
-                                            "good"
+                                        sendDetailedSlackNotification(
+                                            "SonarQube Analysis Completed", 
+                                            "PASSED",
+                                            ":white_check_mark: *Quality Gate:* PASSED\n:chart_with_upwards_trend: Code quality standards met\n:link: *SonarQube Dashboard:* ${SONAR_HOST_URL}/dashboard?id=islamic-app",
+                                            ":chart_with_upwards_trend:"
                                         )
                                     }
                                 }
                             } catch (Exception e) {
                                 echo "⚠️ SonarQube Quality Gate check failed or plugin not available: ${e.message}"
-                                sendSlackNotification(
-                                    "ℹ️ **Code Quality Analysis Complete**", 
-                                    "SonarQube analysis completed. Quality Gate plugin may not be available.", 
-                                    "good"
+                                sendDetailedSlackNotification(
+                                    "SonarQube Analysis Completed", 
+                                    "SUCCESS",
+                                    ":information_source: Analysis completed successfully\n:warning: Quality Gate plugin may not be available\n:link: *SonarQube Dashboard:* ${SONAR_HOST_URL}/dashboard?id=islamic-app",
+                                    ":chart_with_upwards_trend:"
                                 )
                             }
                         }
                         
                     } catch (Exception e) {
                         echo "⚠️ SonarQube analysis failed: ${e.message}"
-                        sendSlackNotification("⚠️ **SonarQube Failed**", "SonarQube analysis failed: ${e.message}", "warning")
+                        sendDetailedSlackNotification(
+                            "SonarQube Analysis Failed", 
+                            "FAILED",
+                            ":x: *Error:* ${e.message}\n:warning: Code quality analysis could not be completed",
+                            ":chart_with_downwards_trend:"
+                        )
                     }
                 }
             }
@@ -219,9 +261,21 @@ sonar.test.inclusions=**/*test*/**,**/*spec*/**
                             sh "docker tag ${env.FRONTEND_IMAGE}:${env.BUILD_TAG} ${env.FRONTEND_IMAGE}:latest"
                             env.FRONTEND_IMAGE_TAG = env.BUILD_TAG
                             echo "✅ Frontend build completed: ${env.FRONTEND_IMAGE}:${env.BUILD_TAG}"
+                            
+                            sendDetailedSlackNotification(
+                                "Frontend Build Completed", 
+                                "SUCCESS",
+                                ":art: *Frontend Image:* ${env.FRONTEND_IMAGE}:${env.BUILD_TAG}\n:docker: Build completed successfully",
+                                ":art:"
+                            )
                         }
                     } catch (Exception e) {
-                        sendSlackNotification("❌ **Frontend Build Failed**", "Frontend build failed: ${e.message}", "danger")
+                        sendDetailedSlackNotification(
+                            "Frontend Build Failed", 
+                            "FAILED",
+                            ":x: *Error:* ${e.message}\n:warning: Frontend build could not be completed",
+                            ":art:"
+                        )
                         throw e
                     }
                 }
@@ -241,9 +295,21 @@ sonar.test.inclusions=**/*test*/**,**/*spec*/**
                             sh "docker tag ${env.BACKEND_IMAGE}:${env.BUILD_TAG} ${env.BACKEND_IMAGE}:latest"
                             env.BACKEND_IMAGE_TAG = env.BUILD_TAG
                             echo "✅ Backend build completed: ${env.BACKEND_IMAGE}:${env.BUILD_TAG}"
+                            
+                            sendDetailedSlackNotification(
+                                "Backend Build Completed", 
+                                "SUCCESS",
+                                ":gear: *Backend Image:* ${env.BACKEND_IMAGE}:${env.BUILD_TAG}\n:docker: Build completed successfully",
+                                ":gear:"
+                            )
                         }
                     } catch (Exception e) {
-                        sendSlackNotification("❌ **Backend Build Failed**", "Backend build failed: ${e.message}", "danger")
+                        sendDetailedSlackNotification(
+                            "Backend Build Failed", 
+                            "FAILED",
+                            ":x: *Error:* ${e.message}\n:warning: Backend build could not be completed",
+                            ":gear:"
+                        )
                         throw e
                     }
                 }
@@ -287,17 +353,23 @@ sonar.test.inclusions=**/*test*/**,**/*spec*/**
             post {
                 success {
                     script {
-                        def message = "🛡️ **Security Scan Completed**\\n"
-                        message += "All security scans completed successfully!\\n\\n"
+                        def message = ":shield: *Security Scan Completed* :white_check_mark:\n" +
+                                     "*Job:* ${JOB_NAME}\n" +
+                                     "*Build:* #${BUILD_NUMBER}\n" +
+                                     "*Branch:* ${env.BRANCH_NAME ?: 'master'}\n" +
+                                     "*Status:* SUCCESS :white_check_mark:\n" +
+                                     ":shield: *Security Summary:*\n"
                         
                         if (env.BUILD_FRONTEND == 'true') {
-                            message += "🎨 Frontend scan: ✅ Completed\\n"
+                            message += ":art: *Frontend scan:* :white_check_mark: Completed\n"
                         }
                         if (env.BUILD_BACKEND == 'true') {
-                            message += "⚙️ Backend scan: ✅ Completed\\n"
+                            message += ":gear: *Backend scan:* :white_check_mark: Completed\n"
                         }
                         
-                        sendSlackNotification("🛡️ **Security Scan Completed**", message, "good")
+                        message += ":link: *Full Reports:* ${BUILD_URL}artifact/security-reports/\n*Build URL:* ${BUILD_URL}"
+                        
+                        sendSlackNotification("Security Scan Completed", message, "good")
                     }
                 }
             }
@@ -324,6 +396,15 @@ sonar.test.inclusions=**/*test*/**,**/*spec*/**
                             sh "docker push ${env.FRONTEND_IMAGE}:${env.BUILD_TAG}"
                             sh "docker push ${env.FRONTEND_IMAGE}:latest"
                             echo "✅ Frontend image pushed: ${env.FRONTEND_IMAGE}:${env.BUILD_TAG}"
+                            
+                            sendDetailedSlackNotification(
+                                "Docker Image Pushed Successfully", 
+                                "SUCCESS",
+                                ":docker: *Frontend Image:* ${env.FRONTEND_IMAGE}:${env.BUILD_TAG}\n" +
+                                ":arrow_up: *Registry:* Docker Hub\n" +
+                                ":white_check_mark: Push completed successfully",
+                                ":docker:"
+                            )
                         }
                     }
                 }
@@ -337,6 +418,15 @@ sonar.test.inclusions=**/*test*/**,**/*spec*/**
                             sh "docker push ${env.BACKEND_IMAGE}:${env.BUILD_TAG}"
                             sh "docker push ${env.BACKEND_IMAGE}:latest"
                             echo "✅ Backend image pushed: ${env.BACKEND_IMAGE}:${env.BUILD_TAG}"
+                            
+                            sendDetailedSlackNotification(
+                                "Docker Image Pushed Successfully", 
+                                "SUCCESS",
+                                ":docker: *Backend Image:* ${env.BACKEND_IMAGE}:${env.BUILD_TAG}\n" +
+                                ":arrow_up: *Registry:* Docker Hub\n" +
+                                ":white_check_mark: Push completed successfully",
+                                ":docker:"
+                            )
                         }
                     }
                 }
@@ -379,8 +469,23 @@ sonar.test.inclusions=**/*test*/**,**/*spec*/**
                         }
                         
                         echo "✅ Kubernetes manifests updated and pushed"
+                        
+                        sendDetailedSlackNotification(
+                            "Deployment Update Completed", 
+                            "SUCCESS",
+                            ":kubernetes: *Kubernetes manifests updated*\n" +
+                            ":rocket: *Image tags updated to:* ${env.BUILD_TAG}\n" +
+                            ":white_check_mark: Changes pushed to repository",
+                            ":kubernetes:"
+                        )
                     } catch (Exception e) {
-                        sendSlackNotification("❌ **K8s Update Failed**", "Failed to update Kubernetes manifests: ${e.message}", "danger")
+                        sendDetailedSlackNotification(
+                            "Deployment Update Failed", 
+                            "FAILED",
+                            ":x: *Issue:* Could not update Kubernetes deployment manifest\n" +
+                            ":warning: *Error:* ${e.message}",
+                            ":kubernetes:"
+                        )
                         throw e
                     }
                 }
@@ -391,26 +496,38 @@ sonar.test.inclusions=**/*test*/**,**/*spec*/**
     post {
         success {
             script {
-                def message = "✅ **Build Successful**\\n"
-                message += "Build #${env.BUILD_NUMBER} completed successfully!\\n\\n"
+                def message = ":jenkins: *Pipeline Completed Successfully* :white_check_mark:\n" +
+                             "*Job:* ${JOB_NAME}\n" +
+                             "*Build:* #${BUILD_NUMBER}\n" +
+                             "*Status:* SUCCESS :white_check_mark:\n" +
+                             "*Duration:* ${currentBuild.durationString}\n"
                 
                 if (env.BUILD_FRONTEND == 'true') {
-                    message += "🎨 Frontend: `${FRONTEND_IMAGE}:${env.BUILD_TAG}`\\n"
+                    message += ":art: *Frontend:* ${FRONTEND_IMAGE}:${env.BUILD_TAG}\n"
                 }
                 if (env.BUILD_BACKEND == 'true') {
-                    message += "⚙️ Backend: `${BACKEND_IMAGE}:${env.BUILD_TAG}`\\n"
+                    message += ":gear: *Backend:* ${BACKEND_IMAGE}:${env.BUILD_TAG}\n"
                 }
                 
-                message += "\\n🔗 [View Build](${env.BUILD_URL})"
+                message += ":link: *Build Details:* ${env.BUILD_URL}\n" +
+                          ":link: *Console:* ${env.BUILD_URL}console"
                 
-                sendSlackNotification("✅ **Build Successful**", message, "good")
+                sendSlackNotification("Pipeline Completed Successfully", message, "good")
             }
         }
         failure {
             script {
-                sendSlackNotification("❌ **Build Failed**", 
-                    "Build #${env.BUILD_NUMBER} failed\\n\\n🔗 [View Build](${env.BUILD_URL})", 
-                    "danger")
+                def message = ":jenkins: *Pipeline Failed* :x:\n" +
+                             "*Job:* ${JOB_NAME}\n" +
+                             "*Build:* #${BUILD_NUMBER}\n" +
+                             "*Status:* FAILED :x:\n" +
+                             "*Duration:* ${currentBuild.durationString}\n" +
+                             "*Failed Stage:* ${env.STAGE_NAME ?: 'Unknown'}\n" +
+                             ":link: *Build Details:* ${env.BUILD_URL}\n" +
+                             ":link: *Console:* ${env.BUILD_URL}console\n" +
+                             ":warning: Please check the logs for more details"
+                
+                sendSlackNotification("Pipeline Failed", message, "danger")
             }
         }
         cleanup {
@@ -433,116 +550,79 @@ def detectChanges() {
     
     try {
         def lastCommit = env.GIT_PREVIOUS_SUCCESSFUL_COMMIT ?: env.GIT_PREVIOUS_COMMIT
+        def changedFiles = []
         
         if (!lastCommit) {
             def recentChanges = sh(
-                script: "git diff --name-only HEAD~1 HEAD 2>/dev/null || echo 'all'",
+                script: "git diff --name-only HEAD~1 HEAD 2>/dev/null || echo ''",
                 returnStdout: true
             ).trim()
             
-            if (recentChanges == 'all') {
-                echo "⚠️ First build or unable to detect changes, building both components"
-                changes.frontend = true
-                changes.backend = true
+            if (!recentChanges) {
+                echo "⚠️ No changes detected or first build, skipping all builds"
                 return changes
             }
             
-            def changedFiles = recentChanges.split('\n')
-            echo "📁 Recent changed files: ${changedFiles.join(', ')}"
-            
-            changedFiles.each { file ->
-                if (file.startsWith('frontend/') || 
-                    file.contains('frontend') || 
-                    file.startsWith('k8s/05-frontend.yaml') ||
-                    file.contains('package.json') ||
-                    file.contains('tsconfig.json') ||
-                    file.contains('nginx.conf') ||
-                    file.endsWith('.tsx') ||
-                    file.endsWith('.ts') ||
-                    file.endsWith('.css') ||
-                    file.endsWith('.scss') ||
-                    file.endsWith('.js') ||
-                    file.endsWith('.jsx')) {
-                    changes.frontend = true
-                }
-                
-                if (file.startsWith('backend/') || 
-                    file.contains('backend') || 
-                    file.startsWith('k8s/04-backend.yaml') ||
-                    file.contains('requirements.txt') ||
-                    file.contains('app.py') ||
-                    file.contains('database.py') ||
-                    file.endsWith('.py') ||
-                    file.startsWith('database/')) {
-                    changes.backend = true
-                }
-                
-                if (file == 'Jenkinsfile' || 
-                    file.contains('Jenkinsfile') ||
-                    file.startsWith('k8s/') ||
-                    file.startsWith('helm/') ||
-                    file.startsWith('terraform/') ||
-                    file.startsWith('ansible/') ||
-                    file.contains('docker-compose') ||
-                    file.endsWith('Dockerfile')) {
-                    echo "🔧 Infrastructure file changed: ${file}, triggering both builds for testing"
-                    changes.frontend = true
-                    changes.backend = true
-                }
-            }
+            changedFiles = recentChanges.split('\n')
         } else {
-            def changedFiles = sh(
+            def diffOutput = sh(
                 script: "git diff --name-only ${lastCommit} HEAD",
                 returnStdout: true
-            ).trim().split('\n')
+            ).trim()
             
-            echo "📁 Changed files since last build: ${changedFiles.join(', ')}"
+            if (!diffOutput) {
+                echo "✅ No changes detected since last successful build"
+                return changes
+            }
             
-            changedFiles.each { file ->
-                if (file.startsWith('frontend/') || 
-                    file.contains('frontend') || 
-                    file.startsWith('k8s/05-frontend.yaml') ||
-                    file.contains('package.json') ||
-                    file.contains('tsconfig.json') ||
-                    file.contains('nginx.conf') ||
-                    file.endsWith('.tsx') ||
-                    file.endsWith('.ts') ||
-                    file.endsWith('.css') ||
-                    file.endsWith('.scss') ||
-                    file.endsWith('.js') ||
-                    file.endsWith('.jsx')) {
-                    changes.frontend = true
-                }
-                
-                if (file.startsWith('backend/') || 
-                    file.contains('backend') || 
-                    file.startsWith('k8s/04-backend.yaml') ||
-                    file.contains('requirements.txt') ||
-                    file.contains('app.py') ||
-                    file.contains('database.py') ||
-                    file.endsWith('.py') ||
-                    file.startsWith('database/')) {
-                    changes.backend = true
-                }
-                
-                if (file == 'Jenkinsfile' || 
-                    file.contains('Jenkinsfile') ||
-                    file.startsWith('k8s/') ||
-                    file.startsWith('helm/') ||
-                    file.startsWith('terraform/') ||
-                    file.startsWith('ansible/') ||
-                    file.contains('docker-compose') ||
-                    file.endsWith('Dockerfile')) {
-                    echo "🔧 Infrastructure file changed: ${file}, triggering both builds for testing"
-                    changes.frontend = true
-                    changes.backend = true
-                }
+            changedFiles = diffOutput.split('\n')
+        }
+        
+        echo "📁 Changed files: ${changedFiles.join(', ')}"
+        
+        changedFiles.each { file ->
+            // Frontend specific changes
+            if (file.startsWith('frontend/') || 
+                file.startsWith('k8s/05-frontend.yaml') ||
+                (file.contains('package.json') && file.startsWith('frontend/')) ||
+                (file.contains('tsconfig.json') && file.startsWith('frontend/')) ||
+                (file.contains('nginx.conf') && file.startsWith('frontend/')) ||
+                file.endsWith('.tsx') ||
+                file.endsWith('.ts') ||
+                file.endsWith('.css') ||
+                file.endsWith('.scss') ||
+                (file.endsWith('.js') && file.startsWith('frontend/')) ||
+                (file.endsWith('.jsx') && file.startsWith('frontend/'))) {
+                echo "🎨 Frontend change detected: ${file}"
+                changes.frontend = true
+            }
+            
+            // Backend specific changes
+            if (file.startsWith('backend/') || 
+                file.startsWith('k8s/04-backend.yaml') ||
+                file.startsWith('database/') ||
+                (file.contains('requirements.txt') && file.startsWith('backend/')) ||
+                (file.contains('app.py') && file.startsWith('backend/')) ||
+                (file.contains('database.py') && file.startsWith('backend/')) ||
+                (file.endsWith('.py') && (file.startsWith('backend/') || file.startsWith('database/')))) {
+                echo "⚙️ Backend change detected: ${file}"
+                changes.backend = true
             }
         }
+        
+        // Log the detection results
+        if (!changes.frontend && !changes.backend) {
+            echo "✅ No frontend or backend code changes detected"
+            echo "📝 Changed files were: ${changedFiles.join(', ')}"
+            echo "🚫 These files don't trigger application builds"
+        }
+        
     } catch (Exception e) {
-        echo "⚠️ Error detecting changes: ${e.message}, building both components"
-        changes.frontend = true
-        changes.backend = true
+        echo "⚠️ Error detecting changes: ${e.message}"
+        echo "🔧 Defaulting to no builds due to detection error"
+        // Don't default to building everything - be conservative
+        changes.frontend = false
+        changes.backend = false
     }
     
     return changes
@@ -567,26 +647,39 @@ def scanImage(imageName, component) {
         
         if (criticalVulns > 0) {
             echo "⚠️ Found ${criticalVulns} HIGH/CRITICAL vulnerabilities in ${component}"
-            sendSlackNotification(
-                "⚠️ **Security Alert**", 
-                "Found ${criticalVulns} HIGH/CRITICAL vulnerabilities in ${component} image", 
-                "warning"
+            sendDetailedSlackNotification(
+                "Trivy Security Scan Complete", 
+                "WARNING",
+                ":warning: *CRITICAL VULNERABILITIES FOUND*\n" +
+                ":shield: *Image:* ${imageName}\n" +
+                ":red_circle: *Critical/High Issues:* ${criticalVulns}\n" +
+                ":exclamation: *IMMEDIATE ACTION REQUIRED*\n" +
+                ":point_right: Review critical vulnerabilities before production deployment\n" +
+                ":link: *Full Report:* ${BUILD_URL}artifact/security-reports/",
+                ":shield:"
             )
         } else {
             echo "✅ No HIGH/CRITICAL vulnerabilities found in ${component}"
-            sendSlackNotification(
-                "✅ **Scan Clean**", 
-                "${component} image scan completed - No HIGH/CRITICAL vulnerabilities found", 
-                "good"
+            sendDetailedSlackNotification(
+                "Trivy Security Scan Complete", 
+                "SUCCESS",
+                ":shield: *Image:* ${imageName}\n" +
+                ":white_check_mark: *Status:* NO CRITICAL VULNERABILITIES FOUND\n" +
+                ":green_circle: Security scan passed\n" +
+                ":link: *Full Report:* ${BUILD_URL}artifact/security-reports/",
+                ":shield:"
             )
         }
         
     } catch (Exception e) {
         echo "⚠️ Security scan failed for ${component}: ${e.message}"
-        sendSlackNotification(
-            "⚠️ **Scan Failed**", 
-            "Security scan failed for ${component}: ${e.message}", 
-            "warning"
+        sendDetailedSlackNotification(
+            "Security Scan Failed", 
+            "FAILED",
+            ":x: *Error:* ${e.message}\n" +
+            ":shield: *Component:* ${component}\n" +
+            ":warning: Security scan could not be completed",
+            ":shield:"
         )
     }
 }
@@ -612,15 +705,55 @@ def sendSlackNotification(title, message, color = "good") {
         slackSend(
             channel: env.SLACK_CHANNEL,
             color: color,
-            message: ":jenkins: *${title}*\\n" +
-                     "*Job:* ${JOB_NAME}\\n" +
-                     "*Build:* #${BUILD_NUMBER}\\n" +
-                     "*Branch:* ${env.BRANCH_NAME ?: 'master'}\\n" +
-                     "*Message:* ${message}\\n" +
-                     "*Build URL:* ${BUILD_URL}",
+            message: message,
             tokenCredentialId: env.SLACK_CREDENTIAL_ID
         )
     } catch (Exception e) {
         echo "Failed to send Slack notification: ${e.message}"
     }
+}
+
+def sendDetailedSlackNotification(stage, status, details = "", emoji = ":jenkins:") {
+    def statusEmoji = ""
+    def statusColor = "good"
+    
+    switch(status.toUpperCase()) {
+        case "SUCCESS":
+        case "PASSED":
+            statusEmoji = ":white_check_mark:"
+            statusColor = "good"
+            break
+        case "FAILED":
+        case "FAILURE":
+            statusEmoji = ":x:"
+            statusColor = "danger"
+            break
+        case "WARNING":
+        case "UNSTABLE":
+            statusEmoji = ":warning:"
+            statusColor = "warning"
+            break
+        case "STARTED":
+        case "RUNNING":
+            statusEmoji = ":arrows_counterclockwise:"
+            statusColor = "#36a64f"
+            break
+        default:
+            statusEmoji = ":information_source:"
+            statusColor = "good"
+    }
+    
+    def message = "${emoji} *${stage}* ${statusEmoji}\n" +
+                  "*Job:* ${JOB_NAME}\n" +
+                  "*Build:* #${BUILD_NUMBER}\n" +
+                  "*Branch:* ${env.BRANCH_NAME ?: 'master'}\n" +
+                  "*Status:* ${status} ${statusEmoji}\n"
+    
+    if (details) {
+        message += "${details}\n"
+    }
+    
+    message += "*Build URL:* ${BUILD_URL}"
+    
+    sendSlackNotification(stage, message, statusColor)
 }
