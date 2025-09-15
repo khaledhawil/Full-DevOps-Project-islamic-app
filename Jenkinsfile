@@ -369,15 +369,36 @@ pipeline {
                         echo "📝 Updating Kubernetes manifests..."
                         updateK8sManifests()
                         
-                        // Commit and push changes
+                        // Commit and push changes with proper credential handling
                         withCredentials([usernamePassword(credentialsId: 'github', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
-                            sh """
+                            sh '''
                                 git config user.name "Jenkins CI"
                                 git config user.email "jenkins@islamic-app.local"
-                                git add k8s/
-                                git commit -m "🚀 Update image tags to ${env.BUILD_TAG} [skip ci]" || echo "No changes to commit"
-                                git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/\$(git config --get remote.origin.url | sed 's/.*github.com[:/]//;s/.git\$//')/ HEAD:master
-                            """
+                                
+                                # Check if there are changes to commit
+                                if git diff --quiet k8s/; then
+                                    echo "No changes to commit in k8s manifests"
+                                else
+                                    echo "Committing k8s manifest changes..."
+                                    git add k8s/
+                                    git commit -m "🚀 Update image tags to $BUILD_TAG [skip ci]"
+                                    
+                                    # Pull latest changes before pushing to avoid conflicts
+                                    echo "Pulling latest changes from remote..."
+                                    git pull --rebase origin master || {
+                                        echo "⚠️ Rebase conflicts detected, attempting to resolve..."
+                                        git rebase --abort
+                                        git pull --no-rebase origin master
+                                    }
+                                    
+                                    # Push changes using git credential helper
+                                    echo "Pushing changes to remote repository..."
+                                    git config credential.helper "store --file=.git-credentials"
+                                    echo "https://'$GIT_USERNAME':'$GIT_PASSWORD'@github.com" > .git-credentials
+                                    git push origin HEAD:master
+                                    rm -f .git-credentials
+                                fi
+                            '''
                         }
                         
                         echo "✅ Kubernetes manifests updated and pushed"
