@@ -141,34 +141,27 @@ pipeline {
                             sonar.test.inclusions=**/*test*/**,**/*spec*/**
                             '''
                         
-                        // Run SonarQube analysis
+                        // Run SonarQube analysis with error handling
                         withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_TOKEN')]) {
                             sh '''
                                 echo "Running SonarQube analysis..."
-                                sonar-scanner -Dsonar.projectBaseDir=. || true
+                                if command -v sonar-scanner >/dev/null 2>&1; then
+                                    sonar-scanner -Dsonar.projectBaseDir=. || echo "SonarQube scan failed, continuing..."
+                                else
+                                    echo "⚠️ sonar-scanner not found. Skipping SonarQube analysis."
+                                    echo "Please install SonarQube Scanner in Jenkins to enable code quality analysis."
+                                fi
                             '''
                         }
                         
-                        // Wait for SonarQube quality gate
-                        timeout(time: 5, unit: 'MINUTES') {
-                            def qg = waitForQualityGate()
-                            if (qg.status != 'OK') {
-                                echo "⚠️ SonarQube Quality Gate: ${qg.status}"
-                                sendSlackNotification(
-                                    "⚠️ **Code Quality Warning**", 
-                                    "SonarQube Quality Gate status: ${qg.status}\\nCheck: ${env.SONAR_HOST_URL}/dashboard?id=islamic-app", 
-                                    "warning"
-                                )
-                                // Don't fail the build, just warn
-                            } else {
-                                echo "✅ SonarQube Quality Gate: PASSED"
-                                sendSlackNotification(
-                                    "✅ **Code Quality Check Passed**", 
-                                    "SonarQube analysis completed successfully\\nView report: ${env.SONAR_HOST_URL}/dashboard?id=islamic-app", 
-                                    "good"
-                                )
-                            }
-                        }
+                        // Skip SonarQube quality gate check until plugin is installed
+                        echo "ℹ️ SonarQube Quality Gate check skipped"
+                        echo "To enable quality gate checks, install the 'SonarQube Quality Gates' plugin in Jenkins"
+                        sendSlackNotification(
+                            "ℹ️ **Code Quality Analysis**", 
+                            "SonarQube analysis attempted (scanner may not be available)\\nQuality gate check requires additional plugin installation", 
+                            "warning"
+                        )
                         
                     } catch (Exception e) {
                         echo "⚠️ SonarQube analysis failed: ${e.message}"
@@ -440,6 +433,12 @@ def detectChanges() {
                 if (file.startsWith('backend/') || file.contains('backend') || file.startsWith('k8s/04-backend.yaml')) {
                     changes.backend = true
                 }
+                // Jenkinsfile changes should trigger both builds for testing
+                if (file == 'Jenkinsfile' || file.contains('Jenkinsfile')) {
+                    echo "🔧 Jenkinsfile changed, triggering both builds for testing"
+                    changes.frontend = true
+                    changes.backend = true
+                }
             }
         } else {
             // Use Jenkins built-in commit comparison
@@ -455,6 +454,12 @@ def detectChanges() {
                     changes.frontend = true
                 }
                 if (file.startsWith('backend/') || file.contains('backend') || file.startsWith('k8s/04-backend.yaml')) {
+                    changes.backend = true
+                }
+                // Jenkinsfile changes should trigger both builds for testing
+                if (file == 'Jenkinsfile' || file.contains('Jenkinsfile')) {
+                    echo "🔧 Jenkinsfile changed, triggering both builds for testing"
+                    changes.frontend = true
                     changes.backend = true
                 }
             }
