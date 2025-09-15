@@ -21,7 +21,7 @@ pipeline {
         DOCKER_CREDENTIALS = credentials('docker-hub')
         GIT_CREDENTIALS = credentials('github')
         TRIVY_VERSION = '0.48.0'
-        SONAR_HOST_URL = 'http://sonarqube:9000'
+        SONAR_HOST_URL = 'http://localhost:9000'
     }
     
     parameters {
@@ -147,11 +147,15 @@ pipeline {
                                 echo "Running SonarQube analysis with Docker container..."
                                 
                                 # Check if we can reach SonarQube container
+                                # Check SonarQube accessibility - try multiple endpoints
                                 if curl -f ${SONAR_HOST_URL}/api/system/status >/dev/null 2>&1; then
                                     echo "✅ SonarQube server is accessible at ${SONAR_HOST_URL}"
+                                elif curl -f http://host.docker.internal:9000/api/system/status >/dev/null 2>&1; then
+                                    echo "✅ SonarQube server found at host.docker.internal:9000"
+                                    SONAR_HOST_URL="http://host.docker.internal:9000"
                                 else
-                                    echo "⚠️ SonarQube server not accessible at ${SONAR_HOST_URL}"
-                                    echo "Please ensure SonarQube Docker container is running"
+                                    echo "⚠️ SonarQube server not accessible"
+                                    echo "Trying to connect to SonarQube container directly..."
                                 fi
                                 
                                 # Use Docker to run sonar-scanner if not installed locally
@@ -160,10 +164,18 @@ pipeline {
                                     sonar-scanner -Dsonar.projectBaseDir=. -Dsonar.host.url=${SONAR_HOST_URL} -Dsonar.login=${SONAR_TOKEN}
                                 else
                                     echo "Using Docker sonar-scanner..."
+                                    # Try with host network first, then bridge network
                                     docker run --rm \
                                         --network host \
                                         -v $(pwd):/usr/src \
                                         -e SONAR_HOST_URL=${SONAR_HOST_URL} \
+                                        -e SONAR_LOGIN=${SONAR_TOKEN} \
+                                        sonarsource/sonar-scanner-cli:latest \
+                                        -Dsonar.projectBaseDir=/usr/src || \
+                                    docker run --rm \
+                                        --add-host=host.docker.internal:host-gateway \
+                                        -v $(pwd):/usr/src \
+                                        -e SONAR_HOST_URL=http://host.docker.internal:9000 \
                                         -e SONAR_LOGIN=${SONAR_TOKEN} \
                                         sonarsource/sonar-scanner-cli:latest \
                                         -Dsonar.projectBaseDir=/usr/src
@@ -383,19 +395,42 @@ pipeline {
                                     git add k8s/
                                     git commit -m "🚀 Update image tags to $BUILD_TAG [skip ci]"
                                     
-                                    # Pull latest changes before pushing to avoid conflicts
-                                    echo "Pulling latest changes from remote..."
-                                    git pull --rebase origin master || {
-                                        echo "⚠️ Rebase conflicts detected, attempting to resolve..."
-                                        git rebase --abort
-                                        git pull --no-rebase origin master
-                                    }
+                                    # Switch to master branch and handle conflicts properly
+                                    echo "Ensuring we're on master branch..."
+                                    git checkout master 2>/dev/null || git checkout -b master
+                                    
+                                    echo "Fetching latest changes from remote..."
+                                    git fetch origin master
+                                    
+                                    # Check if we need to merge remote changes
+                                    LOCAL=$(git rev-parse HEAD)
+                                    REMOTE=$(git rev-parse origin/master)
+                                    
+                                    if [ "$LOCAL" != "$REMOTE" ]; then
+                                        echo "Remote has new changes, resetting to remote and re-applying our changes..."
+                                        # Save our manifest changes
+                                        git stash push -m "Temporary manifest changes"
+                                        
+                                        # Reset to remote master
+                                        git reset --hard origin/master
+                                        
+                                        # Re-apply our manifest updates
+                                        echo "Re-applying manifest updates..."
+                                        sed -i "s|image: khaledhawil/islamic-app_frontend:.*|image: khaledhawil/islamic-app_frontend:$BUILD_TAG|g" k8s/05-frontend.yaml
+                                        sed -i "s|image: khaledhawil/islamic-app_backend:.*|image: khaledhawil/islamic-app_backend:$BUILD_TAG|g" k8s/04-backend.yaml
+                                        
+                                        # Commit if there are changes
+                                        if ! git diff --quiet k8s/; then
+                                            git add k8s/
+                                            git commit -m "🚀 Update image tags to $BUILD_TAG [skip ci]"
+                                        fi
+                                    fi
                                     
                                     # Push changes using git credential helper
                                     echo "Pushing changes to remote repository..."
                                     git config credential.helper "store --file=.git-credentials"
                                     echo "https://'$GIT_USERNAME':'$GIT_PASSWORD'@github.com" > .git-credentials
-                                    git push origin HEAD:master
+                                    git push origin master
                                     rm -f .git-credentials
                                 fi
                             '''
