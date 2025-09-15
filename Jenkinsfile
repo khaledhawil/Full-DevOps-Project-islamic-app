@@ -141,27 +141,78 @@ pipeline {
                             sonar.test.inclusions=**/*test*/**,**/*spec*/**
                             '''
                         
-                        // Run SonarQube analysis with error handling
+                        // Run SonarQube analysis with Docker container
                         withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_TOKEN')]) {
                             sh '''
-                                echo "Running SonarQube analysis..."
-                                if command -v sonar-scanner >/dev/null 2>&1; then
-                                    sonar-scanner -Dsonar.projectBaseDir=. || echo "SonarQube scan failed, continuing..."
+                                echo "Running SonarQube analysis with Docker container..."
+                                
+                                # Check if we can reach SonarQube container
+                                if curl -f ${SONAR_HOST_URL}/api/system/status >/dev/null 2>&1; then
+                                    echo "✅ SonarQube server is accessible at ${SONAR_HOST_URL}"
                                 else
-                                    echo "⚠️ sonar-scanner not found. Skipping SonarQube analysis."
-                                    echo "Please install SonarQube Scanner in Jenkins to enable code quality analysis."
+                                    echo "⚠️ SonarQube server not accessible at ${SONAR_HOST_URL}"
+                                    echo "Please ensure SonarQube Docker container is running"
+                                fi
+                                
+                                # Use Docker to run sonar-scanner if not installed locally
+                                if command -v sonar-scanner >/dev/null 2>&1; then
+                                    echo "Using local sonar-scanner..."
+                                    sonar-scanner -Dsonar.projectBaseDir=. -Dsonar.host.url=${SONAR_HOST_URL} -Dsonar.login=${SONAR_TOKEN}
+                                else
+                                    echo "Using Docker sonar-scanner..."
+                                    docker run --rm \
+                                        --network host \
+                                        -v $(pwd):/usr/src \
+                                        -e SONAR_HOST_URL=${SONAR_HOST_URL} \
+                                        -e SONAR_LOGIN=${SONAR_TOKEN} \
+                                        sonarsource/sonar-scanner-cli:latest \
+                                        -Dsonar.projectBaseDir=/usr/src
                                 fi
                             '''
                         }
                         
-                        // Skip SonarQube quality gate check until plugin is installed
-                        echo "ℹ️ SonarQube Quality Gate check skipped"
-                        echo "To enable quality gate checks, install the 'SonarQube Quality Gates' plugin in Jenkins"
-                        sendSlackNotification(
-                            "ℹ️ **Code Quality Analysis**", 
-                            "SonarQube analysis attempted (scanner may not be available)\\nQuality gate check requires additional plugin installation", 
-                            "warning"
-                        )
+                        // Wait for SonarQube Quality Gate (if available)
+                        script {
+                            try {
+                                echo "Checking SonarQube Quality Gate..."
+                                timeout(time: 5, unit: 'MINUTES') {
+                                    // Try to use quality gate if plugin is available
+                                    try {
+                                        def qg = waitForQualityGate()
+                                        if (qg.status != 'OK') {
+                                            echo "⚠️ SonarQube Quality Gate: ${qg.status}"
+                                            sendSlackNotification(
+                                                "⚠️ **Code Quality Warning**", 
+                                                "SonarQube Quality Gate status: ${qg.status}\\nView details: ${env.SONAR_HOST_URL}/dashboard?id=islamic-app", 
+                                                "warning"
+                                            )
+                                        } else {
+                                            echo "✅ SonarQube Quality Gate: PASSED"
+                                            sendSlackNotification(
+                                                "✅ **Code Quality Passed**", 
+                                                "SonarQube Quality Gate: PASSED\\nView report: ${env.SONAR_HOST_URL}/dashboard?id=islamic-app", 
+                                                "good"
+                                            )
+                                        }
+                                    } catch (NoSuchMethodError e) {
+                                        echo "⚠️ SonarQube Quality Gates plugin not installed"
+                                        echo "Install 'SonarQube Quality Gates' plugin to enable quality gate checks"
+                                        sendSlackNotification(
+                                            "ℹ️ **Code Quality Analysis Complete**", 
+                                            "SonarQube analysis completed\\nQuality Gate plugin not available\\nView report: ${env.SONAR_HOST_URL}/dashboard?id=islamic-app", 
+                                            "good"
+                                        )
+                                    }
+                                }
+                            } catch (Exception e) {
+                                echo "⚠️ SonarQube Quality Gate check failed: ${e.message}"
+                                sendSlackNotification(
+                                    "⚠️ **Code Quality Check Failed**", 
+                                    "SonarQube analysis may have failed\\nError: ${e.message}", 
+                                    "warning"
+                                )
+                            }
+                        }
                         
                     } catch (Exception e) {
                         echo "⚠️ SonarQube analysis failed: ${e.message}"
