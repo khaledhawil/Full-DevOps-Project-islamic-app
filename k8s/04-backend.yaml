@@ -34,7 +34,7 @@ spec:
               key: postgres-password
       containers:
       - name: backend
-        image: khaledhawil/islamic-app_backend:15-2e5cb3f
+        image: khaledhawil/islamic-app_backend:16-2daf56e
         # imagePullPolicy: Never  # For local development
         env:
         - name: FLASK_ENV
