@@ -186,6 +186,14 @@ secrets/
 *.key
 *.crt
 *.p12
+*.token
+*.tokens
+*secret*
+*password*
+*credentials*
+myfile
+personal-notes*
+temp-file*
 
 # Monitoring and analytics
 .sentry-native

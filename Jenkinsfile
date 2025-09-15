@@ -12,7 +12,7 @@ pipeline {
     }
     
     environment {
-        DOCKER_REGISTRY = 'khaledhawil'
+        DOCKER_REGISTRY = 'khaledh139857awil'
         PROJECT_NAME = 'islamic-app'
         FRONTEND_IMAGE = "${DOCKER_REGISTRY}/${PROJECT_NAME}_frontend"
         BACKEND_IMAGE = "${DOCKER_REGISTRY}/${PROJECT_NAME}_backend"

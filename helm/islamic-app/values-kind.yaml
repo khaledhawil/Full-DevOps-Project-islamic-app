@@ -18,8 +18,14 @@ image:
 # Service configuration for Kind
 service:
   frontend:
+    type: ClusterIP  # nginx will handle external access
+
+# Nginx configuration for Kind
+nginx:
+  enabled: true
+  service:
     type: NodePort
-    nodePort: 30000
+    nodePort: 30080
 
 # Ingress configuration for Kind
 ingress:
@@ -32,10 +38,6 @@ ingress:
       paths:
         - path: /
           pathType: Prefix
-          service: frontend
-        - path: /api
-          pathType: Prefix
-          service: backend
 
 # Disable autoscaling in Kind for simplicity
 autoscaling:

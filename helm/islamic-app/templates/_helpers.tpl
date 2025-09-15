@@ -113,7 +113,7 @@ Create the name of the service account to use
 Database URL
 */}}
 {{- define "islamic-app.databaseUrl" -}}
-{{- printf "postgresql://%s:%s@postgres:5432/%s" .Values.postgresql.auth.postgresUser .Values.postgresql.auth.postgresPassword .Values.postgresql.auth.postgresDatabase | b64enc }}
+{{- printf "postgresql://%s:%s@%s-postgresql:5432/%s" .Values.postgresql.auth.postgresUser .Values.postgresql.auth.postgresPassword (include "islamic-app.fullname" .) .Values.postgresql.auth.postgresDatabase | b64enc }}
 {{- end }}
 
 {{/*

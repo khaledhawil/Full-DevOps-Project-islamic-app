@@ -172,7 +172,7 @@ spec:
       volumes:
       - name: postgres-storage
         persistentVolumeClaim:
-          claimName: postgres-pvc  # Use original PVC name
+          claimName: {{ include "islamic-app.fullname" . }}-postgres-pvc
       - name: init-script
         configMap:
           name: {{ include "islamic-app.fullname" . }}-postgres-init-script
@@ -182,7 +182,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: postgres  # Keep original service name for compatibility
+  name: {{ include "islamic-app.fullname" . }}-postgresql
   namespace: {{ include "islamic-app.namespace" . }}
   labels:
     {{- include "islamic-app.postgresql.labels" . | nindent 4 }}

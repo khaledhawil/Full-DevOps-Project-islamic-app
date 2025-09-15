@@ -167,8 +167,8 @@ graph TB
 ### CI/CD Pipeline
 | Tool | Purpose | Configuration |
 |------|---------|---------------|
-| **Jenkins** | Continuous Integration/Deployment | - **Containerized deployment**<br>- **Multibranch pipeline** for branch-based builds<br>- **Ignore Git Committer** to prevent infinite webhook loops<br>- Discord integration for build notifications |
-| **Ngrok** | Webhook forwarding for development | - **Tunnel**: `https://911d-41-129-24-45.ngrok-free.app` → `http://localhost:8080`<br>- Enables GitHub webhooks to reach local Jenkins |
+| **Jenkins** | Continuous Integration/Deployment | - **Containerized deployment** for easy management<br>- **Multibranch pipeline** for branch-based builds<br>- **Ignore Git Committer** strategy to prevent infinite webhook loops<br>- Discord integration for real-time build notifications<br>- GitHub access token integration for secure API access |
+| **Ngrok** | Local development webhook tunneling | - **Development tunnel** for GitHub webhook forwarding<br>- Enables GitHub webhooks to reach local Jenkins instance<br>- Simplifies local development and testing of CI/CD workflows |
 
 ### GitOps & Deployment
 | Tool | Purpose | Configuration |
