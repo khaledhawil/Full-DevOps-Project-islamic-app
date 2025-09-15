@@ -375,37 +375,33 @@ pipeline {
         }
         
         always {
-            node {
+            script {
                 // Clean up Docker images to save space
-                script {
-                    try {
-                        sh """
-                            docker system prune -f
-                            docker image prune -f
-                        """
-                    } catch (Exception e) {
-                        echo "⚠️ Docker cleanup failed: ${e.message}"
-                    }
+                try {
+                    sh """
+                        docker system prune -f
+                        docker image prune -f
+                    """
+                } catch (Exception e) {
+                    echo "⚠️ Docker cleanup failed: ${e.message}"
                 }
+                
                 // Archive artifacts
-                script {
-                    try {
-                        archiveArtifacts artifacts: 'security-reports/*.json', allowEmptyArchive: true
-                    } catch (Exception e) {
-                        echo "⚠️ Archive artifacts failed: ${e.message}"
-                    }
+                try {
+                    archiveArtifacts artifacts: 'security-reports/*.json', allowEmptyArchive: true
+                } catch (Exception e) {
+                    echo "⚠️ Archive artifacts failed: ${e.message}"
                 }
+                
                 // Fallback for HTML report publishing
-                script {
-                    try {
-                        if (fileExists('security-reports')) {
-                            echo "Security scan HTML reports are available in the security-reports directory."
-                        } else {
-                            echo "No security scan HTML reports found."
-                        }
-                    } catch (Exception e) {
-                        echo "⚠️ File check failed: ${e.message}"
+                try {
+                    if (fileExists('security-reports')) {
+                        echo "Security scan HTML reports are available in the security-reports directory."
+                    } else {
+                        echo "No security scan HTML reports found."
                     }
+                } catch (Exception e) {
+                    echo "⚠️ File check failed: ${e.message}"
                 }
             }
         }
