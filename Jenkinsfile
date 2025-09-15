@@ -12,13 +12,13 @@ pipeline {
     }
     
     environment {
-        DOCKER_REGISTRY = 'khaledh139857awil'
+        DOCKER_REGISTRY = 'khaledhawil'
         PROJECT_NAME = 'islamic-app'
         FRONTEND_IMAGE = "${DOCKER_REGISTRY}/${PROJECT_NAME}_frontend"
         BACKEND_IMAGE = "${DOCKER_REGISTRY}/${PROJECT_NAME}_backend"
         SLACK_CHANNEL = '#islamic-app-ci'
         SLACK_CREDENTIAL_ID = 'slack'
-        DOCKER_CREDENTIALS = credentials('dockerhub')
+        DOCKER_CREDENTIALS = credentials('docker-hub')
         GIT_CREDENTIALS = credentials('github')
         TRIVY_VERSION = '0.48.0'
         SONAR_HOST_URL = 'http://sonarqube:9000'
@@ -387,25 +387,37 @@ sonar.test.inclusions=**/*test*/**,**/*spec*/**
         }
         
         always {
-            // Clean up Docker images to save space
-            script {
-                try {
-                    sh """
-                        docker system prune -f
-                        docker image prune -f
-                    """
-                } catch (Exception e) {
-                    echo "⚠️ Docker cleanup failed: ${e.message}"
+            node {
+                // Clean up Docker images to save space
+                script {
+                    try {
+                        sh """
+                            docker system prune -f
+                            docker image prune -f
+                        """
+                    } catch (Exception e) {
+                        echo "⚠️ Docker cleanup failed: ${e.message}"
+                    }
                 }
-            }
-            // Archive artifacts
-            archiveArtifacts artifacts: 'security-reports/*.json', allowEmptyArchive: true
-            // Fallback for HTML report publishing
-            script {
-                if (fileExists('security-reports')) {
-                    echo "Security scan HTML reports are available in the security-reports directory."
-                } else {
-                    echo "No security scan HTML reports found."
+                // Archive artifacts
+                script {
+                    try {
+                        archiveArtifacts artifacts: 'security-reports/*.json', allowEmptyArchive: true
+                    } catch (Exception e) {
+                        echo "⚠️ Archive artifacts failed: ${e.message}"
+                    }
+                }
+                // Fallback for HTML report publishing
+                script {
+                    try {
+                        if (fileExists('security-reports')) {
+                            echo "Security scan HTML reports are available in the security-reports directory."
+                        } else {
+                            echo "No security scan HTML reports found."
+                        }
+                    } catch (Exception e) {
+                        echo "⚠️ File check failed: ${e.message}"
+                    }
                 }
             }
         }
