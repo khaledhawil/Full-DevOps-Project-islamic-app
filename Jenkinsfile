@@ -20,8 +20,7 @@ pipeline {
         SLACK_CREDENTIAL_ID = 'slack'
         DOCKER_CREDENTIALS = credentials('docker-hub')
         GIT_CREDENTIALS = credentials('github')
-        TRIVY_VERSION = '0.48.0'
-        SONAR_HOST_URL = 'http://localhost:9000'
+        SONAR_HOST_URL = 'http://sonarqube:9000'
     }
     
     parameters {
@@ -29,6 +28,11 @@ pipeline {
             name: 'BUILD_TYPE',
             choices: ['auto', 'frontend-only', 'backend-only', 'both'],
             description: 'Choose build type (auto will detect changes)'
+        )
+        booleanParam(
+            name: 'FORCE_BUILD',
+            defaultValue: false,
+            description: 'Force build even if no changes detected'
         )
         booleanParam(
             name: 'SKIP_SECURITY_SCAN',
@@ -66,7 +70,7 @@ pipeline {
         
         stage('Detect Changes') {
             when {
-                expression { params.BUILD_TYPE == 'auto' }
+                not { params.FORCE_BUILD }
             }
             steps {
                 script {
@@ -79,10 +83,28 @@ pipeline {
                     echo "Backend changes: ${env.BUILD_BACKEND}"
                     
                     if (!changes.frontend && !changes.backend) {
-                        echo "⚠️ No significant changes detected. Skipping build."
-                        sendSlackNotification("⚠️ **No Changes**", "No significant changes detected in this commit.", "warning")
-                        currentBuild.result = 'SUCCESS'
-                        return
+                        echo "✅ No application code changes detected. Skipping builds."
+                        sendSlackNotification("✅ **No Changes - Build Skipped**", 
+                            "No frontend or backend changes detected in this commit. Pipeline completed without building.", 
+                            "good")
+                        
+                        // Set flags to skip all build stages
+                        env.BUILD_FRONTEND = 'false'
+                        env.BUILD_BACKEND = 'false'
+                        env.SKIP_BUILD = 'true'
+                        
+                        echo "🎯 Pipeline will skip build stages and proceed to cleanup"
+                    } else {
+                        env.SKIP_BUILD = 'false'
+                        
+                        // Send notification about what will be built
+                        def buildMessage = []
+                        if (changes.frontend) buildMessage.add("Frontend")
+                        if (changes.backend) buildMessage.add("Backend")
+                        
+                        sendSlackNotification("🔄 **Starting Build**", 
+                            "Changes detected. Building: ${buildMessage.join(' and ')}", 
+                            "good")
                     }
                 }
             }
@@ -125,8 +147,7 @@ pipeline {
                             sonar.projectKey=islamic-app
                             sonar.projectName=Islamic App
                             sonar.projectVersion=1.0
-                            sonar.host.url=http://localhost:9000
-                            sonar.login=${SONAR_TOKEN}
+                            sonar.host.url=http://sonarqube:9000
 
                             # Source directories
                             sonar.sources=frontend/src,backend
@@ -141,45 +162,26 @@ pipeline {
                             sonar.test.inclusions=**/*test*/**,**/*spec*/**
                             '''
                         
-                        // Run SonarQube analysis with Docker container
-                        withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_TOKEN')]) {
+                        // Run SonarQube analysis with local sonar-scanner
+                        withCredentials([string(credentialId: 'sonarqube', variable: 'SONAR_TOKEN')]) {
                             sh '''
-                                echo "Running SonarQube analysis with Docker container..."
+                                echo "🔍 Running SonarQube analysis with local scanner..."
                                 
-                                # Check if we can reach SonarQube container
-                                # Check SonarQube accessibility - try multiple endpoints
+                                # Check SonarQube server accessibility
                                 if curl -f ${SONAR_HOST_URL}/api/system/status >/dev/null 2>&1; then
                                     echo "✅ SonarQube server is accessible at ${SONAR_HOST_URL}"
-                                elif curl -f http://host.docker.internal:9000/api/system/status >/dev/null 2>&1; then
-                                    echo "✅ SonarQube server found at host.docker.internal:9000"
-                                    SONAR_HOST_URL="http://host.docker.internal:9000"
                                 else
-                                    echo "⚠️ SonarQube server not accessible"
-                                    echo "Trying to connect to SonarQube container directly..."
+                                    echo "⚠️ SonarQube server not accessible at ${SONAR_HOST_URL}"
+                                    echo "Please ensure SonarQube container is running"
+                                    exit 1
                                 fi
                                 
-                                # Use Docker to run sonar-scanner if not installed locally
-                                if command -v sonar-scanner >/dev/null 2>&1; then
-                                    echo "Using local sonar-scanner..."
-                                    sonar-scanner -Dsonar.projectBaseDir=. -Dsonar.host.url=${SONAR_HOST_URL} -Dsonar.login=${SONAR_TOKEN}
-                                else
-                                    echo "Using Docker sonar-scanner..."
-                                    # Try with host network first, then bridge network
-                                    docker run --rm \
-                                        --network host \
-                                        -v $(pwd):/usr/src \
-                                        -e SONAR_HOST_URL=${SONAR_HOST_URL} \
-                                        -e SONAR_LOGIN=${SONAR_TOKEN} \
-                                        sonarsource/sonar-scanner-cli:latest \
-                                        -Dsonar.projectBaseDir=/usr/src || \
-                                    docker run --rm \
-                                        --add-host=host.docker.internal:host-gateway \
-                                        -v $(pwd):/usr/src \
-                                        -e SONAR_HOST_URL=http://host.docker.internal:9000 \
-                                        -e SONAR_LOGIN=${SONAR_TOKEN} \
-                                        sonarsource/sonar-scanner-cli:latest \
-                                        -Dsonar.projectBaseDir=/usr/src
-                                fi
+                                # Use local sonar-scanner installation
+                                echo "Using local sonar-scanner..."
+                                sonar-scanner 
+                                    -Dsonar.projectBaseDir=. 
+                                    -Dsonar.host.url=${SONAR_HOST_URL} 
+                                    -Dsonar.login=${SONAR_TOKEN}
                             '''
                         }
                         
@@ -285,7 +287,14 @@ pipeline {
         
         stage('Security Scan') {
             when {
-                expression { !params.SKIP_SECURITY_SCAN }
+                allOf {
+                    not { params.SKIP_SECURITY_SCAN }
+                    expression { env.SKIP_BUILD != 'true' }
+                    anyOf {
+                        expression { env.BUILD_FRONTEND == 'true' }
+                        expression { env.BUILD_BACKEND == 'true' }
+                    }
+                }
             }
             parallel {
                 stage('Scan Frontend') {
@@ -341,6 +350,15 @@ pipeline {
         }
         
         stage('Push Images') {
+            when {
+                allOf {
+                    expression { env.SKIP_BUILD != 'true' }
+                    anyOf {
+                        expression { env.BUILD_FRONTEND == 'true' }
+                        expression { env.BUILD_BACKEND == 'true' }
+                    }
+                }
+            }
             parallel {
                 stage('Push Frontend') {
                     when {
@@ -373,7 +391,14 @@ pipeline {
         
         stage('Update K8s Manifests') {
             when {
-                expression { !params.SKIP_DEPLOY }
+                allOf {
+                    not { params.SKIP_DEPLOY }
+                    expression { env.SKIP_BUILD != 'true' }
+                    anyOf {
+                        expression { env.BUILD_FRONTEND == 'true' }
+                        expression { env.BUILD_BACKEND == 'true' }
+                    }
+                }
             }
             steps {
                 script {
@@ -534,15 +559,44 @@ def detectChanges() {
             echo "📁 Recent changed files: ${changedFiles.join(', ')}"
             
             changedFiles.each { file ->
-                if (file.startsWith('frontend/') || file.contains('frontend') || file.startsWith('k8s/05-frontend.yaml')) {
+                // Frontend-related files
+                if (file.startsWith('frontend/') || 
+                    file.contains('frontend') || 
+                    file.startsWith('k8s/05-frontend.yaml') ||
+                    file.contains('package.json') ||
+                    file.contains('tsconfig.json') ||
+                    file.contains('nginx.conf') ||
+                    file.endsWith('.tsx') ||
+                    file.endsWith('.ts') ||
+                    file.endsWith('.css') ||
+                    file.endsWith('.scss') ||
+                    file.endsWith('.js') ||
+                    file.endsWith('.jsx')) {
                     changes.frontend = true
                 }
-                if (file.startsWith('backend/') || file.contains('backend') || file.startsWith('k8s/04-backend.yaml')) {
+                
+                // Backend-related files
+                if (file.startsWith('backend/') || 
+                    file.contains('backend') || 
+                    file.startsWith('k8s/04-backend.yaml') ||
+                    file.contains('requirements.txt') ||
+                    file.contains('app.py') ||
+                    file.contains('database.py') ||
+                    file.endsWith('.py') ||
+                    file.startsWith('database/')) {
                     changes.backend = true
                 }
-                // Jenkinsfile changes should trigger both builds for testing
-                if (file == 'Jenkinsfile' || file.contains('Jenkinsfile')) {
-                    echo "🔧 Jenkinsfile changed, triggering both builds for testing"
+                
+                // Infrastructure changes that affect both
+                if (file == 'Jenkinsfile' || 
+                    file.contains('Jenkinsfile') ||
+                    file.startsWith('k8s/') ||
+                    file.startsWith('helm/') ||
+                    file.startsWith('terraform/') ||
+                    file.startsWith('ansible/') ||
+                    file.contains('docker-compose') ||
+                    file.endsWith('Dockerfile')) {
+                    echo "🔧 Infrastructure file changed: ${file}, triggering both builds for testing"
                     changes.frontend = true
                     changes.backend = true
                 }
@@ -557,15 +611,44 @@ def detectChanges() {
             echo "📁 Changed files since last build: ${changedFiles.join(', ')}"
             
             changedFiles.each { file ->
-                if (file.startsWith('frontend/') || file.contains('frontend') || file.startsWith('k8s/05-frontend.yaml')) {
+                // Frontend-related files
+                if (file.startsWith('frontend/') || 
+                    file.contains('frontend') || 
+                    file.startsWith('k8s/05-frontend.yaml') ||
+                    file.contains('package.json') ||
+                    file.contains('tsconfig.json') ||
+                    file.contains('nginx.conf') ||
+                    file.endsWith('.tsx') ||
+                    file.endsWith('.ts') ||
+                    file.endsWith('.css') ||
+                    file.endsWith('.scss') ||
+                    file.endsWith('.js') ||
+                    file.endsWith('.jsx')) {
                     changes.frontend = true
                 }
-                if (file.startsWith('backend/') || file.contains('backend') || file.startsWith('k8s/04-backend.yaml')) {
+                
+                // Backend-related files
+                if (file.startsWith('backend/') || 
+                    file.contains('backend') || 
+                    file.startsWith('k8s/04-backend.yaml') ||
+                    file.contains('requirements.txt') ||
+                    file.contains('app.py') ||
+                    file.contains('database.py') ||
+                    file.endsWith('.py') ||
+                    file.startsWith('database/')) {
                     changes.backend = true
                 }
-                // Jenkinsfile changes should trigger both builds for testing
-                if (file == 'Jenkinsfile' || file.contains('Jenkinsfile')) {
-                    echo "🔧 Jenkinsfile changed, triggering both builds for testing"
+                
+                // Infrastructure changes that affect both
+                if (file == 'Jenkinsfile' || 
+                    file.contains('Jenkinsfile') ||
+                    file.startsWith('k8s/') ||
+                    file.startsWith('helm/') ||
+                    file.startsWith('terraform/') ||
+                    file.startsWith('ansible/') ||
+                    file.contains('docker-compose') ||
+                    file.endsWith('Dockerfile')) {
+                    echo "🔧 Infrastructure file changed: ${file}, triggering both builds for testing"
                     changes.frontend = true
                     changes.backend = true
                 }
@@ -584,16 +667,9 @@ def scanImage(imageName, component) {
     try {
         echo "🔍 Scanning ${component} image: ${imageName}"
         
-        // Install Trivy if not exists
+        // Use local Trivy installation
         sh """
-            if ! command -v trivy &> /dev/null && ! test -f ./bin/trivy; then
-                echo "Installing Trivy..."
-                mkdir -p ./bin
-                wget -O - https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b ./bin v${TRIVY_VERSION}
-                export PATH=\$PWD/bin:\$PATH
-            elif test -f ./bin/trivy; then
-                export PATH=\$PWD/bin:\$PATH
-            fi
+            echo "Using local Trivy installation..."
         """
         
         // Create reports directory
