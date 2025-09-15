@@ -70,7 +70,7 @@ pipeline {
         
         stage('Detect Changes') {
             when {
-                not { params.FORCE_BUILD }
+                expression { !params.FORCE_BUILD }
             }
             steps {
                 script {
@@ -288,7 +288,7 @@ pipeline {
         stage('Security Scan') {
             when {
                 allOf {
-                    not { params.SKIP_SECURITY_SCAN }
+                    expression { !params.SKIP_SECURITY_SCAN }
                     expression { env.SKIP_BUILD != 'true' }
                     anyOf {
                         expression { env.BUILD_FRONTEND == 'true' }
@@ -392,7 +392,7 @@ pipeline {
         stage('Update K8s Manifests') {
             when {
                 allOf {
-                    not { params.SKIP_DEPLOY }
+                    expression { !params.SKIP_DEPLOY }
                     expression { env.SKIP_BUILD != 'true' }
                     anyOf {
                         expression { env.BUILD_FRONTEND == 'true' }
