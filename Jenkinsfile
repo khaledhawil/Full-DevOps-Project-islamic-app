@@ -16,11 +16,12 @@ pipeline {
         PROJECT_NAME = 'islamic-app'
         FRONTEND_IMAGE = "${DOCKER_REGISTRY}/${PROJECT_NAME}_frontend"
         BACKEND_IMAGE = "${DOCKER_REGISTRY}/${PROJECT_NAME}_backend"
-        DISCORD_WEBHOOK = credentials('discord')
+        SLACK_CHANNEL = '#islamic-app-ci'
+        SLACK_CREDENTIAL_ID = 'slack'
         DOCKER_CREDENTIALS = credentials('dockerhub')
         GIT_CREDENTIALS = credentials('github')
         TRIVY_VERSION = '0.48.0'
-        SONAR_HOST_URL = 'http://localhost:9000'
+        SONAR_HOST_URL = 'http://sonarqube:9000'
     }
     
     parameters {
@@ -58,7 +59,7 @@ pipeline {
                     env.BUILD_TAG = "${env.BUILD_NUMBER}-${env.GIT_COMMIT_SHORT}"
                     
                     // Send build start notification
-                    sendDiscordNotification("🚀 **Build Started**", "Build #${env.BUILD_NUMBER} started for commit `${env.GIT_COMMIT_SHORT}`", "info")
+                    sendSlackNotification("🚀 **Build Started**", "Build #${env.BUILD_NUMBER} started for commit `${env.GIT_COMMIT_SHORT}`", "good")
                 }
             }
         }
@@ -79,7 +80,7 @@ pipeline {
                     
                     if (!changes.frontend && !changes.backend) {
                         echo "⚠️ No significant changes detected. Skipping build."
-                        sendDiscordNotification("⚠️ **No Changes**", "No significant changes detected in this commit.", "warning")
+                        sendSlackNotification("⚠️ **No Changes**", "No significant changes detected in this commit.", "warning")
                         currentBuild.result = 'SUCCESS'
                         return
                     }
@@ -153,7 +154,7 @@ sonar.test.inclusions=**/*test*/**,**/*spec*/**
 '''
                         
                         // Run SonarQube analysis
-                        withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONAR_TOKEN')]) {
+                        withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_TOKEN')]) {
                             sh '''
                                 echo "Running SonarQube analysis..."
                                 sonar-scanner -Dsonar.projectBaseDir=. || true
@@ -165,7 +166,7 @@ sonar.test.inclusions=**/*test*/**,**/*spec*/**
                             def qg = waitForQualityGate()
                             if (qg.status != 'OK') {
                                 echo "⚠️ SonarQube Quality Gate: ${qg.status}"
-                                sendDiscordNotification(
+                                sendSlackNotification(
                                     "⚠️ **Code Quality Warning**", 
                                     "SonarQube Quality Gate status: ${qg.status}\\nCheck: ${env.SONAR_HOST_URL}/dashboard?id=islamic-app", 
                                     "warning"
@@ -173,17 +174,17 @@ sonar.test.inclusions=**/*test*/**,**/*spec*/**
                                 // Don't fail the build, just warn
                             } else {
                                 echo "✅ SonarQube Quality Gate: PASSED"
-                                sendDiscordNotification(
+                                sendSlackNotification(
                                     "✅ **Code Quality Check Passed**", 
                                     "SonarQube analysis completed successfully\\nView report: ${env.SONAR_HOST_URL}/dashboard?id=islamic-app", 
-                                    "success"
+                                    "good"
                                 )
                             }
                         }
                         
                     } catch (Exception e) {
                         echo "⚠️ SonarQube analysis failed: ${e.message}"
-                        sendDiscordNotification(
+                        sendSlackNotification(
                             "⚠️ **SonarQube Analysis Failed**", 
                             "Code quality analysis failed but build will continue: ${e.message}", 
                             "warning"
@@ -209,7 +210,7 @@ sonar.test.inclusions=**/*test*/**,**/*spec*/**
                             echo "✅ Frontend build completed: ${env.FRONTEND_IMAGE}:${env.BUILD_TAG}"
                         }
                     } catch (Exception e) {
-                        sendDiscordNotification("❌ **Frontend Build Failed**", "Frontend build failed: ${e.message}", "error")
+                        sendSlackNotification("❌ **Frontend Build Failed**", "Frontend build failed: ${e.message}", "danger")
                         throw e
                     }
                 }
@@ -231,7 +232,7 @@ sonar.test.inclusions=**/*test*/**,**/*spec*/**
                             echo "✅ Backend build completed: ${env.BACKEND_IMAGE}:${env.BUILD_TAG}"
                         }
                     } catch (Exception e) {
-                        sendDiscordNotification("❌ **Backend Build Failed**", "Backend build failed: ${e.message}", "error")
+                        sendSlackNotification("❌ **Backend Build Failed**", "Backend build failed: ${e.message}", "danger")
                         throw e
                     }
                 }
@@ -280,7 +281,7 @@ sonar.test.inclusions=**/*test*/**,**/*spec*/**
                         
                         message += "\n📊 [View Security Reports](${env.BUILD_URL}artifact/security-reports/)"
                         
-                        sendDiscordNotification("🛡️ **Security Scan Completed**", message, "info")
+                        sendSlackNotification("🛡️ **Security Scan Completed**", message, "good")
                     }
                 }
                 failure {
@@ -289,7 +290,7 @@ sonar.test.inclusions=**/*test*/**,**/*spec*/**
                         message += "One or more security scans failed.\n\n"
                         message += "🔗 [View Build Logs](${env.BUILD_URL}console)"
                         
-                        sendDiscordNotification("🚨 **Security Scan Failed**", message, "error")
+                        sendSlackNotification("🚨 **Security Scan Failed**", message, "danger")
                     }
                 }
             }
@@ -349,7 +350,7 @@ sonar.test.inclusions=**/*test*/**,**/*spec*/**
                         
                         echo "✅ Kubernetes manifests updated and pushed"
                     } catch (Exception e) {
-                        sendDiscordNotification("❌ **K8s Update Failed**", "Failed to update Kubernetes manifests: ${e.message}", "error")
+                        sendSlackNotification("❌ **K8s Update Failed**", "Failed to update Kubernetes manifests: ${e.message}", "danger")
                         throw e
                     }
                 }
@@ -371,7 +372,7 @@ sonar.test.inclusions=**/*test*/**,**/*spec*/**
                 
                 message += "\n🔗 [View Build](${env.BUILD_URL})"
                 
-                sendDiscordNotification("✅ **Build Successful**", message, "success")
+                sendSlackNotification("✅ **Build Successful**", message, "good")
             }
         }
         
@@ -381,7 +382,7 @@ sonar.test.inclusions=**/*test*/**,**/*spec*/**
                 message += "Build #${env.BUILD_NUMBER} failed at stage: ${env.STAGE_NAME}\n\n"
                 message += "🔗 [View Build Logs](${env.BUILD_URL}console)"
                 
-                sendDiscordNotification("❌ **Build Failed**", message, "error")
+                sendSlackNotification("❌ **Build Failed**", message, "danger")
             }
         }
         
@@ -523,23 +524,23 @@ def scanImage(imageName, component) {
         
         if (criticalVulns > 0) {
             echo "⚠️ Found ${criticalVulns} HIGH/CRITICAL vulnerabilities in ${component}"
-            sendDiscordNotification(
+            sendSlackNotification(
                 "⚠️ **Security Alert**", 
                 "Found ${criticalVulns} HIGH/CRITICAL vulnerabilities in ${component} image", 
                 "warning"
             )
         } else {
             echo "✅ No HIGH/CRITICAL vulnerabilities found in ${component}"
-            sendDiscordNotification(
+            sendSlackNotification(
                 "✅ **Scan Clean**", 
                 "${component} image scan completed - No HIGH/CRITICAL vulnerabilities found", 
-                "success"
+                "good"
             )
         }
         
     } catch (Exception e) {
         echo "⚠️ Security scan failed for ${component}: ${e.message}"
-        sendDiscordNotification(
+        sendSlackNotification(
             "⚠️ **Scan Failed**", 
             "Security scan failed for ${component}: ${e.message}", 
             "warning"
@@ -563,27 +564,22 @@ def updateK8sManifests() {
     }
 }
 
-def sendDiscordNotification(title, message, type = "info") {
-    // Use discordSend step if available
+def sendSlackNotification(title, message, color = "good") {
     try {
-        discordSend(
-            webhookURL: env.DISCORD_WEBHOOK,
-            title: title,
-            description: message,
-            footer: "Jenkins CI/CD Pipeline"
+        slackSend(
+            channel: env.SLACK_CHANNEL,
+            color: color,
+            message: ":jenkins: *${title}*\n" +
+                     "*Job:* ${JOB_NAME}\n" +
+                     "*Build:* #${BUILD_NUMBER}\n" +
+                     "*Branch:* ${env.BRANCH_NAME ?: 'master'}\n" +
+                     "*Message:* ${message}\n" +
+                     "*Build URL:* ${BUILD_URL}",
+            tokenCredentialId: env.SLACK_CREDENTIAL_ID
         )
     } catch (Exception e) {
-        echo "⚠️ Failed to send Discord notification: ${e.message}"
-        // Fallback: try simple curl command
-        try {
-            def simpleMessage = "${title}: ${message}"
-            sh """
-                curl -X POST -H "Content-Type: application/json" \\
-                     -d '{"content": "${simpleMessage.replaceAll('"', '\\\\"')}"}' \\
-                     "${env.DISCORD_WEBHOOK}" || echo "Curl fallback also failed"
-            """
-        } catch (Exception fallbackError) {
-            echo "⚠️ Discord notification fallback also failed: ${fallbackError.message}"
-        }
+        echo "⚠️ Failed to send Slack notification: ${e.message}"
+        // Fallback: log to console
+        echo "Slack notification would have been: ${title} - ${message}"
     }
 }
