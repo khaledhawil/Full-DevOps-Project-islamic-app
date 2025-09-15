@@ -119,39 +119,27 @@ pipeline {
                     try {
                         echo "🔍 Running SonarQube Code Analysis..."
                         
-                        // Install SonarQube Scanner if not exists
-                        sh '''
-                            if [ ! -f /usr/local/bin/sonar-scanner ]; then
-                                echo "Installing SonarQube Scanner..."
-                                wget -q https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.8.0.2856-linux.zip
-                                unzip -q sonar-scanner-cli-4.8.0.2856-linux.zip
-                                sudo mv sonar-scanner-4.8.0.2856-linux /opt/sonar-scanner
-                                sudo ln -sf /opt/sonar-scanner/bin/sonar-scanner /usr/local/bin/sonar-scanner
-                                rm -f sonar-scanner-cli-4.8.0.2856-linux.zip
-                            fi
-                        '''
-                        
                         // Create sonar-project.properties if not exists
-                        writeFile file: 'sonar-project.properties', text: '''
-# SonarQube project configuration for Islamic App
-sonar.projectKey=islamic-app
-sonar.projectName=Islamic App
-sonar.projectVersion=1.0
-sonar.host.url=http://localhost:9000
-sonar.login=${SONAR_TOKEN}
+                                                    writeFile file: 'sonar-project.properties', text: '''
+                            # SonarQube project configuration for Islamic App
+                            sonar.projectKey=islamic-app
+                            sonar.projectName=Islamic App
+                            sonar.projectVersion=1.0
+                            sonar.host.url=http://localhost:9000
+                            sonar.login=${SONAR_TOKEN}
 
-# Source directories
-sonar.sources=frontend/src,backend
-sonar.exclusions=**/*test*/**,**/*node_modules*/**,**/*build*/**,**/*dist*/**
+                            # Source directories
+                            sonar.sources=frontend/src,backend
+                            sonar.exclusions=**/*test*/**,**/*node_modules*/**,**/*build*/**,**/*dist*/**
 
-# Language specific settings
-sonar.javascript.lcov.reportPaths=frontend/coverage/lcov.info
-sonar.python.coverage.reportPaths=backend/coverage.xml
+                            # Language specific settings
+                            sonar.javascript.lcov.reportPaths=frontend/coverage/lcov.info
+                            sonar.python.coverage.reportPaths=backend/coverage.xml
 
-# Test directories
-sonar.tests=frontend/src,backend/tests
-sonar.test.inclusions=**/*test*/**,**/*spec*/**
-'''
+                            # Test directories
+                            sonar.tests=frontend/src,backend/tests
+                            sonar.test.inclusions=**/*test*/**,**/*spec*/**
+                            '''
                         
                         // Run SonarQube analysis
                         withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_TOKEN')]) {
